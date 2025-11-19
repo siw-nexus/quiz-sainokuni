@@ -190,6 +190,51 @@ def gourmet_data_insert(endpoint, db):
         db.rollback() # エラー時はロールバック
 
 
+# 問題文のデータをINSERTする関数
+def question_data_insert(db):
+    # 観光地の問題文のINSERT
+    try:
+        new_questions = [
+            Questions(
+                spot_type = 'tourist',
+                spot_id = i,
+                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
+            )
+            for i in range(1, 101)
+        ]
+        
+        db.add_all(new_questions)
+        
+        # トランザクションを確定
+        db.commit() 
+        
+        print('観光地の問題文のinsert/check完了')
+    except Exception as e:
+        print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
+        db.rollback() # エラー時はロールバック
+    
+    # グルメの問題文のINSERT
+    try:
+        new_questions = [
+            Questions(
+                spot_type = 'gourmet',
+                spot_id = i,
+                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
+            )
+            for i in range(101, 201)
+        ]
+        
+        db.add_all(new_questions)
+        
+        # トランザクションを確定
+        db.commit()
+        
+        print('グルメの問題文のinsert/check完了')
+    except Exception as e:
+        print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
+        db.rollback() # エラー時はロールバック
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -208,6 +253,12 @@ def seed_data():
         print('すでにデータがあるので初期データの投入をスキップ')
     else:
         gourmet_data_insert(endpoint, db)
+        
+    # questionsテーブルにデータがあるかチェック
+    if db.query(Questions).first():
+        print('すでにデータがあるので初期データの投入をスキップ')
+    else:
+        question_data_insert(db)
 
 
     db.close()
