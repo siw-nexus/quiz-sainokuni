@@ -110,6 +110,86 @@ def tourist_data_insert(endpoint, db):
         db.rollback() # エラー時はロールバック
 
 
+# グルメのデータをINSERTする関数
+def gourmet_data_insert(endpoint, db):
+    # グルメのSPARQLクエリ
+    sparql_gourmet = """
+        PREFIX ic: <https://imi.go.jp/ns/core/rdf#>
+        PREFIX pd3110: <https://imi.go.jp/pd/pd3110/>
+        PREFIX pd3114: <https://imi.go.jp/pd/pd3114/>
+        PREFIX xsd: <https://www.w3.org/2001/XMLSchema#>
+        PREFIX schema: <https://schema.org/>
+
+        select distinct ?dantai_code ?dantaimei ?shikibetsujoho
+        ?tempo_meisho ?gaiyo
+        ?tempo_jusho ?tempo_ido ?tempo_keido
+        ?kubun ?tokusanhin ?category
+        ?kaishijikan ?shuryojikan ?nichijibiko
+        ?hp ?tempo_jiyukijutsuran
+        ?tempo_gazo ?tempo_gazo_license ?tempo_gazo_text
+        where {
+        graph<https://opendata.pref.saitama.lg.jp/graph/05_gurume>
+        { ?KEY pd3110:団体コード ?dantai_code;
+        pd3110:団体名 ?dantaimei;
+        pd3110:識別情報 ?shikibetsujoho;
+        ic:名称/ic:表記 ?tempo_meisho;
+        ic:概要 ?gaiyo;
+        ic:住所/ic:表記 ?tempo_jusho;
+        ic:地理座標/ic:緯度 ?tempo_ido;
+        ic:地理座標/ic:経度 ?tempo_keido;
+        pd3114:グルメ情報区分 ?kubun;
+        pd3114:特産品 ?tokusanhin;
+        ic:種別 ?category;
+        ic:利用可能時間/ic:開始時間 ?kaishijikan;
+        ic:利用可能時間/ic:終了時間 ?shuryojikan;
+        ic:利用可能時間/ic:説明 ?nichijibiko;
+        ic:参照/ic:参照先 ?hp;
+        ic:備考 ?tempo_jiyukijutsuran;
+        schema:image/schema:contentUrl ?tempo_gazo;
+        schema:image/schema:license ?tempo_gazo_license;
+        schema:image/schema:text ?tempo_gazo_text
+        .}} order by ?dantai_code xsd:int(?shikibetsujoho) LIMIT 100
+        """
+
+    params = {
+            "query": sparql_gourmet,
+            "format": "json"
+        }
+    
+    try:
+        # グルメデータの取得
+        print('グルメのオープンデータ取得中...')
+        gourmet_res = requests.get(endpoint, params = params)
+        gourmet_res.encoding = 'utf-8'
+        gourmet_data = gourmet_res.json()["results"]["bindings"]
+        print(f'グルメのオープンデータ取得成功 ({len(gourmet_data)} 件)')
+        
+        for item in gourmet_data:
+            new_gourmet = Gourmet_spots(
+                name = item["tempo_meisho"]["value"],
+                detail = item["gaiyo"]["value"],
+                address = item["tempo_jusho"]["value"],
+                lat = item["tempo_ido"]["value"],
+                lon = item["tempo_keido"]["value"],
+                category = item["kubun"]["value"],
+                tokusanhin = item["tokusanhin"]["value"],
+                start_time = item["kaishijikan"]["value"],
+                finish_time = item["shuryojikan"]["value"],
+                notes = item["nichijibiko"]["value"],
+                hp_url = item["hp"]["value"],
+                img = item["tempo_gazo"]["value"]
+            )
+            db.add(new_gourmet)
+            
+            # トランザクションを確定
+            db.commit()
+            
+            print('グルメのinsert/check完了')
+    except Exception as e:
+        print(f"グルメのデータをINSERT中にエラーが発生しました: {e}")
+        db.rollback() # エラー時はロールバック
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -122,6 +202,12 @@ def seed_data():
         print('すでにデータがあるので初期データの投入をスキップ')
     else:
         tourist_data_insert(endpoint, db)
+        
+    # gourmet_spotsテーブルにデータがあるかチェック
+    if db.query(Gourmet_spots).first():
+        print('すでにデータがあるので初期データの投入をスキップ')
+    else:
+        gourmet_data_insert(endpoint, db)
 
 
     db.close()
