@@ -101,10 +101,10 @@ def tourist_data_insert(endpoint, db):
             )
             db.add(new_spot)
             
-            # トランザクションを確定
-            db.commit()
-            
-            print('観光地のinsert/check完了')
+        # トランザクションを確定
+        db.commit()
+        
+        print('観光地のinsert/check完了')
     except Exception as e:
         print(f"観光地のデータをINSERT中にエラーが発生しました: {e}")
         db.rollback() # エラー時はロールバック
@@ -181,10 +181,10 @@ def gourmet_data_insert(endpoint, db):
             )
             db.add(new_gourmet)
             
-            # トランザクションを確定
-            db.commit()
-            
-            print('グルメのinsert/check完了')
+        # トランザクションを確定
+        db.commit()
+        
+        print('グルメのinsert/check完了')
     except Exception as e:
         print(f"グルメのデータをINSERT中にエラーが発生しました: {e}")
         db.rollback() # エラー時はロールバック
