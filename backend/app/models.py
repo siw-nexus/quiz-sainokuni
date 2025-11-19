@@ -47,3 +47,15 @@ class Gourmet_spots(Base):
     img = Column(Text, comment = '画像')
     create_at = Column(DATETIME, server_default=func.now())
     update_at = Column(DATETIME, server_default=func.now(), onupdate=func.now())
+
+
+# questionsテーブルのモデル
+class Questions(Base):
+    __tablename__ = 'questions'
+    
+    id = Column(Integer, primary_key = True)
+    spot_type = Column(String(100), nullable = False)
+    spot_id = Column(Integer, nullable = False)
+    question_text = Column(Text, nullable = False)
+    create_at = Column(DATETIME, server_default=func.now())
+    update_at = Column(DATETIME, server_default=func.now(), onupdate=func.now())
