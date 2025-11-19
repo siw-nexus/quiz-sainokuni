@@ -1,4 +1,8 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
-mysqlclient
+pymysql
+cryptography
+alembic
+greenlet
+requests
