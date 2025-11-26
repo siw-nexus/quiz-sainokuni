@@ -9,3 +9,12 @@ class QestionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# 選択肢のレスポンスの型の定義
+class OptionResponse(BaseModel):
+    option_text: str
+    is_correct: int
+
+    class Config:
+        from_attributes = True
