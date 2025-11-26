@@ -1,21 +1,14 @@
-import os
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 
 # モデルをインポート
 from app.models import Questions
 
+# データベース接続設定をインポート
+from app.database import db_connect
 
-# .envからDATABASE_URLを取得
-DATABASE_URL = os.environ['DATABASE_URL']
 
-# データベース接続設定
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"charset": "utf8mb4"}
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# セッションの作成
+SessionLocal = db_connect()
 
 
 # 問題文を取得する関数
