@@ -59,8 +59,24 @@ def get_options(spot_type: str, spot_id: int):
             # 結果を返す
             return db.execute(option_union).all()
         
-        # elif spot_type == 'gourmet':
-        #     return
-        
-        else:
-            return []
+        elif spot_type == 'gourmet':
+            # グルメの選択肢を取得
+            # 正解を取得
+            option_correct = (
+                select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(1).label('is_correct'))
+                .where(spot_id == Gourmet_spots.id)
+            )
+            
+            # 不正解の選択肢を3件取得
+            option_incorrect = (
+                select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(0).label('is_correct'))
+                .where(spot_id != Gourmet_spots.id)
+                .order_by(func.random())
+                .limit(3)
+            )
+            
+            # 正解と不正解のsqlをunion_allで繋げる
+            option_union = union_all(option_correct, option_incorrect)
+            
+            # 結果を返す
+            return db.execute(option_union).all()
