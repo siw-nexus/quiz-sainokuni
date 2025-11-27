@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+import pytest
 
 
 # テスト用のクライアントを作成
@@ -7,20 +8,19 @@ client = TestClient(app)
 
 
 # テストケース：正常に問題を取得できるか
-def test_get_questionss():
-    # 取得する問題数
-    limit = 5
-    
+@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize("test_limit", [5, 10, 15])
+def test_get_questions(test_spot_type, test_limit):
     # リクエストを送る 
-    response = client.get("/question", params={"spot_type": "tourist", "limit": limit})
+    response = client.get("/question", params={"spot_type": test_spot_type, "limit": test_limit})
 
     # ステータスコードの確認
     assert response.status_code == 200
 
     # レスポンスの中身の確認
     data = response.json()
-    assert isinstance(data, list) # リストで返ってくるか
-    assert len(data) == limit     # 問題数が取得した問題数と一致しているか
+    assert isinstance(data, list)     # リストで返ってくるか
+    assert len(data) == test_limit    # 問題数が取得した問題数と一致しているか
     
     if len(data) > 0:
         # 必要なキーが含まれているかチェック
@@ -43,14 +43,11 @@ def test_get_questions_unknown_type():
 
 
 # テストケース：正常に選択肢を取得できるか
-def test_get_options():
-    # spot_typeの指定
-    spot_type = "tourist"
-    # spot_idの指定
-    spot_id = 1
-    
+@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize("test_spot_id", [1, 50, 100])
+def test_get_options(test_spot_type, test_spot_id):
     # リクエストを送る
-    response = client.get("/option", params={"spot_type": spot_type, "spot_id": spot_id})
+    response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
     
     # ステータスコードの確認
     assert response.status_code == 200
@@ -76,7 +73,7 @@ def test_get_options():
     assert len(incorrect_options) == 3
 
     # 「正解」の中身が正しいかチェック
-    assert correct_options[0]["id"] == spot_id
+    assert correct_options[0]["id"] == test_spot_id
 
     # 選択肢に重複がないかチェック
     all_ids = [x["id"] for x in data]
@@ -97,22 +94,15 @@ def test_get_options_unknown_type():
 
 
 # テストケース：存在しないIDを指定したら空リストが返るか
-def test_get_options_unknown_id():
+@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize("test_spot_id", [0, 101, -1, 9999])
+def test_get_options_unknown_id(test_spot_type, test_spot_id):
     # リクエストを送る
-    response1 = client.get("/option", params={"spot_type": "tourist", "spot_id": 0})
-    response2 = client.get("/option", params={"spot_type": "tourist", "spot_id": 101})
+    response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
     
-    # response1のステータスコードの確認
-    assert response1.status_code == 404 
+    # responseのステータスコードの確認
+    assert response.status_code == 404 
     
-    # response1のレスポンスの中身の確認
-    data = response1.json()
-    assert data["detail"] == "データが見つかりませんでした"
-    
-    
-    # response2のステータスコードの確認
-    assert response2.status_code == 404 
-    
-    # response2のレスポンスの中身の確認
-    data = response2.json()
+    # responseのレスポンスの中身の確認
+    data = response.json()
     assert data["detail"] == "データが見つかりませんでした"
