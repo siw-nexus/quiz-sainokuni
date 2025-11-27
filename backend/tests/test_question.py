@@ -28,3 +28,15 @@ def test_get_questionss():
         assert "spot_type" in data[0]
         assert "spot_id" in data[0]
         assert "question_text" in data[0]
+
+
+# テストケース：存在しないタイプを指定したら空リストが返るか
+def test_get_questions_unknown_type():
+    response = client.get("/question", params={"spot_type": "unknown", "limit": 5})
+    
+    # ステータスコードの確認
+    assert response.status_code == 404 
+    
+    # レスポンスの中身の確認
+    data = response.json()
+    assert data["detail"] == "データが見つかりませんでした"
