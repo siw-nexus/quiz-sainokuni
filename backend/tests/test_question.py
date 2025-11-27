@@ -94,3 +94,25 @@ def test_get_options_unknown_type():
     # レスポンスの中身の確認
     data = response.json()
     assert data["detail"] == "データが見つかりませんでした"
+
+
+# テストケース：存在しないIDを指定したら空リストが返るか
+def test_get_options_unknown_id():
+    # リクエストを送る
+    response1 = client.get("/option", params={"spot_type": "tourist", "spot_id": 0})
+    response2 = client.get("/option", params={"spot_type": "tourist", "spot_id": 101})
+    
+    # response1のステータスコードの確認
+    assert response1.status_code == 404 
+    
+    # response1のレスポンスの中身の確認
+    data = response1.json()
+    assert data["detail"] == "データが見つかりませんでした"
+    
+    
+    # response2のステータスコードの確認
+    assert response2.status_code == 404 
+    
+    # response2のレスポンスの中身の確認
+    data = response2.json()
+    assert data["detail"] == "データが見つかりませんでした"
