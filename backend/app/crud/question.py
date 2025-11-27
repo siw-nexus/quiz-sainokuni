@@ -29,6 +29,10 @@ def get_question_text(spot_type: str, limit: int):
 
 # 選択肢を取得する関数
 def get_options(spot_type: str, spot_id: int):
+    # spot_idが0以下101以上だった場合はからリストを返す
+    if spot_id <= 0 or spot_id >= 101:
+        return []
+    
     # データベース接続開始
     with SessionLocal() as db:   
         if spot_type == 'tourist':
