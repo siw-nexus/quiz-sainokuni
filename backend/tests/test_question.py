@@ -81,3 +81,16 @@ def test_get_options():
     # 選択肢に重複がないかチェック
     all_ids = [x["id"] for x in data]
     assert len(set(all_ids)) == 4
+
+
+# テストケース：存在しないタイプを指定したら空リストが返るか
+def test_get_options_unknown_type():
+    # リクエストを送る
+    response = client.get("/option", params={"spot_type": "unknown", "spot_id": 1})
+    
+    # ステータスコードの確認
+    assert response.status_code == 404 
+    
+    # レスポンスの中身の確認
+    data = response.json()
+    assert data["detail"] == "データが見つかりませんでした"
