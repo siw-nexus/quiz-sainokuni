@@ -14,23 +14,17 @@ SessionLocal = db_connect()
 # 問題文を取得する関数
 def get_question_text(spot_type: str, limit: int):
     # データベース接続開始
-    db = SessionLocal()
-
+    with SessionLocal() as db:
     # 問題を取得
-    try:
         question_texts = (
-            db.query(Questions.id, Questions.spot_type, Questions.spot_id, Questions.question_text)
+            select(Questions.id, Questions.spot_type, Questions.spot_id, Questions.question_text)
             .filter(Questions.spot_type == spot_type)
             .order_by(func.random())
             .limit(limit)
-            .all()
         )
 
         # 結果を返す
-        return question_texts
-    finally:
-        # データベース接続終了
-        db.close()
+        return db.execute(question_texts).all()
 
 
 # 選択肢を取得する関数
