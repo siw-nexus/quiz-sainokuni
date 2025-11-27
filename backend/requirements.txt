@@ -6,3 +6,5 @@ cryptography
 alembic
 greenlet
 requests
+pytest
+httpx

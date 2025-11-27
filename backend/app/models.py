@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DATETIME, func
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 
 # SQLAlchemyの基底クラスを作成
