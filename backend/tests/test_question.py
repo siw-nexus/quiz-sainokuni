@@ -7,7 +7,7 @@ import pytest
 client = TestClient(app)
 
 
-# テストケース：正常に問題を取得できるか
+# テストケース：正常に問題を取得できるか---------------------------------------------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
 @pytest.mark.parametrize("test_limit", [5, 10, 15])
 def test_get_questions(test_spot_type, test_limit):
@@ -30,7 +30,7 @@ def test_get_questions(test_spot_type, test_limit):
         assert "question_text" in data[0]
 
 
-# テストケース：存在しないタイプを指定したら空リストが返るか
+# テストケース：存在しないタイプを指定したら空リストが返るか----------------------------------
 def test_get_questions_unknown_type():
     response = client.get("/question", params={"spot_type": "unknown", "limit": 5})
     
@@ -42,7 +42,7 @@ def test_get_questions_unknown_type():
     assert data["detail"] == "データが見つかりませんでした"
 
 
-# テストケース：正常に選択肢を取得できるか
+# テストケース：正常に選択肢を取得できるか-----------------------------------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
 @pytest.mark.parametrize("test_spot_id", [1, 50, 100])
 def test_get_options(test_spot_type, test_spot_id):
@@ -80,7 +80,7 @@ def test_get_options(test_spot_type, test_spot_id):
     assert len(set(all_ids)) == 4
 
 
-# テストケース：存在しないタイプを指定したら空リストが返るか
+# テストケース：存在しないタイプを指定したら空リストが返るか-----------------------------------------
 def test_get_options_unknown_type():
     # リクエストを送る
     response = client.get("/option", params={"spot_type": "unknown", "spot_id": 1})
@@ -93,7 +93,7 @@ def test_get_options_unknown_type():
     assert data["detail"] == "データが見つかりませんでした"
 
 
-# テストケース：存在しないIDを指定したら空リストが返るか
+# テストケース：存在しないIDを指定したら空リストが返るか-------------------------------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
 @pytest.mark.parametrize("test_spot_id", [0, 101, -1, 9999])
 def test_get_options_unknown_id(test_spot_type, test_spot_id):
