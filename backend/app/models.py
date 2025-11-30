@@ -93,12 +93,12 @@ class QuizResults(Base):
 
 # クイズ詳細テーブルのモデル
 class QuizAnswers(Base):
-    __tablename__ = 'quiz-answers'
+    __tablename__ = 'quiz_answers'
     
     id = Column(Integer, primary_key = True)
     quiz_result_id = Column(Integer, ForeignKey('quiz_results.id', ondelete = 'CASCADE'), nullable = False, comment = 'クイズ結果IDの外部キー')
     question_num = Column(Integer, nullable = False, comment = '何問目か')
-    question_id = Column(Integer, nullable = False, comment = '問題ID')
+    question_id = Column(Integer, ForeignKey('questions.id'), nullable = False, comment = '問題ID')
     choice_id = Column(Integer, nullable = False, comment = '選んだ選択肢のID')
     is_correct = Column(Boolean, nullable = False, comment = '正解したか')
     create_at = Column(DATETIME, server_default=func.now())
