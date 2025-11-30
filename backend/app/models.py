@@ -59,3 +59,15 @@ class Questions(Base):
     question_text = Column(Text, nullable = False)
     create_at = Column(DATETIME, server_default=func.now())
     update_at = Column(DATETIME, server_default=func.now(), onupdate=func.now())
+
+
+# ユーザーテーブルのモデル
+class Users(Base):
+    __tablename__ = 'users'
+    
+    id = Column(Integer, primary_key = True)
+    name = Column(String(100), nullable = False, comment = 'ユーザー名')
+    email = Column(String(255), nullable = False, comment = 'メールアドレス')
+    password = Column(String(255), nullable = False, comment = 'パスワード')
+    create_at = Column(DATETIME, server_default=func.now())
+    update_at = Column(DATETIME, server_default=func.now(), onupdate=func.now())
