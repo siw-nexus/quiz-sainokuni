@@ -61,6 +61,7 @@ Table users {
 Table quiz_results {
   id              integer  [pk, increment]
   user_id         integer  [not null, note: 'ユーザーIDの外部キー']
+  spot_type       text     [not null, note: 'tourist or gourmet']
   score           integer  [not null, note: '正解した問題数']
   total_questions integer  [not null, note: '出題数']
   play_at         datetime [default: `current_timestamp`]
