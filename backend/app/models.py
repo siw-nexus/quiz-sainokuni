@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DATETIME, func, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, DATETIME, UniqueConstraint, func, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 
 
@@ -104,3 +104,19 @@ class QuizAnswers(Base):
     create_at = Column(DATETIME, server_default=func.now())
     
     question = relationship('Questions', back_populates = 'quiz_answer')
+
+
+# 興味テーブル
+class Interests(Base):
+    __tablename__ = 'interests'
+    
+    id = Column(Integer, primary_key = True)
+    user_id = Column(Integer, ForeignKey('users.id', onupdate = 'CASCADE', ondelete = 'CASCADE'), nullable = False, comment = 'ユーザーIDの外部キー')
+    spot_type = Column(String(100), nullable = False, comment = 'tourist or gourmet')
+    spot_id = Column(Integer, nullable = False, comment = 'touristかgourmetのID')
+    create_at = Column(DATETIME, server_default=func.now())
+    
+    __table_args__ = (
+        UniqueConstraint('user_id', 'spot_type', 'spot_id', name='unique_user_spot_interest'),
+        {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'}
+    )
