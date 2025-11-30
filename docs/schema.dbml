@@ -1,0 +1,97 @@
+// 観光地テーブル
+Table tourist_spots {
+  id             integer  [pk, increment]
+  name           text     [not null, note: '観光地名']
+  detail         text     [not null, note: '概要']
+  address        text     [not null, note: '住所']
+  lat            text     [note: '緯度']
+  lon            text     [note: '経度']
+  availavle_time text     [note: '利用可能時間']
+  closure_info   text     [note: '休業情報']
+  start_time     time     [note: '開始時間']
+  finish_time    time     [note: '終了時間']
+  notes          text     [note: '備考']
+  tel            text     [note: '電話番号']
+  hp_url         text     [note: 'ホームページURL']
+  img            text     [note: '画像']
+  create_at      datetime [default: `current_timestamp`]
+  update_at      datetime [default: `current_timestamp`, note: 'on update: current_timestamp']
+}
+
+// グルメテーブル
+Table gourmet_spots {
+  id          integer  [pk, increment]
+  name        text     [not null, note: '店舗名']
+  detail      text     [not null, note: '概要']
+  address     text     [not null, note: '住所']
+  lat         text     [note: '緯度']
+  lon         text     [note: '経度']
+  category    text     [note: '区分']
+  tokusanhin  text     [note: '特産品']
+  start_time  time     [note: '開始時間']
+  finish_time time     [note: '終了時間']
+  notes       text     [note: '備考']
+  hp_url      text     [note: 'ホームページURL']
+  img         text     [note: '画像']
+  create_at   datetime [default: `current_timestamp`]
+  update_at   datetime [default: `current_timestamp`, note: 'on update: current_timestamp']
+}
+
+// 問題テーブル
+Table questions {
+  id            integer  [pk, increment]
+  spot_type     text     [not null, note: 'tourist or gourmet']
+  spot_id       integer  [not null, note: 'tourist_spotsかgourmet_spotsのID']
+  question_text text     [not null, note: '問題文']
+  create_at     datetime [default: `current_timestamp`]
+  update_at     datetime [default: `current_timestamp`, note: 'on update: current_timestamp']
+}
+
+// ユーザーテーブル
+Table users {
+  id          integer      [pk, increment]
+  name        varchar(100) [not null, note: 'ユーザー名']
+  email       varchar(255) [not null, note: 'メールアドレス']
+  password    varchar(255) [not null, note: 'パスワード']
+  create_at   datetime     [default: `current_timestamp`]
+  update_at   datetime     [default: `current_timestamp`, note: 'on update: current_timestamp']
+}
+
+// クイズ結果テーブル
+Table quiz_results {
+  id              integer  [pk, increment]
+  user_id         integer  [not null, note: 'ユーザーIDの外部キー']
+  score           integer  [not null, note: '正解した問題数']
+  total_questions integer  [not null, note: '出題数']
+  play_at         datetime [default: `current_timestamp`]
+}
+
+// クイズ詳細テーブル
+Table quiz_answers {
+  id             integer  [pk, increment]
+  quiz_result_id integer  [not null, note: 'クイズ結果の外部キー']
+  question_num   integer  [not null, note: '何問目か']
+  question_id    integer  [not null, note: '問題IDの外部キー']
+  choice_id      integer  [not null, note: '選んだ選択肢のIDの外部キー']
+  is_correct     boolean  [not null, note: '正解だったか']
+  create_at      datetime [default: `current_timestamp`]
+}
+
+// 興味テーブル
+Table interests {
+  id        integer  [pk, increment]
+  user_id   integer  [not null, note: 'ユーザーIDの外部キー']
+  spot_type text     [not null, note: 'tourist or gourmet']
+  spot_id   integer  [not null, note: 'tourist_spotsかgourmet_spotsのID']
+  create_at datetime [default: `current_timestamp`]
+
+  // 同じユーザーが同じスポットを登録できないようにする復号ユニークの設定
+  indexes {
+    (user_id, spot_type, spot_id) [unique]
+  }
+}
+
+Ref: users.id < quiz_results.user_id
+Ref: quiz_results.id < quiz_answers.quiz_result_id
+Ref: questions.id < quiz_answers.question_id
+Ref: users.id < interests.user_id
