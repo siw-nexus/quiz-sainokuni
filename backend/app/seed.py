@@ -1,4 +1,5 @@
 import requests
+from passlib.context import CryptContext
 
 # データベース接続設定をインポート
 from database import db_connect
@@ -7,10 +8,13 @@ from database import db_connect
 # セッションの作成
 SessionLocal = db_connect()
 
+# ハッシュ化の設定
+pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
+
 
 # tourist_spotsモデル、gourmet_spotsモデル、questionsモデルをインポート
 try:
-    from models import Tourist_spots, Gourmet_spots, Questions
+    from models import Tourist_spots, Gourmet_spots, Questions, Users
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
@@ -228,6 +232,41 @@ def question_data_insert(db):
         db.rollback() # エラー時はロールバック
 
 
+# ダミーユーザーをINSERTする関数
+def dummy_user_insert(db):
+    print('ユーザーデータ確認中...')
+    
+    # ダミーユーザーの情報
+    dummy_user = {'name': 'test', 'email': 'test@example.com', 'password': 'password'}
+    
+    # 同じメールアドレスのユーザーがいるか確認
+    check_user = db.query(Users).filter(Users.email == dummy_user['email']).first()
+    
+    try:
+        if not check_user:
+            # パスワードをハッシュ化
+            hashed_password = pwd_context.hash(dummy_user['password'])
+            
+            # 新しいダミーユーザーを定義
+            new_user = Users(
+                name = dummy_user['name'],
+                email = dummy_user['email'],
+                password = hashed_password
+            )
+            
+            db.add(new_user)
+        
+            # トランザクションを確定
+            db.commit()
+            
+            print('ユーザーデータのinsert/check完了')
+        else:
+            print('すでにダミーユーザーがいるのでスキップ')
+    except Exception as e:
+        print(f"ダミーユーザーのデータをINSERT中にエラーが発生しました: {e}")
+        db.rollback() # エラー時はロールバック
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -252,6 +291,9 @@ def seed_data():
         print('すでにデータがあるので初期データの投入をスキップ')
     else:
         question_data_insert(db)
+    
+    # ダミーユーザーをINSERTする関数を呼び出す
+    dummy_user_insert(db)
 
 
     db.close()
