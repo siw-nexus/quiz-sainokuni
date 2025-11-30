@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, DATETIME, func
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String, Text, DATETIME, func, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
 
 
 # SQLAlchemyの基底クラスを作成
@@ -71,3 +71,18 @@ class Users(Base):
     password = Column(String(255), nullable = False, comment = 'パスワード')
     create_at = Column(DATETIME, server_default=func.now())
     update_at = Column(DATETIME, server_default=func.now(), onupdate=func.now())
+    
+    quiz_results = relationship('QuizResults', back_populates = 'user')
+
+
+# クイズ結果テーブルのモデル
+class QuizResults(Base):
+    __tablename__ = 'quiz_results'
+    
+    id = Column(Integer, primary_key = True)
+    user_id = Column(Integer, ForeignKey('users.id', onupdate = 'CASCADE', ondelete = 'CASCADE'), nullable = False, comment = 'ユーザーIDの外部キー')
+    score = Column(Integer, nullable = False, comment = '正解した問題数')
+    total_questions = Column(Integer, nullable = False, comment = '出題数')
+    play_at = Column(DATETIME, server_default=func.now(), comment = 'プレイした日時')
+    
+    user = relationship('Users', back_populates = 'quiz_results')
