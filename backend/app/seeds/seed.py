@@ -163,21 +163,22 @@ def gourmet_data_insert(endpoint, db):
         print(f'グルメのオープンデータ取得成功 ({len(gourmet_data)} 件)')
         
         for item in gourmet_data:
-            new_gourmet = Gourmet_spots(
-                name = item["tempo_meisho"]["value"],
-                detail = item["gaiyo"]["value"],
-                address = item["tempo_jusho"]["value"],
-                lat = item["tempo_ido"]["value"],
-                lon = item["tempo_keido"]["value"],
-                category = item["kubun"]["value"],
-                tokusanhin = item["tokusanhin"]["value"],
-                start_time = item["kaishijikan"]["value"],
-                finish_time = item["shuryojikan"]["value"],
-                notes = item["nichijibiko"]["value"],
-                hp_url = item["hp"]["value"],
-                img = item["tempo_gazo"]["value"]
-            )
-            db.add(new_gourmet)
+            if item['tempo_meisho']['value']:
+                new_gourmet = Gourmet_spots(
+                    name = item["tempo_meisho"]["value"],
+                    detail = item["gaiyo"]["value"],
+                    address = item["tempo_jusho"]["value"],
+                    lat = item["tempo_ido"]["value"],
+                    lon = item["tempo_keido"]["value"],
+                    category = item["kubun"]["value"],
+                    tokusanhin = item["tokusanhin"]["value"],
+                    start_time = item["kaishijikan"]["value"],
+                    finish_time = item["shuryojikan"]["value"],
+                    notes = item["nichijibiko"]["value"],
+                    hp_url = item["hp"]["value"],
+                    img = item["tempo_gazo"]["value"]
+                )
+                db.add(new_gourmet)
             
         # トランザクションを確定
         db.commit()
