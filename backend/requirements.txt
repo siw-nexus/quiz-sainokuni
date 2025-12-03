@@ -8,3 +8,5 @@ greenlet
 requests
 pytest
 httpx
+passlib[bcrypt]
+bcrypt==3.2.2
