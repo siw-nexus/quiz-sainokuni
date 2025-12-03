@@ -1,5 +1,6 @@
 import requests
 from passlib.context import CryptContext
+import json
 
 # データベース接続設定をインポート
 from app.database import db_connect
@@ -187,6 +188,31 @@ def gourmet_data_insert(endpoint, db):
         db.rollback() # エラー時はロールバック
 
 
+# 緯度経度のデータを入れる関数
+def coordinates_data_insert(db):
+    # coordinates.jsonを読み込む
+    with open('app/seeds/coordinates.json', 'r') as f:
+        coordinates_data = json.load(f)
+        
+        # 観光地の緯度経度を入れる
+        for item in coordinates_data['tourist']:
+            spot = db.query(Tourist_spots).filter(Tourist_spots.id == item['id']).first()
+            if not spot.lat or not spot.lon:
+                spot.lat = item['lat']
+                spot.lon = item['lon']
+                db.commit()
+        print(f'観光地の緯度経度のデータのinsert/check完了')
+        
+        # グルメの緯度経度を入れる
+        for item in coordinates_data['gourmet']:
+            spot = db.query(Gourmet_spots).filter(Gourmet_spots.id == item['id']).first()
+            if not spot.lat or not spot.lon:
+                spot.lat = item['lat']
+                spot.lon = item['lon']
+                db.commit()
+        print(f'グルメの緯度経度のデータのinsert/check完了')
+
+
 # 問題文のデータをINSERTする関数
 def question_data_insert(db):
     # 観光地の問題文のINSERT
@@ -285,7 +311,10 @@ def seed_data():
         print('すでにデータがあるので初期データの投入をスキップ')
     else:
         gourmet_data_insert(endpoint, db)
-        
+    
+    # 緯度経度のデータを入れる関数を呼び出す
+    coordinates_data_insert(db)
+    
     # questionsテーブルにデータがあるかチェック
     if db.query(Questions).first():
         print('すでにデータがあるので初期データの投入をスキップ')
