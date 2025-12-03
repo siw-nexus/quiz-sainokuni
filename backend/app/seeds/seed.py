@@ -245,7 +245,7 @@ def question_data_insert(db):
                 spot_id = i,
                 question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
             )
-            for i in range(1, 101)
+            for i in range(1, 100)
         ]
         
         db.add_all(new_questions)
