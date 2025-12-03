@@ -21,7 +21,7 @@ alembic upgrade head
 
 # 2. シードデータの投入
 echo "Seeding database"
-python app/seed.py
+python -m app.seeds.seed
 
 # 3. Dockerfile の CMD で指定されたもの を実行
 echo "Starting server..."
