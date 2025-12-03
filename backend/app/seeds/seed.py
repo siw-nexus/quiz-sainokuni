@@ -2,7 +2,7 @@ import requests
 from passlib.context import CryptContext
 
 # データベース接続設定をインポート
-from database import db_connect
+from app.database import db_connect
 
 
 # セッションの作成
@@ -14,7 +14,7 @@ pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 
 # tourist_spotsモデル、gourmet_spotsモデル、questionsモデルをインポート
 try:
-    from models import Tourist_spots, Gourmet_spots, Questions, Users
+    from app.models import Tourist_spots, Gourmet_spots, Questions, Users
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
