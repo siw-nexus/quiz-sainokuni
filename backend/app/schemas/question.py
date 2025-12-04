@@ -20,3 +20,14 @@ class OptionResponse(BaseModel):
     is_correct: int
 
     model_config = ConfigDict(from_attributes = True)
+
+# 保存したデータのレスポンスの型を定義
+class SendSaveQuestion(BaseModel):
+    id: int
+    user_id: int
+    spot_type: str
+    score: int
+    total_questions: int
+
+    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
+

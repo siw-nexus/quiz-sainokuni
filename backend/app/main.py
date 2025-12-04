@@ -2,10 +2,10 @@ from typing import List
 from fastapi import FastAPI, HTTPException, Query
 
 # データベースを操作する関数をインポート
-from app.crud.question import get_question_text, get_options
+from app.crud.question import get_question_text, get_options , save_question
 
 # レスポンスモデルをインポート
-from app.schemas.question import QestionResponse, OptionResponse
+from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion
 
 
 app = FastAPI()
@@ -42,4 +42,17 @@ def get_option(
     if not result:
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
     
+    return result  # returnのタイミングでschemas>question.pyの型変換が実行される
+
+
+# 問題を保存する
+@app.post("/save_questions", response_model=SendSaveQuestion, status_code=201)
+def send_save_question(
+    user_id: int = Query(..., description= "UserのID"),
+    spot_type: str = Query(..., description= "観光地(tourist)かグルメ(gourmet)か"),
+    score: int = Query(..., description="クイズのスコアの整数が入る"),
+    total_questions: int = Query(..., description="解いた問題数が入る")
+):
+    result = save_question(user_id, spot_type, score, total_questions)
+
     return result

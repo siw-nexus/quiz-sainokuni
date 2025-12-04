@@ -81,10 +81,10 @@ def get_options(spot_type: str, spot_id: int):
 
 
 # 問題をデータベースに保存する関数
-def create_question(user_id: int, spot_type: str, score: int, total_questions: int):
+def save_question(user_id: int, spot_type: str, score: int, total_questions: int):
     with SessionLocal() as db:
         # 1. モデルのインスタンス（実体）を作る
-        new_result = QuizResults(
+        quiz_result = QuizResults(
             user_id=user_id,
             spot_type=spot_type,
             score=score,
@@ -92,15 +92,12 @@ def create_question(user_id: int, spot_type: str, score: int, total_questions: i
         )
 
         # 2. セッションに追加して保存
-        db.add(new_result)
+        db.add(quiz_result)
         db.commit()
 
         # 3. ここが重要！データベースから最新情報を再読み込みする
-        # これをすることで、空だった new_result.id に数値が入ります
-        db.refresh(new_result)
+        # これをすることで、空だった quiz_result.id に数値が入ります
+        db.refresh(quiz_result)
 
         # 4. IDを返す
-        return new_result.id
-    
-print(create_question(1,"tourist",5,10))
-    
+        return quiz_result
