@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import FastAPI, HTTPException, Query
-
+from fastapi import HTTPException, status
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, get_options , save_question
 
@@ -53,6 +53,9 @@ def send_save_question(
     score: int = Query(..., description="クイズのスコアの整数が入る"),
     total_questions: int = Query(..., description="解いた問題数が入る")
 ):
+    # データ
+    if (score != 5 or score != 10 or score != 15) and total_questions-score < 0:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアまたは問題数の値が不正です")
     result = save_question(user_id, spot_type, score, total_questions)
 
     return result
