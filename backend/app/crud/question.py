@@ -1,7 +1,7 @@
-from sqlalchemy import func, literal, union_all, select
+from sqlalchemy import func, literal, union_all, select, insert
 
 # モデルをインポート
-from app.models import Questions, Tourist_spots, Gourmet_spots
+from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults
 
 # データベース接続設定をインポート
 from app.database import db_connect
@@ -74,7 +74,21 @@ def get_options(spot_type: str, spot_id: int):
             )
             
             # 正解と不正解のsqlをunion_allで繋げる
-            option_union = union_all(option_correct, option_incorrect)
+            option_union = union_all(option_correct, option_incorrect) # .union_all２つのSQLを１つで繋げる
             
             # 結果を返す
             return db.execute(option_union).all()
+
+
+# 問題をデータベースに保存する関数
+def create_question(user_id: int, spot_type: str, score: int, total_questions: int):
+    # データベースに接続開始
+    with SessionLocal() as db:
+        # クイズのデータをインサートする
+        add_result = insert(QuizResults)
+
+        values = {"user_id": user_id, "spot_type": spot_type, "score": score, "total_questions": total_questions}
+        db.execute(add_result, values)
+        db.commit()
+
+    
