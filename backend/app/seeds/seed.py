@@ -1,8 +1,9 @@
 import requests
 from passlib.context import CryptContext
+import json
 
 # データベース接続設定をインポート
-from database import db_connect
+from app.database import db_connect
 
 
 # セッションの作成
@@ -14,7 +15,7 @@ pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 
 # tourist_spotsモデル、gourmet_spotsモデル、questionsモデルをインポート
 try:
-    from models import Tourist_spots, Gourmet_spots, Questions, Users
+    from app.models import Tourist_spots, Gourmet_spots, Questions, Users
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
@@ -162,21 +163,22 @@ def gourmet_data_insert(endpoint, db):
         print(f'グルメのオープンデータ取得成功 ({len(gourmet_data)} 件)')
         
         for item in gourmet_data:
-            new_gourmet = Gourmet_spots(
-                name = item["tempo_meisho"]["value"],
-                detail = item["gaiyo"]["value"],
-                address = item["tempo_jusho"]["value"],
-                lat = item["tempo_ido"]["value"],
-                lon = item["tempo_keido"]["value"],
-                category = item["kubun"]["value"],
-                tokusanhin = item["tokusanhin"]["value"],
-                start_time = item["kaishijikan"]["value"],
-                finish_time = item["shuryojikan"]["value"],
-                notes = item["nichijibiko"]["value"],
-                hp_url = item["hp"]["value"],
-                img = item["tempo_gazo"]["value"]
-            )
-            db.add(new_gourmet)
+            if item['tempo_meisho']['value']:
+                new_gourmet = Gourmet_spots(
+                    name = item["tempo_meisho"]["value"],
+                    detail = item["gaiyo"]["value"],
+                    address = item["tempo_jusho"]["value"],
+                    lat = item["tempo_ido"]["value"],
+                    lon = item["tempo_keido"]["value"],
+                    category = item["kubun"]["value"],
+                    tokusanhin = item["tokusanhin"]["value"],
+                    start_time = item["kaishijikan"]["value"],
+                    finish_time = item["shuryojikan"]["value"],
+                    notes = item["nichijibiko"]["value"],
+                    hp_url = item["hp"]["value"],
+                    img = item["tempo_gazo"]["value"]
+                )
+                db.add(new_gourmet)
             
         # トランザクションを確定
         db.commit()
@@ -185,6 +187,31 @@ def gourmet_data_insert(endpoint, db):
     except Exception as e:
         print(f"グルメのデータをINSERT中にエラーが発生しました: {e}")
         db.rollback() # エラー時はロールバック
+
+
+# 緯度経度のデータを入れる関数
+def coordinates_data_insert(db):
+    # coordinates.jsonを読み込む
+    with open('app/seeds/coordinates.json', 'r') as f:
+        coordinates_data = json.load(f)
+        
+        # 観光地の緯度経度を入れる
+        for item in coordinates_data['tourist']:
+            spot = db.query(Tourist_spots).filter(Tourist_spots.id == item['id']).first()
+            if not spot.lat or not spot.lon:
+                spot.lat = item['lat']
+                spot.lon = item['lon']
+                db.commit()
+        print(f'観光地の緯度経度のデータのinsert/check完了')
+        
+        # グルメの緯度経度を入れる
+        for item in coordinates_data['gourmet']:
+            spot = db.query(Gourmet_spots).filter(Gourmet_spots.id == item['id']).first()
+            if not spot.lat or not spot.lon:
+                spot.lat = item['lat']
+                spot.lon = item['lon']
+                db.commit()
+        print(f'グルメの緯度経度のデータのinsert/check完了')
 
 
 # 問題文のデータをINSERTする関数
@@ -218,7 +245,7 @@ def question_data_insert(db):
                 spot_id = i,
                 question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
             )
-            for i in range(1, 101)
+            for i in range(1, 100)
         ]
         
         db.add_all(new_questions)
@@ -285,7 +312,10 @@ def seed_data():
         print('すでにデータがあるので初期データの投入をスキップ')
     else:
         gourmet_data_insert(endpoint, db)
-        
+    
+    # 緯度経度のデータを入れる関数を呼び出す
+    coordinates_data_insert(db)
+    
     # questionsテーブルにデータがあるかチェック
     if db.query(Questions).first():
         print('すでにデータがあるので初期データの投入をスキップ')
