@@ -82,7 +82,7 @@ class QuizResults(Base):
     __tablename__ = 'quiz_results'
     
     id = Column(Integer, primary_key = True)
-    user_id = Column(Integer, ForeignKey('users.id', onupdate = 'CASCADE', ondelete = 'CASCADE'), nullable = False, comment = 'ユーザーIDの外部キー')
+    user_id = Column(Integer, ForeignKey('users.id', onupdate = 'CASCADE', ondelete = 'CASCADE'), comment = 'ユーザーIDの外部キー')
     spot_type = Column(String(100), nullable = False, comment = 'tourist or gourmet')
     score = Column(Integer, nullable = False, comment = '正解した問題数')
     total_questions = Column(Integer, nullable = False, comment = '出題数')
