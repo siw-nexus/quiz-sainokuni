@@ -1,12 +1,13 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
 
 
 # 興味があるの保存のbodyの型の定義
 class InterestsCreate(BaseModel):
     user_id: int
-    spot_type: str
-    spot_id: int
+    spot_type: Literal['tourist', 'gourmet']
+    spot_id: int = Field(..., ge = 1)
 
 # 興味があるを保存した結果のレスポンスの型の定義
 class AddInterestResponse(BaseModel):
