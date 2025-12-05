@@ -62,9 +62,13 @@ def create_interests(
     interest_data: InterestsCreate,
     db: Session = Depends(db_connect)
 ):
-    result = add_interests(db, interest_data.user_id, interest_data.spot_type, interest_data.spot_id)
-    
-    return result  # returnのタイミングでschemas>question.pyの型変換が実行される
+    try:
+        result = add_interests(db, interest_data.user_id, interest_data.spot_type, interest_data.spot_id)
+        
+        return result
+        
+    except IntegrityError:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
 
 
 # 問題を保存する
