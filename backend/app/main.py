@@ -24,10 +24,12 @@ def read_root():
 # 問題取得
 @app.get("/question", response_model = List[QestionResponse])
 def get_questions(
-    spot_type: Literal['tourist', 'gourmet'] = Query(description = "観光地(tourist)かグルメ(gourmet)か"),
-    limit: Literal[5, 10, 15] = Query(description = "取得する問題数"),
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = "観光地(tourist)かグルメ(gourmet)か"),
+    limit: int = Query(..., description = "取得する問題数（5 or 10 ro 15）"),
     db: Session = Depends(db_connect)
 ):
+    if limit not in [5, 10, 15]:
+        raise HTTPException(status_code = 422, detail = 'limitは5か10か15のどれか')
     result = get_question_text(db, spot_type, limit)
     
     # データがからなら404エラーを返す
@@ -40,8 +42,8 @@ def get_questions(
 # 選択肢取得
 @app.get("/option", response_model = List[OptionResponse])
 def get_option(
-    spot_type: Literal['tourist', 'gourmet'] = Query(description = '観光地(tourist)かグルメ(gourmet)か'),
-    spot_id: int = Query(ge = 1, description = '問題のID'),
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
+    spot_id: int = Query(..., ge = 1, description = '問題のID'),
     db: Session = Depends(db_connect)
 ):
     result = get_options(db, spot_type, spot_id)
