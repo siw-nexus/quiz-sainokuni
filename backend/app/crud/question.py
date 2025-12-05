@@ -20,10 +20,6 @@ def get_question_text(db, spot_type: str, limit: int):
 
 # 選択肢を取得する関数
 def get_options(db, spot_type: str, spot_id: int):
-    # spot_idが0以下101以上だった場合はからリストを返す
-    if spot_id <= 0 or spot_id >= 101:
-        return []
-    
     if spot_type == 'tourist':
         # 観光地の選択肢を取得
         # 正解を取得
@@ -43,8 +39,18 @@ def get_options(db, spot_type: str, spot_id: int):
         # 正解と不正解のsqlをunion_allで繋げる
         option_union = union_all(option_correct, option_incorrect)
         
-        # 結果を返す
-        return db.execute(option_union).all()
+        # 結果を取得
+        result = db.execute(option_union).all()
+        
+        # 正解データがあるかチェック
+        has_correct = any(row.is_correct == 1 for row in result)
+        
+        if not has_correct:
+            # 正解データが無かったら空を返す
+            return []
+        
+        # 正解データがあったら結果を返す
+        return result
     
     elif spot_type == 'gourmet':
         # グルメの選択肢を取得
@@ -65,8 +71,18 @@ def get_options(db, spot_type: str, spot_id: int):
         # 正解と不正解のsqlをunion_allで繋げる
         option_union = union_all(option_correct, option_incorrect) # .union_all２つのSQLを１つで繋げる
         
-        # 結果を返す
-        return db.execute(option_union).all()
+        # 結果を取得
+        result = db.execute(option_union).all()
+        
+        # 正解データがあるかチェック
+        has_correct = any(row.is_correct == 1 for row in result)
+        
+        if not has_correct:
+            # 正解データが無かったら空を返す
+            return []
+        
+        # 正解データがあったら結果を返す
+        return result
 
 
 # 問題をデータベースに保存する関数
