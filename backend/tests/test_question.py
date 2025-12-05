@@ -30,16 +30,23 @@ def test_get_questions(test_spot_type, test_limit):
         assert "question_text" in data[0]
 
 
-# テストケース：存在しないタイプを指定したら空リストが返るか----------------------------------
-def test_get_questions_unknown_type():
-    response = client.get("/question", params={"spot_type": "unknown", "limit": 5})
+# テストケース：問題取得で存在しないタイプを指定したら422が返るか----------------------------------
+@pytest.mark.parametrize("test_limit", [5, 10, 15])
+def test_get_questions_unknown_type(test_limit):
+    response = client.get("/question", params={"spot_type": "unknown", "limit": test_limit})
     
     # ステータスコードの確認
-    assert response.status_code == 404 
+    assert response.status_code == 422
+
+
+# テストケース：問題取得でlimitを[5, 10, 15]以外でリクエスト送信したら422が返るか--------------------
+@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize('test_422_limit', [1, 4, 6, 9, 11, 14, 15, 999])
+def test_get_question_limit_422(test_spot_type, test_422_limit):
+    response = client.get('/question', params = {'spot_type': test_spot_type, 'limit': test_422_limit})
     
-    # レスポンスの中身の確認
-    data = response.json()
-    assert data["detail"] == "データが見つかりませんでした"
+    # ステータスコードの確認
+    assert response.status_code == 422
 
 
 # テストケース：正常に選択肢を取得できるか-----------------------------------------------
