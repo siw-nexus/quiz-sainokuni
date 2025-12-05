@@ -155,3 +155,26 @@ def test_save_question_success(spot_type, score, total):
     assert data["user_id"] == 1
     assert data["score"] == score
     assert data["total_questions"] == total
+
+
+# テストケース：回答結果保存でscoreがtotal_questionsより大きい値の場合に400が返るか
+@pytest.mark.parametrize("score, total", [
+    (6, 5),
+    (11, 10),
+    (100, 15)
+])
+def test_save_question_logic_error(score, total):
+    payload = {
+        "user_id": 1,
+        "spot_type": "tourist",
+        "score": score,
+        "total_questions": total
+    }
+    
+    response = client.post("/save_questions", json=payload)
+    
+    # ステータスコードの確認
+    assert response.status_code == 400
+    
+    # レスポンスの中身の確認
+    assert response.json()["detail"] == "スコアが問題数より大きい数値ではいけません"
