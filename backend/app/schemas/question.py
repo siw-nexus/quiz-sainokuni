@@ -38,5 +38,3 @@ class SendSaveQuestion(BaseModel):
     spot_type: str
     score: Literal[5, 10, 15] = 5
     total_questions: int
-
-    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
