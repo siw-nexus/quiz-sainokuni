@@ -25,9 +25,10 @@ def read_root():
 @app.get("/question", response_model = List[QestionResponse])
 def get_questions(
     spot_type: Literal['tourist', 'gourmet'] = Query(description = "観光地(tourist)かグルメ(gourmet)か"),
-    limit: Literal[5, 10, 15] = Query(description = "取得する問題数")
+    limit: Literal[5, 10, 15] = Query(description = "取得する問題数"),
+    db: Session = Depends(db_connect)
 ):
-    result = get_question_text(spot_type, limit)
+    result = get_question_text(db, spot_type, limit)
     
     # データがからなら404エラーを返す
     if not result:
@@ -40,9 +41,10 @@ def get_questions(
 @app.get("/option", response_model = List[OptionResponse])
 def get_option(
     spot_type: Literal['tourist', 'gourmet'] = Query(description = '観光地(tourist)かグルメ(gourmet)か'),
-    spot_id: int = Query(ge = 1, description = '問題のID')
+    spot_id: int = Query(ge = 1, description = '問題のID'),
+    db: Session = Depends(db_connect)
 ):
-    result = get_options(spot_type, spot_id)
+    result = get_options(db, spot_type, spot_id)
     
     # データがからなら404エラーを返す
     if not result:
@@ -66,11 +68,12 @@ def create_interests(
 @app.post("/save_questions", response_model=SendSaveQuestionResponse, status_code=201)
 def send_save_question(
     quiz_result_data: SendSaveQuestion,
+    db: Session = Depends(db_connect)
 ):
     # スコアと問題数に不正な値が入っていた場合エラーを返す
     if quiz_result_data.total_questions - quiz_result_data.score < 0:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアが問題数より大きい数値ではいけません")
     
-    result = save_question(quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
+    result = save_question(db, quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
 
     return result
