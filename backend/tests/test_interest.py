@@ -76,3 +76,18 @@ def test_create_interest_validation_error(invalid_payload):
     
     # ステータスコードの確認
     assert response.status_code == 422
+
+
+# テストケース：興味がある保存の存在しないユーザーIDを指定したときに404が返ってくるか
+def test_create_interest_unknown_user():
+    '''存在しないユーザーIDを指定した場合'''
+    payload = {
+        'user_id': 9999,
+        'spot_type': 'tourist',
+        'spot_id': 1
+    }
+    
+    response = client.post('/interests', json=payload)
+    
+    # ステータスコードの確認
+    assert response.status_code == 404
