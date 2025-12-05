@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 from fastapi import FastAPI, HTTPException, Query, status, Depends
 from sqlalchemy.orm import Session
 
@@ -24,8 +24,8 @@ def read_root():
 # 問題取得
 @app.get("/question", response_model = List[QestionResponse])
 def get_questions(
-    spot_type: str = Query(..., description = "観光地(tourist)かグルメ(gourmet)か"),
-    limit: int = Query(description = "取得する問題数")
+    spot_type: Literal['tourist', 'gourmet'] = Query(description = "観光地(tourist)かグルメ(gourmet)か"),
+    limit: Literal[5, 10, 15] = Query(description = "取得する問題数")
 ):
     result = get_question_text(spot_type, limit)
     
@@ -39,8 +39,8 @@ def get_questions(
 # 選択肢取得
 @app.get("/option", response_model = List[OptionResponse])
 def get_option(
-    spot_type: str = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
-    spot_id: int = Query(description = '問題のID')
+    spot_type: Literal['tourist', 'gourmet'] = Query(description = '観光地(tourist)かグルメ(gourmet)か'),
+    spot_id: int = Query(ge = 1, description = '問題のID')
 ):
     result = get_options(spot_type, spot_id)
     
