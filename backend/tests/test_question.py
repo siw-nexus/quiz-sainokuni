@@ -199,3 +199,22 @@ def test_save_question_validation_error():
     
     # ステータスコードの確認
     assert res3.status_code == 422
+
+
+# テストケース：存在しない user_id を指定した場合に404が返るか
+def test_save_question_unknown_user():
+    payload = {
+        "user_id": 9999,
+        "spot_type": "tourist",
+        "score": 3,
+        "total_questions": 5
+    }
+    
+    # リクエスト送信
+    response = client.post("/save_questions", json=payload)
+    
+    # ステータスコードの確認
+    assert response.status_code == 404
+    
+    # レスポンスの中身の確認
+    assert response.json()['detail'] == '指定されたユーザーは存在しません'
