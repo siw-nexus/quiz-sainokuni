@@ -28,3 +28,31 @@ def test_create_interest_success():
     assert data['spot_id'] == payload['spot_id']
     assert 'id' in data
     assert 'create_at' in data
+
+
+# 興味がある保存ですでに存在するデータを送っても既存のデータが返ってきて201か返るか（冪等チェック）
+def test_create_interest_duplicate():
+    '''同じデータを2回送ってもエラーにならず、既存のデータが返るか'''
+    payload = {
+        'user_id': 1,
+        'spot_type': 'gourmet',
+        'spot_id': 1
+    }
+    
+    # 1回目
+    response1 = client.post('/interests', json=payload)
+    
+    # ステータスコードの確認
+    assert response1.status_code == 201
+    
+    id1 = response1.json()['id']
+    
+    # 2回目
+    response2 = client.post('/interests', json=payload)
+    
+    # ステータスコードの確認
+    assert response2.status_code == 201
+    id2 = response2.json()['id']
+    
+    #同じIDが返ってきているか確認
+    assert id1 == id2
