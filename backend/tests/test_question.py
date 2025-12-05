@@ -125,3 +125,33 @@ def test_get_options_id_422(test_spot_type, test_spot_id):
     
     # responseのステータスコードの確認
     assert response.status_code == 422
+
+
+# テストケース：回答結果保存で正常系のテスト
+@pytest.mark.parametrize("spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize("score, total", [
+    (0, 5),
+    (5, 5),
+    (3, 10),
+    (15, 15)
+])
+def test_save_question_success(spot_type, score, total):
+    # 送信するデータ
+    payload = {
+        "user_id": 1,
+        "spot_type": spot_type,
+        "score": score,
+        "total_questions": total
+    }
+    
+    response = client.post("/save_questions", json=payload)
+    
+    # ステータスコードの確認
+    assert response.status_code == 201
+    
+    # レスポンスの中身の確認
+    data = response.json()
+    assert "id" in data
+    assert data["user_id"] == 1
+    assert data["score"] == score
+    assert data["total_questions"] == total
