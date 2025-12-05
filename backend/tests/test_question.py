@@ -41,7 +41,7 @@ def test_get_questions_unknown_type(test_limit):
 
 # テストケース：問題取得でlimitを[5, 10, 15]以外でリクエスト送信したら422が返るか--------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
-@pytest.mark.parametrize('test_422_limit', [1, 4, 6, 9, 11, 14, 15, 999])
+@pytest.mark.parametrize('test_422_limit', [-1, 0, 1, 4, 6, 9, 11, 14, 16, 999])
 def test_get_question_limit_422(test_spot_type, test_422_limit):
     response = client.get('/question', params = {'spot_type': test_spot_type, 'limit': test_422_limit})
     
@@ -50,8 +50,10 @@ def test_get_question_limit_422(test_spot_type, test_422_limit):
 
 
 # テストケース：正常に選択肢を取得できるか-----------------------------------------------
-@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
-@pytest.mark.parametrize("test_spot_id", [1, 50, 100])
+@pytest.mark.parametrize("test_spot_type, test_spot_id", [
+    ("tourist", 1), ("tourist", 100),
+    ("gourmet", 1), ("gourmet", 99),
+])
 def test_get_options(test_spot_type, test_spot_id):
     # リクエストを送る
     response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
@@ -87,22 +89,21 @@ def test_get_options(test_spot_type, test_spot_id):
     assert len(set(all_ids)) == 4
 
 
-# テストケース：存在しないタイプを指定したら空リストが返るか-----------------------------------------
+# テストケース：存在しないタイプを指定したら422が返るか-----------------------------------------
 def test_get_options_unknown_type():
     # リクエストを送る
     response = client.get("/option", params={"spot_type": "unknown", "spot_id": 1})
     
     # ステータスコードの確認
-    assert response.status_code == 404 
-    
-    # レスポンスの中身の確認
-    data = response.json()
-    assert data["detail"] == "データが見つかりませんでした"
+    assert response.status_code == 422 
 
 
 # テストケース：存在しないIDを指定したら空リストが返るか-------------------------------------------
-@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
-@pytest.mark.parametrize("test_spot_id", [0, 101, -1, 9999])
+@pytest.mark.parametrize("test_spot_type, test_spot_id", [
+    ("tourist", 101), 
+    ("gourmet", 100), 
+    ("tourist", 9999),
+])
 def test_get_options_unknown_id(test_spot_type, test_spot_id):
     # リクエストを送る
     response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
@@ -113,3 +114,14 @@ def test_get_options_unknown_id(test_spot_type, test_spot_id):
     # responseのレスポンスの中身の確認
     data = response.json()
     assert data["detail"] == "データが見つかりませんでした"
+    
+
+# テストケース：選択肢取得で許容されてない数値をIDに指定したら422が返るか----------------------------
+@pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
+@pytest.mark.parametrize("test_spot_id", [-999, -1, 0])
+def test_get_options_id_422(test_spot_type, test_spot_id):
+    # リクエストを送る
+    response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
+    
+    # responseのステータスコードの確認
+    assert response.status_code == 422
