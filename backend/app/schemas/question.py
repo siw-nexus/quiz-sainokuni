@@ -1,7 +1,5 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
-
-
 
 
 # 問題文のレスポンスの型の定義
@@ -36,5 +34,5 @@ class SendSaveQuestionResponse(BaseModel):
 class SendSaveQuestion(BaseModel):
     user_id: int
     spot_type: Literal['tourist', 'gourmet']
-    score: Literal[5, 10, 15] = 5
-    total_questions: int
+    score: int = Field(ge = 0)
+    total_questions: Literal[5, 10, 15]
