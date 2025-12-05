@@ -1,6 +1,7 @@
 from typing import List, Literal
 from fastapi import FastAPI, HTTPException, Query, status, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 # データベース接続設定をインポート
 from app.database import db_connect
@@ -76,6 +77,10 @@ def send_save_question(
     if quiz_result_data.total_questions - quiz_result_data.score < 0:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアが問題数より大きい数値ではいけません")
     
-    result = save_question(db, quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
-
-    return result
+    try:
+        result = save_question(db, quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
+        
+        return result
+    
+    except IntegrityError:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
