@@ -65,17 +65,12 @@ def create_interests(
 # 問題を保存する
 @app.post("/save_questions", response_model=SendSaveQuestionResponse, status_code=201)
 def send_save_question(
-    quiz_result_data: SendSaveQuestion
+    quiz_result_data: SendSaveQuestion,
 ):
-    q = quiz_result_data
-
     # スコアと問題数に不正な値が入っていた場合エラーを返す
-    if (q.score != 5 or q.score != 10 or q.score != 15) and q.total_questions-q.score < 0:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアまたは問題数の値が不正です")
-    # spot_typeの値が指定意外だった場合
-    elif q.spot_type != "tourist" or q.spot_type != "gourmet":
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スポットタイプの値が不正です")
-    else:
-        result = save_question(q.user_id, q.spot_type, q.score, q.total_questions)
+    if quiz_result_data.total_questions - quiz_result_data.score < 0:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアが問題数より大きい数値ではいけません")
+    
+    result = save_question(quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
 
     return result
