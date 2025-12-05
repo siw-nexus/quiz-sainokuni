@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 from app.database import db_connect
 
 # データベースを操作する関数をインポート
-from app.crud.question import get_question_text, get_options
+from app.crud.question import get_question_text, get_options, save_question
 from app.crud.interest import add_interests
 
 # レスポンスモデルをインポート
-from app.schemas.question import QestionResponse, OptionResponse
+from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse
 from app.schemas.interest import AddInterestResponse, InterestsCreate
 
 
