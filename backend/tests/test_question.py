@@ -178,3 +178,24 @@ def test_save_question_logic_error(score, total):
     
     # レスポンスの中身の確認
     assert response.json()["detail"] == "スコアが問題数より大きい数値ではいけません"
+
+
+# テストケース：回答結果保存でschemasの制限に引っかかる値を送信して422が返ってくるか
+def test_save_question_validation_error():
+    # 存在しないspot_type
+    res1 = client.post("/save_questions", json={"user_id": 1, "spot_type": "unknown", "score": 3, "total_questions": 5})
+    
+    # ステータスコードの確認
+    assert res1.status_code == 422
+
+    # マイナスのスコア
+    res2 = client.post("/save_questions", json={"user_id": 1, "spot_type": "tourist", "score": -1, "total_questions": 5})
+    
+    # ステータスコードの確認
+    assert res2.status_code == 422
+
+    # 許可されていない問題数
+    res3 = client.post("/save_questions", json={"user_id": 1, "spot_type": "tourist", "score": 3, "total_questions": 7})
+    
+    # ステータスコードの確認
+    assert res3.status_code == 422
