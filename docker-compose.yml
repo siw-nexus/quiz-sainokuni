@@ -12,6 +12,7 @@ services:
       TZ: Asia/Tokyo 
     volumes:
       - db-data:/var/lib/mysql
+      - ./mysql_conf:/etc/mysql/conf.d
     ports:
       - "${MYSQL_PORT_NUMBER}:3306"
     restart: unless-stopped
