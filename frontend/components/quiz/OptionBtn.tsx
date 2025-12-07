@@ -41,6 +41,15 @@ const getOptions = async (apiUrl: string, spot_type: 'tourist' | 'gourmet', spot
   return options;
 }
 
+// 正誤判定をする関数
+const handleOption = (is_correct: number) => {
+  if (is_correct === 1) {
+    console.log('正解');
+  } else {
+    console.log('不正解');
+  }
+}
+
 
 export default function OptionBtn({ questions, spot_type }: Props) {
   const [options, setOptions] = useState<Option[]>([]);
@@ -70,6 +79,7 @@ export default function OptionBtn({ questions, spot_type }: Props) {
         <button
           key={option.id}
           className='border'
+          onClick={() => handleOption(option.is_correct)} // 正誤判定をする関数を呼び出し
         >
           {option.option_text}
         </button>
