@@ -23,6 +23,7 @@ type Props = {
 export default function QuizScreen({ spot_type, limit, onResult }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]); // 問題文を格納
   const [questionCount, setQuestionCount] = useState(1);
+  const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
 
   // APIのエンドポイント
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -52,6 +53,7 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
   const handleAnswerResult = (result: boolean) => {
+    setIsResponding(false);
     if (result === true) {
       console.log("正解");
     } else {
@@ -62,11 +64,19 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
     setQuestionCount(questionCount + 1)
   };
 
+  if (isResponding) {
+    return (
+      <main>
+        <QuestionText questions={questions} questionCount={questionCount}/>
+        <OptionBtn questions={questions} spot_type={spot_type} questionCount={questionCount} onResult={handleAnswerResult}/>
+      </main>
+    );
+  } else {
+    return (
+      <p>結果</p>
+    );
+  }
 
-  return (
-    <main>
-      <QuestionText questions={questions} questionCount={questionCount}/>
-      <OptionBtn questions={questions} spot_type={spot_type} questionCount={questionCount} onResult={handleAnswerResult}/>
-    </main>
-  )
+
+  return null;
 }
