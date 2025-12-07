@@ -1,4 +1,5 @@
 // コンポーネントのインポート
+import QuestionText from "@/components/quiz/QuestionText";
 import OptionBtn from "@/components/quiz/OptionBtn";
 
 type Props = {
@@ -32,8 +33,8 @@ export default async function Quiz({ searchParams }: Props) {
   
   return (
     <main>
-      <p>問題文</p>
-      <OptionBtn />
+      <QuestionText questions={questions} />
+      <OptionBtn questions={questions} spot_type={spot_type}/>
     </main>
   );
 }
