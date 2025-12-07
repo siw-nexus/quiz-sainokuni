@@ -20,11 +20,12 @@ type Option = {
 type Props = {
   questions: Question[];
   spot_type: 'tourist' | 'gourmet';
+  questionCount: number;
+  onResult: (isCorrect: boolean) => void;
 }
 
 // 選択肢を取得する関数
 const getOptions = async (apiUrl: string, spot_type: 'tourist' | 'gourmet', spot_id: number): Promise<Option[]> => {
-  console.log(`${apiUrl}/option?spot_type=${spot_type}&spot_id=${spot_id}`);
   // 選択肢を取得する
   const res = await fetch(
     `${apiUrl}/option?spot_type=${spot_type}&spot_id=${spot_id}`,
@@ -41,17 +42,8 @@ const getOptions = async (apiUrl: string, spot_type: 'tourist' | 'gourmet', spot
   return options;
 }
 
-// 正誤判定をする関数
-const handleOption = (is_correct: number) => {
-  if (is_correct === 1) {
-    console.log('正解');
-  } else {
-    console.log('不正解');
-  }
-}
 
-
-export default function OptionBtn({ questions, spot_type }: Props) {
+export default function OptionBtn({ questions, spot_type, questionCount, onResult }: Props) {
   const [options, setOptions] = useState<Option[]>([]);
 
   // APIのエンドポイント
@@ -62,7 +54,7 @@ export default function OptionBtn({ questions, spot_type }: Props) {
       try {
         // questions[0]が存在するかチェック
         if (questions && questions.length > 0) {
-            const data = await getOptions(apiUrl, spot_type, questions[0].id);
+            const data = await getOptions(apiUrl, spot_type, questions[questionCount - 1].spot_id);
             setOptions(data);
         }
       } catch (e) {
@@ -71,15 +63,16 @@ export default function OptionBtn({ questions, spot_type }: Props) {
     };
 
     fetchOptions();
-  }, [apiUrl, spot_type, questions]);
+  }, [apiUrl, spot_type, questions, questionCount]);
 
+  
   return (
     <div>
       {options.map((option) => (
         <button
           key={option.id}
           className='border'
-          onClick={() => handleOption(option.is_correct)} // 正誤判定をする関数を呼び出し
+          onClick={() => onResult(option.is_correct === 1)} // 正誤判定をする関数を呼び出し
         >
           {option.option_text}
         </button>
