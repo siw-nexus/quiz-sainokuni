@@ -3,11 +3,8 @@ from passlib.context import CryptContext
 import json
 
 # データベース接続設定をインポート
-from app.database import db_connect
+from app.database import SessionLocal
 
-
-# セッションの作成
-SessionLocal = db_connect()
 
 # ハッシュ化の設定
 pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
