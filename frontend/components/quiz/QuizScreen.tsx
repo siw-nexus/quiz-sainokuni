@@ -44,10 +44,11 @@ type Props = {
 
 export default function QuizScreen({ spot_type, limit, onResult }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]); // 問題文を格納
-  const [options, setOptions] = useState<Option>([]);        // 選択肢を格納
+  const [options, setOptions] = useState<Option>([]);         // 選択肢を格納
   const [questionCount, setQuestionCount] = useState(1);      // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
-  const [isCorrectText, setIsCorrectText] = useState('')      // 「正解」か「不正解」の文字列を格納
+  const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
+  const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
   const router = useRouter();
 
   // APIのエンドポイント
@@ -112,6 +113,10 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
     } else {
       setIsCorrectText("不正解");
     }
+
+    // 正解の選択肢を取得
+    const correctOption = options.find(item => item.is_correct === 1);
+    isAnswer(correctOption?.option_text);
   };
 
   // 次の問題へ行く関数
@@ -145,6 +150,8 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
     return (
       <main>
         <p>{isCorrectText}</p>
+        <p>{answer}</p>
+        <button className='border'>興味がある</button>
         <button className='border'onClick={() => handleNextQuiz()}>次の問題へ</button>
       </main>
     );
