@@ -68,9 +68,21 @@ def test_get_options(test_spot_type, test_spot_id):
     
     if len(data) > 0:
         # 必要なキーが含まれているかチェック
+        # 必須項目
         assert "id" in data[0]
         assert "option_text" in data[0]
         assert "is_correct" in data[0]
+        
+        # null許容項目（nullでもキー自体はある）
+        expected_fields = [
+            "detail", "address", "lat", "lon", "img", "hp_url",
+            "start_time", "finish_time", "notes", "tel",
+            # 観光地・グルメ固有のものも含めてチェック
+            "availavle_time", "closure_info", "category", "tokusanhin"
+        ]
+        
+        for field in expected_fields:
+            assert field in data[0]
     
     
     # 正解と不正解をリストに分ける
