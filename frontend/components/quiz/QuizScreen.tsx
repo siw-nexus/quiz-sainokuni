@@ -15,6 +15,27 @@ type Question = {
   question_text: string;
 }
 
+// optionsの型を定義
+type Option = {
+  id: number;
+  option_text: string;
+  is_correct: number;
+  detail: string | null;
+  address: string | null;
+  lat: string | null;
+  lon: string | null;
+  availavle_time: string | null;
+  closure_info: string | null;
+  category: string | null;
+  tokusanhin: string | null;
+  start_time: string | null;
+  finish_time: string | null;
+  notes: string | null;
+  tel: string | null;
+  hp_url: string | null;
+  img: string | null;
+}
+
 type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
@@ -23,6 +44,7 @@ type Props = {
 
 export default function QuizScreen({ spot_type, limit, onResult }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]); // 問題文を格納
+  const [options, setOptions] = useState<Option>([]);        // 選択肢を格納
   const [questionCount, setQuestionCount] = useState(1);      // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('')      // 「正解」か「不正解」の文字列を格納
@@ -52,6 +74,32 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
 
     fetchQuestions(apiUrl, spot_type, limit);
   }, []);
+
+
+  // 選択肢を取得する
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const res = await fetch(
+        `${apiUrl}/option?spot_type=${spot_type}&spot_id=${questions[questionCount - 1].spot_id}`,
+        { cache: "no-cache"} // キャッシュを無効化
+      );
+    
+      // レスポンスの確認
+      if (!res.ok) {
+        throw new Error("選択肢の取得に失敗しました");
+      }
+    
+      // レスポンスの中身を取得
+      const data = await res.json();
+
+      setOptions(data);
+    }
+    
+    // questions配列に値が入っていて、かつquestionCountがquestions配列の長さ以下の場合にfetchOptions()を呼び出す
+    if (questions.length > 0 && questions.length >= questionCount){
+      fetchOptions()
+    }
+  }, [questions, questionCount, apiUrl, spot_type]);
 
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
@@ -89,7 +137,7 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
       <main>
         <p>{questionCount}問目</p>
         <QuestionText questions={questions} questionCount={questionCount}/>
-        <OptionBtn questions={questions} spot_type={spot_type} questionCount={questionCount} onResult={handleAnswerResult}/>
+        <OptionBtn options={options} onResult={handleAnswerResult}/>
       </main>
     );
   } else {
