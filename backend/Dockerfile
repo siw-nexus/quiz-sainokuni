@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # nc (netcat) をインストール (DBの起動待ちで使用)
 RUN apt-get update && \
-    apt-get install -y netcat-traditional && \
+    apt-get install -y netcat-traditional tzdata && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

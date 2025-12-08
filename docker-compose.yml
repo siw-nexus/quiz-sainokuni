@@ -9,8 +9,10 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       LANG: C.UTF-8
+      TZ: Asia/Tokyo 
     volumes:
       - db-data:/var/lib/mysql
+      - ./mysql_conf:/etc/mysql/conf.d
     ports:
       - "${MYSQL_PORT_NUMBER}:3306"
     restart: unless-stopped
@@ -28,6 +30,7 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       DB_HOST: db
       DB_PORT: 3306
+      TZ: Asia/Tokyo
     depends_on:
       - db
     restart: unless-stopped
