@@ -97,7 +97,7 @@ export default function QuizScreen({ spot_type, limit, onResult }: Props) {
     return (
       <main>
         <p>{isCorrectText}</p>
-        <button onClick={() => handleNextQuiz()}>次の問題へ</button>
+        <button className='border'onClick={() => handleNextQuiz()}>次の問題へ</button>
       </main>
     );
   }
