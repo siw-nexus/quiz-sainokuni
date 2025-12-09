@@ -10,7 +10,6 @@ const QUESTION_COUNTS = [5, 10, 15];
 const QUESTION_TYPES = [
   { key: 'gourmet', label: 'グルメ' },
   { key: 'tourist', label: '観光地' },
-  { key: 'event', label: 'イベント' },
 ];
 
 export default function QuizSelect() {
