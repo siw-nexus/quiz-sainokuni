@@ -9,11 +9,13 @@ export default function FinishScreen() {
     router.push('/');
   };
 
+  // ▼▼▼ ここを書き換えました ▼▼▼
   // 「出題した問題を表示」ボタンを押したときの処理
   const handleShowQuestions = () => {
-    // ※ここに問題一覧を表示する処理を書く予定（現在はログのみ）
-    console.log("出題した問題を表示");
+    // ログ出力ではなく、実際にページ移動するように変更
+    router.push('/history');
   };
+  // ▲▲▲ 書き換え終わり ▲▲▲
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
@@ -67,7 +69,6 @@ export default function FinishScreen() {
               ホームへ戻る
             </button>
             
-            {/* 変更箇所: シェアボタン -> 出題した問題を表示ボタン */}
             <button 
               onClick={handleShowQuestions}
               className="w-full bg-white border-2 border-gray-200 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center gap-2"
