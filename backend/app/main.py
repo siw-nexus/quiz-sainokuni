@@ -9,11 +9,11 @@ from app.database import db_connect
 
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, get_options, save_question
-from app.crud.interest import add_interests
+from app.crud.interest import add_interests, get_interests
 
 # レスポンスモデルをインポート
 from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse
-from app.schemas.interest import AddInterestResponse, InterestsCreate
+from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
 
 
 app = FastAPI()
@@ -102,3 +102,19 @@ def send_save_question(
     
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
+
+
+# 興味がある一覧取得
+@app.get('/interest', response_model = List[GetInterestResponse])
+def get_interest(
+    user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
+    db: Session = Depends(db_connect)
+):
+    result = get_interests(db, user_id, spot_type)
+    
+    # データがからなら404エラーを返す
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
