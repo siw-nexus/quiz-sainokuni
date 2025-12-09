@@ -5,8 +5,6 @@ from app.models import Interests
 
 
 # 興味がある一覧取得する関数
-def get_interests(db, user_id, spot_type):
-    stmt = 
 
 
 # 興味あるを保存する関数
