@@ -109,13 +109,14 @@ export default function QuizScreen({ spot_type, limit }: Props) {
     isAnswer(correctOption?.option_text || '');
   };
 
- // 次の問題へ行く関数
+  // 次の問題へ
   const handleNextQuiz = () => {
     const nextCount = questionCount + 1;
     setQuestionCount(nextCount);
     
     if (questions.length < nextCount) {
-      // ▼▼▼ 追加: 終了画面に行く前に、今回の問題を保存する ▼▼▼
+      // ▼▼▼ ここに追加しました (手順1) ▼▼▼
+      // クイズ終了時に、今回の問題データをブラウザに保存する
       localStorage.setItem('quiz_history', JSON.stringify(questions));
       // ▲▲▲ 追加終わり ▲▲▲
 
@@ -129,10 +130,10 @@ export default function QuizScreen({ spot_type, limit }: Props) {
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
       
-      {/* メインコンテナ：スマホは縦、PCは横並び(flex-row) */}
+      {/* メインコンテナ */}
       <div className="w-full max-w-md md:max-w-6xl bg-white min-h-[600px] md:min-h-[700px] rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
-        {/* --- [PC用] 左サイドパネル (黒背景) --- */}
+        {/* --- [PC用] 左サイドパネル --- */}
         <div className="hidden md:flex md:w-1/3 bg-[#333333] text-white p-10 flex-col justify-between relative">
           <div>
             <p className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-2">CATEGORY</p>
@@ -147,14 +148,13 @@ export default function QuizScreen({ spot_type, limit }: Props) {
             </p>
           </div>
 
-          {/* 装飾 */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
         </div>
 
-        {/* --- [共通] 右サイドパネル (メインコンテンツ) --- */}
+        {/* --- [共通] 右サイドパネル --- */}
         <div className="w-full md:w-2/3 flex flex-col relative">
           
-          {/* スマホ用ヘッダー (PCでは非表示) */}
+          {/* スマホ用ヘッダー */}
           <div className="md:hidden h-14 flex items-center justify-center font-bold text-gray-400 text-sm border-b border-gray-100">
             Q. {questionCount} / {limit}
           </div>
