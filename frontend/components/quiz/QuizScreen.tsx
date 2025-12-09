@@ -109,11 +109,16 @@ export default function QuizScreen({ spot_type, limit }: Props) {
     isAnswer(correctOption?.option_text || '');
   };
 
-  // 次の問題へ
+ // 次の問題へ行く関数
   const handleNextQuiz = () => {
     const nextCount = questionCount + 1;
     setQuestionCount(nextCount);
+    
     if (questions.length < nextCount) {
+      // ▼▼▼ 追加: 終了画面に行く前に、今回の問題を保存する ▼▼▼
+      localStorage.setItem('quiz_history', JSON.stringify(questions));
+      // ▲▲▲ 追加終わり ▲▲▲
+
       router.push('/finish');
     } else {
       setIsResponding(true);
