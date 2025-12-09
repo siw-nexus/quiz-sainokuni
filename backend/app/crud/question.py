@@ -24,13 +24,13 @@ def get_options(db, spot_type: str, spot_id: int):
         # 観光地の選択肢を取得
         # 正解を取得
         option_correct = (
-            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(1).label('is_correct'))
+            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(1).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.availavle_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
             .where(spot_id == Tourist_spots.id)
         )
         
         # 不正解の選択肢を3件取得
         option_incorrect = (
-            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(0).label('is_correct'))
+            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(0).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.availavle_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
             .where(spot_id != Tourist_spots.id)
             .order_by(func.random())
             .limit(3)
@@ -56,13 +56,13 @@ def get_options(db, spot_type: str, spot_id: int):
         # グルメの選択肢を取得
         # 正解を取得
         option_correct = (
-            select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(1).label('is_correct'))
+            select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(1).label('is_correct'), Gourmet_spots.detail, Gourmet_spots.lat, Gourmet_spots.lon, Gourmet_spots.category, Gourmet_spots.tokusanhin, Gourmet_spots.start_time, Gourmet_spots.finish_time, Gourmet_spots.notes, Gourmet_spots.hp_url, Gourmet_spots.img)
             .where(spot_id == Gourmet_spots.id)
         )
         
         # 不正解の選択肢を3件取得
         option_incorrect = (
-            select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(0).label('is_correct'))
+            select(Gourmet_spots.id, Gourmet_spots.name.label('option_text'), literal(0).label('is_correct'), Gourmet_spots.detail, Gourmet_spots.lat, Gourmet_spots.lon, Gourmet_spots.category, Gourmet_spots.tokusanhin, Gourmet_spots.start_time, Gourmet_spots.finish_time, Gourmet_spots.notes, Gourmet_spots.hp_url, Gourmet_spots.img)
             .where(spot_id != Gourmet_spots.id)
             .order_by(func.random())
             .limit(3)

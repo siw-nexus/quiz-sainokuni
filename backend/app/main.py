@@ -1,5 +1,6 @@
 from typing import List, Literal
 from fastapi import FastAPI, HTTPException, Query, status, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -16,6 +17,19 @@ from app.schemas.interest import AddInterestResponse, InterestsCreate
 
 
 app = FastAPI()
+
+# CORSの設定
+origins = [
+    "http://localhost:3000", # Next.jsのURL
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, # 許可するオリジン
+    allow_credentials=True,
+    allow_methods=["*"],   # 全てのメソッド(GET, POST...)を許可
+    allow_headers=["*"],   # 全てのヘッダーを許可
+)
 
 @app.get("/")
 def read_root():
