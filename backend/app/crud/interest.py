@@ -62,6 +62,9 @@ def get_interests(db, user_id: int, spot_type: str):
     return db.execute(stmt).mappings().all()
 
 
+# 興味がある一覧取得する関数
+
+
 # 興味あるを保存する関数
 def add_interests(db, user_id: int, spot_type: str, spot_id: int):
     # データがすでにあるか確認
