@@ -50,3 +50,11 @@ class SendSaveQuestion(BaseModel):
     spot_type: Literal['tourist', 'gourmet']
     score: int = Field(ge = 0)
     total_questions: Literal[5, 10, 15]
+
+
+class SendSaveHistory(BaseModel):
+    quiz_result_id: int
+    quiz_num: int
+    quiz_id: int
+    choice_id: int
+    is_correct: bool
