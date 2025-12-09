@@ -108,11 +108,11 @@ def save_question(db, user_id: int, spot_type: str, score: int, total_questions:
 
 
 # 回答履歴をデータベースに保存する関数
-def save_quiz_history(db, quiz_result_id: int, quiz_num: int, quiz_id: int, choice_id: int, is_correct: bool):
+def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, choice_id: int, is_correct: bool):
     quiz_history = QuizAnswers(
         quiz_result_id = quiz_result_id,
-        quiz_num = quiz_num,
-        quiz_id = quiz_id,
+        question_num = quiz_num,
+        question_id = quiz_id,
         choice_id = choice_id,
         is_correct = is_correct
     )
@@ -120,4 +120,6 @@ def save_quiz_history(db, quiz_result_id: int, quiz_num: int, quiz_id: int, choi
     db.add(quiz_history)
     db.commit()
 
-    return "データベースに回答履歴を保存が完了しました。"
+    db.refresh(quiz_history)
+
+    return quiz_history

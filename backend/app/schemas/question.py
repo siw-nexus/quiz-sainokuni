@@ -51,6 +51,14 @@ class SendSaveQuestion(BaseModel):
     score: int = Field(ge = 0)
     total_questions: Literal[5, 10, 15]
 
+class SendSaveHistoryResponse(BaseModel):
+    quiz_result_id: int
+    question_num: int
+    question_id: int
+    choice_id: int
+    is_correct: bool
+
+    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
 
 class SendSaveHistory(BaseModel):
     quiz_result_id: int

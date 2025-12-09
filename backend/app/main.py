@@ -8,11 +8,11 @@ from sqlalchemy.exc import IntegrityError
 from app.database import db_connect
 
 # データベースを操作する関数をインポート
-from app.crud.question import get_question_text, get_options, save_question
+from app.crud.question import get_question_text, get_options, save_question, save_quiz_histories
 from app.crud.interest import add_interests
 
 # レスポンスモデルをインポート
-from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse
+from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse, SendSaveHistory, SendSaveHistoryResponse
 from app.schemas.interest import AddInterestResponse, InterestsCreate
 
 
@@ -102,3 +102,17 @@ def send_save_question(
     
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
+    
+
+# 回答の履歴を保存する
+@app.post("/save_histories", response_model=SendSaveHistoryResponse, status_code=201)
+def send_save_history(
+    history_data: SendSaveHistory,
+    db: Session = Depends(db_connect)
+):
+
+    if history_data.quiz_result_id <= 0:
+        raise HTTPException(statsu_code = status.HTTP_400_BAD_REQUEST, detail = "0以下のidの値は不正です")
+    else:
+        result = save_quiz_histories(db, history_data.quiz_result_id, history_data.quiz_num, history_data.quiz_id, history_data.choice_id, history_data.is_correct)
+        return result
