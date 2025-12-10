@@ -38,8 +38,8 @@ type Option = {
 
 // Propsの定義
 type Props = {
-  spot_type: 'tourist' | 'gourmet' | undefined;
-  limit: number | undefined;
+  spot_type: 'tourist' | 'gourmet';
+  limit: number;
 }
 
 export default function QuizScreen({ spot_type, limit }: Props) {
