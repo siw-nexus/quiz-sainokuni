@@ -13,9 +13,9 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<Question[]>([]);
   const router = useRouter();
 
-  // 画面が表示されたらローカルストレージからデータを取得
+  // 画面が表示されたらセッションストレージから回答履歴を取得
   useEffect(() => {
-    const savedData = localStorage.getItem('quiz_history');
+    const savedData = sessionStorage.getItem('quiz_history');
     if (savedData) {
       setHistory(JSON.parse(savedData));
     }
@@ -30,13 +30,13 @@ export default function HistoryPage() {
         {/* --- [PC用] 左サイドパネル --- */}
         <div className="hidden md:flex md:w-1/3 bg-[#333333] text-white p-10 flex-col justify-between relative">
           <div>
-             <h1 className="text-3xl font-bold tracking-widest mb-4">HISTORY</h1>
-             <p className="text-gray-400 text-sm">
-               出題された問題の一覧です。<br/>
-               復習に役立てましょう。
-             </p>
+            <h1 className="text-3xl font-bold tracking-widest mb-4">HISTORY</h1>
+            <p className="text-gray-400 text-sm">
+              出題された問題の一覧です。<br/>
+              復習に役立てましょう。
+            </p>
           </div>
-          
+
           <button 
             onClick={() => router.push('/')}
             className="mt-auto flex items-center gap-2 text-gray-300 hover:text-white transition"

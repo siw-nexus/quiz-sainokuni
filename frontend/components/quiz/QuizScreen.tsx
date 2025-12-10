@@ -115,10 +115,8 @@ export default function QuizScreen({ spot_type, limit }: Props) {
     setQuestionCount(nextCount);
     
     if (questions.length < nextCount) {
-      // ▼▼▼ ここに追加しました (手順1) ▼▼▼
       // クイズ終了時に、今回の問題データをブラウザに保存する
-      localStorage.setItem('quiz_history', JSON.stringify(questions));
-      // ▲▲▲ 追加終わり ▲▲▲
+      sessionStorage.setItem('quiz_history', JSON.stringify(questions));
 
       router.push('/finish');
     } else {
