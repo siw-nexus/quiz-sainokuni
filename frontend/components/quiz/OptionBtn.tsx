@@ -33,7 +33,7 @@ export default function OptionBtn({ options, onResult }: Props) {
       {options.map((option) => (
         <button
           key={option.id}
-          onClick={() => onResult(option.is_correct === 1)} // 正誤判定
+          onClick={() => onResult(option.is_correct === 1)} // 正誤判定をする関数を呼び出し
           className="
             bg-[#333333] 
             hover:bg-black 
