@@ -57,7 +57,7 @@ export default function HistoryPage() {
           {/* スマホ用ヘッダー */}
           <div className="md:hidden h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-white sticky top-0 z-10">
             <h1 className="font-bold text-gray-800">出題履歴</h1>
-            <button onClick={() => router.push('/')} className="text-sm text-gray-500">
+            <button onClick={() => router.push('/finish')} className="text-sm text-gray-500">
               閉じる
             </button>
           </div>
