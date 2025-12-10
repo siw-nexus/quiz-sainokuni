@@ -43,12 +43,12 @@ type Props = {
 }
 
 export default function QuizScreen({ spot_type, limit }: Props) {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
-  const [questionCount, setQuestionCount] = useState(1);
-  const [isResponding, setIsResponding] = useState(true);
-  const [isCorrectText, setIsCorrectText] = useState('');
-  const [answer, isAnswer] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]); // 問題文を格納
+  const [options, setOptions] = useState<Option[]>([]);       // 選択肢を格納
+  const [questionCount, setQuestionCount] = useState(1);      // 現在何問目かをカウントする変数
+  const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
+  const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
+  const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
   const router = useRouter();
 
   // APIのエンドポイント
@@ -61,9 +61,11 @@ export default function QuizScreen({ spot_type, limit }: Props) {
       try {
         const res = await fetch(
           `${apiUrl}/question?spot_type=${spot_type}&limit=${limit}`,
-          { cache: "no-cache"} 
+          { cache: "no-cache"} // キャッシュを無効化
         );
+        // レスポンスの確認
         if (!res.ok) throw new Error("問題の取得に失敗しました");
+        // レスポンスの中身を取得
         const data = await res.json();
         setQuestions(data);
       } catch (e) {
@@ -81,45 +83,55 @@ export default function QuizScreen({ spot_type, limit }: Props) {
       try {
         const res = await fetch(
           `${apiUrl}/option?spot_type=${spot_type}&spot_id=${questions[questionCount - 1].spot_id}`,
-          { cache: "no-cache"}
+          { cache: "no-cache"} // キャッシュを無効化
         );
+        // レスポンスの確認
         if (!res.ok) throw new Error("選択肢の取得に失敗しました");
+        // レスポンスの中身を取得
         const data = await res.json();
         setOptions(data);
       } catch (e) {
         console.error(e);
       }
     };
-    
+
+    // questions配列に値が入っていて、かつquestionCountがquestions配列の長さ以下の場合にfetchOptions()を呼び出す
     if (questions.length > 0 && questions.length >= questionCount){
       fetchOptions();
     }
   }, [questions, questionCount, apiUrl, spot_type]);
 
 
-  // 正誤判定
+  // OptionBtnコンポーネントから正誤判定の結果を受け取る
   const handleAnswerResult = (result: boolean) => {
+    // 回答中のフラグをfalseにする
     setIsResponding(false);
     if (result) {
       setIsCorrectText("正解！");
     } else {
       setIsCorrectText("不正解...");
     }
+    // 正解の選択肢を取得
     const correctOption = options.find(item => item.is_correct === 1);
     isAnswer(correctOption?.option_text || '');
   };
 
-  // 次の問題へ
+  // 次の問題へ行く関数
   const handleNextQuiz = () => {
+    // 次か何問目か
     const nextCount = questionCount + 1;
+
+    // 次の問題へ
     setQuestionCount(nextCount);
     
+    // 出題数が取得した問題数を超えたらfinish画面に移動
     if (questions.length < nextCount) {
       // クイズ終了時に、今回の問題データをブラウザに保存する
       sessionStorage.setItem('quiz_history', JSON.stringify(questions));
 
       router.push('/finish');
     } else {
+      // 出題数が取得した問題数を超えていなかったら回答中のフラグをtrueにする
       setIsResponding(true);
     }
   };
@@ -160,6 +172,7 @@ export default function QuizScreen({ spot_type, limit }: Props) {
           {/* コンテンツエリア */}
           <div className="flex-1 flex flex-col px-6 py-8 md:px-12 md:py-12 justify-center">
             
+            {/* 回答中フラグがtrueだったら問題と選択肢を表示 */}
             {isResponding ? (
               /* --- 出題中 --- */
               <>
@@ -173,7 +186,7 @@ export default function QuizScreen({ spot_type, limit }: Props) {
                 </div>
               </>
             ) : (
-              /* --- 結果表示 --- */
+              /* 回答中フラグがfalseだったら結果を表示 */
               <div className="flex-1 flex flex-col items-center justify-center animate-pulse-once max-w-lg mx-auto w-full">
                 <div className="text-center mb-12">
                   <h2 className={`text-5xl md:text-6xl font-black mb-6 ${isCorrectText.includes("正解") ? "text-red-500" : "text-blue-600"}`}>
