@@ -12,7 +12,7 @@ pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 
 # モデルをインポート
 try:
-    from app.models import Tourist_spots, Gourmet_spots, Questions, Users, Interests
+    from app.models import Tourist_spots, Gourmet_spots, Questions, Users, Interests, QuizResults, QuizAnswers
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
@@ -325,6 +325,132 @@ def dummy_interest_insert(db):
     db.commit()
 
 
+# 回答結果と回答履歴のダミーデータを入れる関数
+def dummy_quiz_result_insert(db):
+    # 観光地の回答結果を取得
+    check_quiz_result = db.query(QuizResults).filter(
+        QuizResults.user_id == 1,
+        QuizResults.spot_type == 'tourist'
+    ).first()
+    
+    tourist_dummy_result = None
+    
+    # 観光地の回答結果が無かったらINSERTする
+    if not check_quiz_result:
+        tourist_dummy_result = QuizResults(
+            user_id = 1,
+            spot_type = 'tourist',
+            score = 5,
+            total_questions = 5
+        )
+        
+        db.add(tourist_dummy_result)
+        
+        db.flush()
+        db.refresh(tourist_dummy_result)
+        
+        print('観光地の回答結果のINSERT完了')
+    else:
+        # すでにあるデータを格納
+        tourist_dummy_result = check_quiz_result
+        print('観光地の回答結果は存在するのでスキップ')
+    
+    # 観光地の回答履歴があるか確認
+    quiz_answers_num = db.query(QuizAnswers).filter(
+        QuizAnswers.quiz_result_id == tourist_dummy_result.id
+    ).count()
+    
+    # 観光地の回答履歴が5個未満だったら、足りない分だけ追加
+    if quiz_answers_num < 5:
+        # 足りない個数を取得
+        missing_count = 5 - quiz_answers_num
+        
+        # 続きの番頭を定義
+        start_num = quiz_answers_num + 1
+        
+        for i in range(missing_count):
+            # 現在の番号
+            current_q_num = start_num + i
+            
+            tourist_dummy_answers = QuizAnswers(
+                quiz_result_id = tourist_dummy_result.id,
+                question_num = current_q_num,
+                question_id = current_q_num,
+                choice_id = current_q_num,
+                is_correct = True
+            )
+            
+            db.add(tourist_dummy_answers)
+        
+        print(f'観光地の回答履歴の足りない分（{missing_count}件）をINSERT完了')
+    else:
+        print('観光地の回答履歴は5件あるのでスキップ')
+    
+    
+    # グルメの回答結果を取得
+    check_quiz_result = db.query(QuizResults).filter(
+        QuizResults.user_id == 1,
+        QuizResults.spot_type == 'gourmet'
+    ).first()
+    
+    gourmet_dummy_result = None
+    
+    # グルメの回答結果が無かったらINSERTする
+    if not check_quiz_result:
+        gourmet_dummy_result = QuizResults(
+            user_id = 1,
+            spot_type = 'gourmet',
+            score = 5,
+            total_questions = 5
+        )
+        
+        db.add(gourmet_dummy_result)
+        
+        db.flush()
+        db.refresh(gourmet_dummy_result)
+        
+        print('グルメの回答結果のINSERT完了')
+    else:
+        # すでにあるデータを格納
+        gourmet_dummy_result = check_quiz_result
+        
+        print('グルメの回答結果は存在するのでスキップ')
+    
+    # グルメの回答履歴があるか確認
+    quiz_answers_num = db.query(QuizAnswers).filter(
+        QuizAnswers.quiz_result_id == gourmet_dummy_result.id
+    ).count()
+    
+    # グルメの回答履歴が5個未満だったら、足りない分だけ追加
+    if quiz_answers_num < 5:
+        # 足りない個数を取得
+        missing_count = 5 - quiz_answers_num
+        
+        # 続きの番頭を定義
+        start_num = quiz_answers_num + 1
+        
+        for i in range(missing_count):
+            # 現在の番号
+            current_q_num = start_num + i
+            
+            gourmet_dummy_answers = QuizAnswers(
+                quiz_result_id = gourmet_dummy_result.id,
+                question_num = current_q_num,
+                question_id = current_q_num,
+                choice_id = current_q_num,
+                is_correct = True
+            )
+            
+            db.add(gourmet_dummy_answers)
+        
+        print(f'グルメの回答履歴の足りない分（{missing_count}件）をINSERT完了')
+    else:
+        print('グルメの回答履歴は5件あるのでスキップ')
+    
+    # トランザクションを確定
+    db.commit()
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -358,6 +484,9 @@ def seed_data():
     
     # 興味があるのデータを入れる関数を呼び出す
     dummy_interest_insert(db)
+    
+    # 回答結果と回答履歴のダミーデータを入れる関数を呼び出す
+    dummy_quiz_result_insert(db)
 
 
     db.close()
