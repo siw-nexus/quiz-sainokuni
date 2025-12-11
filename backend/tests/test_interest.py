@@ -123,3 +123,15 @@ def test_get_interest():
         assert 'tel' in data[0]
         assert 'hp_url' in data[0]
         assert 'img' in data[0]
+
+
+# テストケース：興味がある一覧取得で興味があるを保存してないユーザーIDを指定したときに404が返るか
+def test_get_interest_404():
+    response = client.get('/interests', params={"user_id": 100000000000})
+    
+    # ステータスコードの確認
+    assert response.status_code == 404
+    
+    # レスポンスの中身の確認
+    data = response.json()
+    assert data["detail"] == "データが見つかりませんでした"
