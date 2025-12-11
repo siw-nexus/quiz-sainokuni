@@ -135,3 +135,12 @@ def test_get_interest_404():
     # レスポンスの中身の確認
     data = response.json()
     assert data["detail"] == "データが見つかりませんでした"
+
+
+# テストケース：興味がある一覧取得でuser_idの指定を許容されていない値にしたときに422が返ってくるか
+@pytest.mark.parametrize('user_id', [-9999, -1, 0])
+def test_get_interest_422(user_id):
+    response = client.get('/interests', params={"user_id": user_id})
+    
+    # ステータスコードの確認
+    assert response.status_code == 422
