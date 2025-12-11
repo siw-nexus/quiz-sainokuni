@@ -17,7 +17,7 @@ def get_interests(db, user_id: int):
             Tourist_spots.address,
             Tourist_spots.lat,
             Tourist_spots.lon,
-            Tourist_spots.availavle_time,
+            Tourist_spots.available_time,
             Tourist_spots.closure_info,
             Tourist_spots.start_time,
             Tourist_spots.finish_time,

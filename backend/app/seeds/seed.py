@@ -85,7 +85,7 @@ def tourist_data_insert(endpoint, db):
                 address = item["kankochi_jusho"]["value"],
                 lat = item["kankochi_ido"]["value"],
                 lon = item["kankochi_keido"]["value"],
-                availavle_time = item["kankochi_riyokanojikanjoho"]["value"],
+                available_time = item["kankochi_riyokanojikanjoho"]["value"],
                 closure_info = item["kankochi_kyugyojoho"]["value"],
                 start_time = item["kaishijikan"]["value"],
                 finish_time = item["shuryojikan"]["value"],

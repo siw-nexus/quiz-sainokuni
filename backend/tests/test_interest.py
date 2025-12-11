@@ -121,7 +121,7 @@ def test_get_interest():
         assert 'address' in i
         assert 'lat' in i
         assert 'lon' in i
-        assert 'availavle_time' in i
+        assert 'available_time' in i
         assert 'closure_info' in i
         assert 'category' in i
         assert 'tokusanhin' in i
@@ -143,7 +143,7 @@ def test_get_interest():
         if i['spot_type'] == 'gourmet':
             has_gourmet = True
             
-            assert i['availavle_time'] is None
+            assert i['available_time'] is None
             assert i['closure_info'] is None
             
     # 観光地とグルメのデータを正しく受け取れているか確認
