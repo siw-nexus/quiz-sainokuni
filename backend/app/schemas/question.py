@@ -61,8 +61,8 @@ class SendSaveHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
 
 class SendSaveHistory(BaseModel):
-    quiz_result_id: int
-    quiz_num: int
-    quiz_id: int
-    choice_id: int
+    quiz_result_id: int = Field(ge = 1)
+    question_num: int = Field(ge = 1)
+    question_id: int = Field(ge = 1)
+    choice_id: int = Field(ge = 1)
     is_correct: bool

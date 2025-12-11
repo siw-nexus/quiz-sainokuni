@@ -111,8 +111,10 @@ def send_save_history(
     db: Session = Depends(db_connect)
 ):
 
-    if history_data.quiz_result_id <= 0:
-        raise HTTPException(statsu_code = status.HTTP_400_BAD_REQUEST, detail = "0以下のidの値は不正です")
-    else:
-        result = save_quiz_histories(db, history_data.quiz_result_id, history_data.quiz_num, history_data.quiz_id, history_data.choice_id, history_data.is_correct)
+    try:
+        result = save_quiz_histories(db, history_data.quiz_result_id, history_data.question_num, history_data.question_id, history_data.choice_id, history_data.is_correct)
         return result
+    
+    except IntegrityError:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
+
