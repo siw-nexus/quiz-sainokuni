@@ -91,3 +91,82 @@ def test_create_interest_unknown_user():
     
     # ステータスコードの確認
     assert response.status_code == 404
+
+
+# テストケース：興味がある一覧を正常に取得できるか
+def test_get_interest():
+    response = client.get('/interests', params={"user_id": 1})
+    
+    # ステータスコードの確認
+    assert response.status_code == 200
+    
+    # レスポンスの確認
+    data = response.json()
+    
+    # 観光地とグルメの両方を取得出来てることを確認するフラグ
+    has_tourist = False
+    has_gourmet = False
+    
+    # データが返ってきているか確認
+    assert len(data) > 0
+        
+    # 必要なキーが含まれているかチェック
+    for i in data:
+        # 共通項目
+        assert 'id' in i
+        assert 'spot_type' in i
+        assert 'spot_id' in i
+        assert 'name' in i
+        assert 'detail' in i
+        assert 'address' in i
+        assert 'lat' in i
+        assert 'lon' in i
+        assert 'availavle_time' in i
+        assert 'closure_info' in i
+        assert 'category' in i
+        assert 'tokusanhin' in i
+        assert 'start_time' in i
+        assert 'finish_time' in i
+        assert 'notes' in i
+        assert 'tel' in i
+        assert 'hp_url' in i
+        assert 'img' in i
+        
+        # 観光地のレスポンスにグルメのデータが混ざっていないか確認
+        if i['spot_type'] == 'tourist':
+            has_tourist = True
+            
+            assert i['category'] is None
+            assert i['tokusanhin'] is None
+            
+        # グルメのレスポンスに観光地のデータが混ざっていないか確認
+        if i['spot_type'] == 'gourmet':
+            has_gourmet = True
+            
+            assert i['availavle_time'] is None
+            assert i['closure_info'] is None
+            
+    # 観光地とグルメのデータを正しく受け取れているか確認
+    assert has_tourist, '観光地データが含まれていません'
+    assert has_gourmet, 'グルメデータが含まれていません'
+
+
+# テストケース：興味がある一覧取得で興味があるを保存してないユーザーIDを指定したときに404が返るか
+def test_get_interest_404():
+    response = client.get('/interests', params={"user_id": 100000000000})
+    
+    # ステータスコードの確認
+    assert response.status_code == 404
+    
+    # レスポンスの中身の確認
+    data = response.json()
+    assert data["detail"] == "データが見つかりませんでした"
+
+
+# テストケース：興味がある一覧取得でuser_idの指定を許容されていない値にしたときに422が返ってくるか
+@pytest.mark.parametrize('user_id', [-9999, -1, 0])
+def test_get_interest_422(user_id):
+    response = client.get('/interests', params={"user_id": user_id})
+    
+    # ステータスコードの確認
+    assert response.status_code == 422
