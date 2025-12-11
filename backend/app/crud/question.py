@@ -124,6 +124,7 @@ def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, ch
 
     return quiz_history
 
+
 # 回答履歴一覧を取得する関数
 def get_question_historys(db, user_id: int):
     quiz_histories_data = (
@@ -137,13 +138,13 @@ def get_question_historys(db, user_id: int):
             QuizResults.spot_type,
             QuizResults.score,
             QuizResults.total_questions,
-            QuizResults.play_at
+            QuizResults.play_at,
+            Questions.question_text
         )
         .join(QuizResults, QuizResults.id == QuizAnswers.quiz_result_id)
+        .join(Questions, Questions.id == QuizAnswers.question_id)
         .where(QuizResults.user_id == user_id)
     )
     quiz_histories_result = db.execute(quiz_histories_data).mappings().all() #mappings()は結果を辞書（キーと値のペア）のように扱える形式に変換する。.all()は全件取得をし辞書方を中に含んだリスト型で返してくれる。
-    
+
     return list(quiz_histories_result)
-from app.database import SessionLocal
-print(get_question_historys(SessionLocal(),1))
