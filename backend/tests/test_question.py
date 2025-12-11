@@ -3,6 +3,7 @@ from app.main import app
 import pytest
 
 
+
 # テスト用のクライアントを作成
 client = TestClient(app)
 
@@ -305,3 +306,80 @@ def test_save_history_missing_field(missing_field):
     response = client.post("/save_histories", json=payload)
     
     assert response.status_code == 422
+
+
+
+# --- 回答履歴をgetするapiのテストケース ---
+def test_get_histories_success():
+    """
+    【正常系】存在する user_id を指定してデータが取得できるか
+    (既存のDBデータを使用)
+    """
+    # 既存DBに確実に存在する user_id を指定してください
+    user_id = 1 
+    
+    response = client.get(f"/histories?user_id={user_id}")
+    
+    # ステータスコードの確認
+    assert response.status_code == 200, f"Error details: {response.text}"
+    
+    data = response.json()
+    
+    # 【変更点】データが「1件以上」あればOKとする
+    assert len(data) >= 1, "データが1件も取得できませんでした"
+    
+    # 最初のデータの構造チェック（値の完全一致ではなく、キーの存在や型をチェック推奨）
+    item = data[0]
+    assert "quiz_result_id" in item
+    assert "question_text" in item
+    assert "score" in item
+    assert "is_correct" in item
+    assert "play_at" in item
+
+def test_get_histories_not_found():
+    """
+    【準正常系】存在しない user_id の場合 404 が返るか
+    """
+    # 既存DBに「絶対に存在しない」IDを指定してください
+    user_id = 999999
+    response = client.get(f"/histories?user_id={user_id}")
+    
+    assert response.status_code == 404
+    assert response.json()["detail"] == "データが見つかりませんでした"
+
+def test_get_histories_validation_boundary_min():
+    """
+    【境界値・異常系】user_id=0 (ge=1 なのでエラーになるべき)
+    """
+    user_id = 0
+    response = client.get(f"/histories?user_id={user_id}")
+    
+    assert response.status_code == 422
+
+def test_get_histories_validation_invalid_type():
+    """
+    【異常系】user_id に文字列を入れた場合
+    """
+    user_id = "abc"
+    response = client.get(f"/histories?user_id={user_id}")
+    
+    assert response.status_code == 422
+
+# setup_data 引数は削除
+def test_get_histories_boundary_valid_min():
+    """
+    【境界値・正常系】user_id=1 (最小の有効値) で成功するか
+    """
+    user_id = 1
+    response = client.get(f"/histories?user_id={user_id}")
+    assert response.status_code == 200
+
+def test_get_histories_large_number():
+    """
+    【極端な値】user_id が非常に大きい数字の場合
+    """
+    user_id = 999999999999999
+    response = client.get(f"/histories?user_id={user_id}")
+    
+    # 422ではなく404になればOK
+    assert response.status_code == 404
