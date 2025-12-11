@@ -105,7 +105,7 @@ def send_save_question(
 
 
 # 興味がある一覧取得
-@app.get('/interest', response_model = List[GetInterestResponse])
+@app.get('/interests', response_model = List[GetInterestResponse])
 def get_interest(
     user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
     db: Session = Depends(db_connect)
