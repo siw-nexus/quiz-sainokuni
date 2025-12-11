@@ -126,7 +126,7 @@ def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, ch
 
 
 # 回答履歴一覧を取得する関数
-def get_question_historys(db, user_id: int):
+def get_question_histories(db, user_id: int):
     quiz_histories_data = (
         select(
             QuizAnswers.id,
