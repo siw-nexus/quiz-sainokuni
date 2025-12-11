@@ -16,7 +16,7 @@ class Tourist_spots(Base):
     address = Column(String(255), nullable = False, comment = '住所')
     lat = Column(String(100), comment = '緯度')
     lon = Column(String(100), comment = '経度')
-    availavle_time = Column(String(100), comment = '利用可能時間')
+    available_time = Column(String(100), comment = '利用可能時間')
     closure_info = Column(Text, comment = '休業情報')
     start_time = Column(String(100), comment = '開始時間')
     finish_time = Column(String(100), comment = '終了時間')
