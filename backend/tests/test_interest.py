@@ -103,26 +103,52 @@ def test_get_interest():
     # レスポンスの確認
     data = response.json()
     
-    if len(data) > 0:
-        # 必要なキーが含まれているかチェック
-        assert 'id' in data[0]
-        assert 'spot_type' in data[0]
-        assert 'spot_id' in data[0]
-        assert 'name' in data[0]
-        assert 'detail' in data[0]
-        assert 'address' in data[0]
-        assert 'lat' in data[0]
-        assert 'lon' in data[0]
-        assert 'availavle_time' in data[0]
-        assert 'closure_info' in data[0]
-        assert 'category' in data[0]
-        assert 'tokusanhin' in data[0]
-        assert 'start_time' in data[0]
-        assert 'finish_time' in data[0]
-        assert 'notes' in data[0]
-        assert 'tel' in data[0]
-        assert 'hp_url' in data[0]
-        assert 'img' in data[0]
+    # 観光地とグルメの両方を取得出来てることを確認するフラグ
+    has_tourist = False
+    has_gourmet = False
+    
+    # データが返ってきているか確認
+    assert len(data) > 0
+        
+    # 必要なキーが含まれているかチェック
+    for i in data:
+        # 共通項目
+        assert 'id' in i
+        assert 'spot_type' in i
+        assert 'spot_id' in i
+        assert 'name' in i
+        assert 'detail' in i
+        assert 'address' in i
+        assert 'lat' in i
+        assert 'lon' in i
+        assert 'availavle_time' in i
+        assert 'closure_info' in i
+        assert 'category' in i
+        assert 'tokusanhin' in i
+        assert 'start_time' in i
+        assert 'finish_time' in i
+        assert 'notes' in i
+        assert 'tel' in i
+        assert 'hp_url' in i
+        assert 'img' in i
+        
+        # 観光地のレスポンスにグルメのデータが混ざっていないか確認
+        if i['spot_type'] == 'tourist':
+            has_tourist = True
+            
+            assert i['category'] is None
+            assert i['tokusanhin'] is None
+            
+        # グルメのレスポンスに観光地のデータが混ざっていないか確認
+        if i['spot_type'] == 'gourmet':
+            has_gourmet = True
+            
+            assert i['availavle_time'] is None
+            assert i['closure_info'] is None
+            
+    # 観光地とグルメのデータを正しく受け取れているか確認
+    assert has_tourist, '観光地データが含まれていません'
+    assert has_gourmet, 'グルメデータが含まれていません'
 
 
 # テストケース：興味がある一覧取得で興味があるを保存してないユーザーIDを指定したときに404が返るか
