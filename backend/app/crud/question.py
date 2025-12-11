@@ -147,4 +147,4 @@ def get_question_histories(db, user_id: int):
     )
     quiz_histories_result = db.execute(quiz_histories_data).mappings().all() #mappings()は結果を辞書（キーと値のペア）のように扱える形式に変換する。.all()は全件取得をし辞書方を中に含んだリスト型で返してくれる。
 
-    return list(quiz_histories_result)
+    return quiz_histories_result
