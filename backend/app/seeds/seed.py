@@ -12,7 +12,7 @@ pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 
 # モデルをインポート
 try:
-    from app.models import Tourist_spots, Gourmet_spots, Questions, Users, Interests
+    from app.models import Tourist_spots, Gourmet_spots, Questions, Users, Interests, QuizResults
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
@@ -325,6 +325,55 @@ def dummy_interest_insert(db):
     db.commit()
 
 
+# 回答結果と回答履歴のダミーデータを入れる関数
+def dummy_quiz_result_insert(db):
+    # 観光地の回答結果を取得
+    check_quiz_result = db.query(QuizResults).filter(
+        QuizResults.user_id == 1,
+        QuizResults.spot_type == 'tourist'
+    ).first()
+    
+    # 観光地の回答結果が無かったらINSERTする
+    if not check_quiz_result:
+        tourist_dummy_result = QuizResults(
+            user_id = 1,
+            spot_type = 'tourist',
+            score = 5,
+            total_questions = 5
+        )
+        
+        db.add(tourist_dummy_result)
+        
+        print('観光地の回答結果のINSERT完了')
+    else:
+        print('観光地の回答結果は存在するのでスキップ')
+    
+    
+    # グルメの回答結果を取得
+    check_quiz_result = db.query(QuizResults).filter(
+        QuizResults.user_id == 1,
+        QuizResults.spot_type == 'gourmet'
+    ).first()
+    
+    # グルメの回答結果が無かったらINSERTする
+    if not check_quiz_result:
+        gourmet_dummy_result = QuizResults(
+            user_id = 1,
+            spot_type = 'gourmet',
+            score = 5,
+            total_questions = 5
+        )
+        
+        db.add(gourmet_dummy_result)
+        
+        print('グルメの回答結果のINSERT完了')
+    else:
+        print('グルメの回答結果は存在するのでスキップ')
+    
+    # トランザクションを確定
+    db.commit()
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -358,6 +407,9 @@ def seed_data():
     
     # 興味があるのデータを入れる関数を呼び出す
     dummy_interest_insert(db)
+    
+    # 回答結果と回答履歴のダミーデータを入れる関数を呼び出す
+    dummy_quiz_result_insert(db)
 
 
     db.close()
