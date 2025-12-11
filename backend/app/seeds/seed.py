@@ -10,9 +10,9 @@ from app.database import SessionLocal
 pwd_context = CryptContext(schemes = ['bcrypt'], deprecated = 'auto')
 
 
-# tourist_spotsモデル、gourmet_spotsモデル、questionsモデルをインポート
+# モデルをインポート
 try:
-    from app.models import Tourist_spots, Gourmet_spots, Questions, Users
+    from app.models import Tourist_spots, Gourmet_spots, Questions, Users, Interests
 except ImportError:
     print('モデルのインポートに失敗しました')
     exit(1)
@@ -291,6 +291,40 @@ def dummy_user_insert(db):
         db.rollback() # エラー時はロールバック
 
 
+# 興味があるのダミーデータをINSERTする関数
+def dummy_interest_insert(db):
+    # 観光地の興味があるのデータを取得
+    tourist_interest = db.query(Interests).filter(
+        Interests.user_id == 1,
+        Interests.spot_type == 'tourist',
+    ).first()
+    
+    # 観光地の興味があるのデータが無ければ追加
+    if not tourist_interest:
+        print('観光地の興味あるダミーデータINSERT')
+        db.add(Interests(user_id = 1, spot_type = 'tourist', spot_id = 1))
+        
+    else:
+        print('観光地の興味あるダメーデータはすでにあるのでスキップ')
+    
+    # グルメの興味があるのデータを取得
+    gourmet_interest = db.query(Interests).filter(
+        Interests.user_id == 1,
+        Interests.spot_type == 'gourmet',
+    ).first()
+    
+    # グルメの興味があるのデータが無ければ追加
+    if not gourmet_interest:
+        print('グルメの興味あるダミーデータINSERT')
+        db.add(Interests(user_id = 1, spot_type = 'gourmet', spot_id = 1))
+    
+    else:
+        print('グルメの興味あるダメーデータはすでにあるのでスキップ')
+    
+    # トランザクションを確定
+    db.commit()
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -321,6 +355,9 @@ def seed_data():
     
     # ダミーユーザーをINSERTする関数を呼び出す
     dummy_user_insert(db)
+    
+    # 興味があるのデータを入れる関数を呼び出す
+    dummy_interest_insert(db)
 
 
     db.close()
