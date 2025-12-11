@@ -230,3 +230,55 @@ def test_save_question_unknown_user():
     
     # レスポンスの中身の確認
     assert response.json()['detail'] == '指定されたユーザーは存在しません'
+
+
+# --- クイズの回答履歴を保存するapiのテストケース ---
+def test_save_history_success():
+    """正常に保存できるかテスト"""
+    payload = {
+        "quiz_result_id": 1,
+        "question_num": 1,
+        "question_id": 100,
+        "choice_id": 2,
+        "is_correct": True
+    }
+    
+    response = client.post("/save_histories", json=payload)
+    
+    # ステータスコードが 201 (Created) であること
+    assert response.status_code == 201
+    
+    # レスポンスの中身が送信したものと一致するか
+    data = response.json()
+    assert data["quiz_result_id"] == 1
+    assert data["question_num"] == 1
+    assert data["is_correct"] is True
+
+def test_save_history_validation_error():
+    """不正なデータ（1未満の数値など）を送った時にエラーになるかテスト"""
+    payload = {
+        "quiz_result_id": 0, # エラーになるはず (ge=1)
+        "question_num": 1,
+        "question_id": 1,
+        "choice_id": 1,
+        "is_correct": True
+    }
+    
+    response = client.post("/save_histories", json=payload)
+    
+    # バリデーションエラーなので 422 が返るはず
+    assert response.status_code == 422
+
+def test_save_history_missing_field():
+    """必須項目（is_correct）が欠けている場合のテスト"""
+    payload = {
+        "quiz_result_id": 1,
+        "question_num": 1,
+        "question_id": 1,
+        "choice_id": 1
+        # is_correct がない
+    }
+    
+    response = client.post("/save_histories", json=payload)
+    
+    assert response.status_code == 422
