@@ -91,3 +91,35 @@ def test_create_interest_unknown_user():
     
     # ステータスコードの確認
     assert response.status_code == 404
+
+
+# テストケース：興味がある一覧を正常に取得できるか
+def test_get_interest():
+    response = client.get('/interests', params={"user_id": 1})
+    
+    # ステータスコードの確認
+    assert response.status_code == 200
+    
+    # レスポンスの確認
+    data = response.json()
+    
+    if len(data) > 0:
+        # 必要なキーが含まれているかチェック
+        assert 'id' in data[0]
+        assert 'spot_type' in data[0]
+        assert 'spot_id' in data[0]
+        assert 'name' in data[0]
+        assert 'detail' in data[0]
+        assert 'address' in data[0]
+        assert 'lat' in data[0]
+        assert 'lon' in data[0]
+        assert 'availavle_time' in data[0]
+        assert 'closure_info' in data[0]
+        assert 'category' in data[0]
+        assert 'tokusanhin' in data[0]
+        assert 'start_time' in data[0]
+        assert 'finish_time' in data[0]
+        assert 'notes' in data[0]
+        assert 'tel' in data[0]
+        assert 'hp_url' in data[0]
+        assert 'img' in data[0]
