@@ -108,10 +108,9 @@ def send_save_question(
 @app.get('/interest', response_model = List[GetInterestResponse])
 def get_interest(
     user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
-    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
     db: Session = Depends(db_connect)
 ):
-    result = get_interests(db, user_id, spot_type)
+    result = get_interests(db, user_id)
     
     # データがからなら404エラーを返す
     if not result:
