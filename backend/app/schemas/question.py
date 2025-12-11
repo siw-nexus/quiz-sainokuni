@@ -21,7 +21,7 @@ class OptionResponse(BaseModel):
     address: str | None = None
     lat: str | None = None
     lon: str | None = None
-    availavle_time: str | None = None
+    available_time: str | None = None
     closure_info: str | None = None
     category: str  | None = None
     tokusanhin: str | None = None

@@ -24,13 +24,13 @@ def get_options(db, spot_type: str, spot_id: int):
         # 観光地の選択肢を取得
         # 正解を取得
         option_correct = (
-            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(1).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.availavle_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
+            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(1).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.available_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
             .where(spot_id == Tourist_spots.id)
         )
         
         # 不正解の選択肢を3件取得
         option_incorrect = (
-            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(0).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.availavle_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
+            select(Tourist_spots.id, Tourist_spots.name.label('option_text'), literal(0).label('is_correct'), Tourist_spots.detail, Tourist_spots.lat, Tourist_spots.lon, Tourist_spots.available_time, Tourist_spots.start_time, Tourist_spots.finish_time, Tourist_spots.notes, Tourist_spots.tel, Tourist_spots.hp_url, Tourist_spots.img)
             .where(spot_id != Tourist_spots.id)
             .order_by(func.random())
             .limit(3)
