@@ -230,3 +230,78 @@ def test_save_question_unknown_user():
     
     # レスポンスの中身の確認
     assert response.json()['detail'] == '指定されたユーザーは存在しません'
+
+
+# テストケース：クイズの回答履歴を正常に保存できるか
+def test_save_history_success():
+    """正常に保存できるかテスト"""
+    payload = {
+        "quiz_result_id": 1,
+        "question_num": 1,
+        "question_id": 100,
+        "choice_id": 2,
+        "is_correct": True
+    }
+    
+    response = client.post("/save_histories", json=payload)
+    
+    # ステータスコードが 201 (Created) であること
+    assert response.status_code == 201
+    
+    # レスポンスの中身が送信したものと一致するか
+    data = response.json()
+    assert data["quiz_result_id"] == 1
+    assert data["question_num"] == 1
+    assert data["is_correct"] is True
+
+
+# テストケース：bodyに入れる値が不正な値の場合に422が返るか
+@pytest.mark.parametrize("field, invalid_value", [
+    ("quiz_result_id", 0),
+    ("question_num", 0),
+    ("question_id", 0),
+    ("choice_id", 0),
+])
+def test_save_history_validation_error(field, invalid_value):
+    """不正なデータ（1未満の数値など）を送った時にエラーになるかテスト"""
+    payload = {
+        "quiz_result_id": 0,
+        "question_num": 1,
+        "question_id": 1,
+        "choice_id": 1,
+        "is_correct": True
+    }
+    
+    # 不正な値に書き換える
+    payload[field] = invalid_value
+    
+    response = client.post("/save_histories", json=payload)
+    
+    # バリデーションエラーなので 422 が返るはず
+    assert response.status_code == 422
+
+
+# テストケース：必須項目が足りない時に422が返るか
+@pytest.mark.parametrize("missing_field", [
+    "quiz_result_id",
+    "question_num", 
+    "question_id",
+    "choice_id",
+    "is_correct",
+])
+def test_save_history_missing_field(missing_field):
+    """必須項目（is_correct）が欠けている場合のテスト"""
+    payload = {
+        "quiz_result_id": 1,
+        "question_num": 1,
+        "question_id": 1,
+        "choice_id": 1,
+        "is_correct": True
+    }
+    
+    # フィールドを削除する
+    del payload[missing_field]
+    
+    response = client.post("/save_histories", json=payload)
+    
+    assert response.status_code == 422

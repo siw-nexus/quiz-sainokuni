@@ -1,7 +1,7 @@
 from sqlalchemy import func, literal, union_all, select
 
 # モデルをインポート
-from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults
+from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults, QuizAnswers
 
 
 # 問題文を取得する関数
@@ -105,3 +105,21 @@ def save_question(db, user_id: int, spot_type: str, score: int, total_questions:
 
     # 4. IDを返す
     return quiz_result
+
+
+# 回答履歴をデータベースに保存する関数
+def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, choice_id: int, is_correct: bool):
+    quiz_history = QuizAnswers(
+        quiz_result_id = quiz_result_id,
+        question_num = quiz_num,
+        question_id = quiz_id,
+        choice_id = choice_id,
+        is_correct = is_correct
+    )
+
+    db.add(quiz_history)
+    db.commit()
+
+    db.refresh(quiz_history)
+
+    return quiz_history
