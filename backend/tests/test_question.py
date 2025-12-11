@@ -78,7 +78,7 @@ def test_get_options(test_spot_type, test_spot_id):
             "detail", "address", "lat", "lon", "img", "hp_url",
             "start_time", "finish_time", "notes", "tel",
             # 観光地・グルメ固有のものも含めてチェック
-            "availavle_time", "closure_info", "category", "tokusanhin"
+            "available_time", "closure_info", "category", "tokusanhin"
         ]
         
         for field in expected_fields:
