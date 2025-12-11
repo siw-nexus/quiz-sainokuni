@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
-
+from datetime import datetime
 
 # 問題文のレスポンスの型の定義
 class QestionResponse(BaseModel):
@@ -66,3 +66,18 @@ class SendSaveHistory(BaseModel):
     question_id: int = Field(ge = 1)
     choice_id: int = Field(ge = 1)
     is_correct: bool
+
+class GetHistoryListResponse(BaseModel):
+    id: int
+    quiz_result_id: int
+    question_num: int
+    question_id: int
+    choice_id: int
+    is_correct: bool
+    spot_type: str
+    score: int
+    total_questions: int
+    play_at: datetime
+    question_text: str
+
+    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる

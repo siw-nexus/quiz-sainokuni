@@ -1,7 +1,7 @@
 from sqlalchemy import func, literal, union_all, select
 
 # モデルをインポート
-from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults, QuizAnswers
+from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults, QuizAnswers 
 
 
 # 問題文を取得する関数
@@ -123,3 +123,28 @@ def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, ch
     db.refresh(quiz_history)
 
     return quiz_history
+
+
+# 回答履歴一覧を取得する関数
+def get_question_histories(db, user_id: int):
+    quiz_histories_data = (
+        select(
+            QuizAnswers.id,
+            QuizAnswers.quiz_result_id,
+            QuizAnswers.question_num,
+            QuizAnswers.question_id,
+            QuizAnswers.choice_id,
+            QuizAnswers.is_correct,
+            QuizResults.spot_type,
+            QuizResults.score,
+            QuizResults.total_questions,
+            QuizResults.play_at,
+            Questions.question_text
+        )
+        .join(QuizResults, QuizResults.id == QuizAnswers.quiz_result_id)
+        .join(Questions, Questions.id == QuizAnswers.question_id)
+        .where(QuizResults.user_id == user_id)
+    )
+    quiz_histories_result = db.execute(quiz_histories_data).mappings().all() #mappings()は結果を辞書（キーと値のペア）のように扱える形式に変換する。.all()は全件取得をし辞書方を中に含んだリスト型で返してくれる。
+
+    return quiz_histories_result
