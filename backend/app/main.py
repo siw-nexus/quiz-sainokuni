@@ -10,10 +10,12 @@ from app.database import db_connect
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, get_options, save_question, save_quiz_histories, get_question_histories
 from app.crud.interest import add_interests, get_interests
+from app.crud.spot import get_spot
 
 # レスポンスモデルをインポート
 from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse, SendSaveHistory, SendSaveHistoryResponse, GetHistoryListResponse
 from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
+from app.schemas.spot import GetSpotResponce
 
 
 app = FastAPI()
@@ -133,13 +135,29 @@ def send_save_history(
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
 
-# 
+# 回答履歴取得
 @app.get("/histories", response_model=List[GetHistoryListResponse])
 def get_histories(
     user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
     db: Session = Depends(db_connect)
 ):
     result = get_question_histories(db, user_id)
+    
+    # データがからなら404エラーを返す
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
+
+
+# 観光地・グルメを一件取得
+@app.get('/spot', response_model = GetSpotResponce)
+def g_spot(
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
+    spot_id: int = Query(..., ge = 1, description = 'スポットのID（1以上の数値）'),
+    db: Session = Depends(db_connect)
+):
+    result = get_spot(db, spot_type, spot_id)
     
     # データがからなら404エラーを返す
     if not result:
