@@ -1,5 +1,6 @@
 // コンポーネントをインポート
 import Detail from "@/components/Spot_detail/Detail";
+import DetailFooterBtn from "@/components/Spot_detail/DetailFooterBtn";
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
@@ -41,6 +42,9 @@ export default async function SpotDetail({ searchParams }: Props) {
   const spotDetail = await getSpot(spotType, spotId);
 
   return (
-    <Detail proSpotDetail={spotDetail}/>
+    <main>
+      <Detail proSpotDetail={spotDetail}/>
+      <DetailFooterBtn />
+    </main>
   );
 }
