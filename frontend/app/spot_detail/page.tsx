@@ -25,7 +25,7 @@ const getSpot = async (spotType: string, spotId: number): Promise<Spot> => {
     // レスポンスの中身を取得
     const data: Spot = await res.json();
 
-    return data
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -41,6 +41,6 @@ export default async function SpotDetail({ searchParams }: Props) {
   const spotDetail = await getSpot(spotType, spotId);
 
   return (
-    <Detail />
+    <Detail proSpotDetail={spotDetail}/>
   );
 }
