@@ -11,7 +11,7 @@ def get_spot(db, spot_type: str, id: int):
         # 観光地の詳細を取得
         get_tourist = (
             select(Tourist_spots)
-            .filter(Tourist_spots.id == id)
+            .where(Tourist_spots.id == id)
         )
         
         # 結果を返す
@@ -21,7 +21,7 @@ def get_spot(db, spot_type: str, id: int):
         # 観光地の詳細を取得
         get_gourmet = (
             select(Gourmet_spots)
-            .filter(Gourmet_spots.id == id)
+            .where(Gourmet_spots.id == id)
         )
         
         # 結果を返す
