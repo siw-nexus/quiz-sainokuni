@@ -15,7 +15,7 @@ def get_spot(db, spot_type: str, id: int):
         )
         
         # 結果を返す
-        return db.execute(get_tourist)
+        return db.execute(get_tourist).scalars().first()
     
     else:
         # 観光地の詳細を取得
@@ -25,4 +25,4 @@ def get_spot(db, spot_type: str, id: int):
         )
         
         # 結果を返す
-        return db.execute(get_gourmet)
+        return db.execute(get_gourmet).scalars().first()
