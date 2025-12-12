@@ -16,3 +16,13 @@ def get_spot(db, spot_type: str, id: int):
         
         # 結果を返す
         return db.execute(get_tourist)
+    
+    else:
+        # 観光地の詳細を取得
+        get_gourmet = (
+            select(Gourmet_spots)
+            .filter(Gourmet_spots.id == id)
+        )
+        
+        # 結果を返す
+        return db.execute(get_gourmet)
