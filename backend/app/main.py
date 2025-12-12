@@ -133,7 +133,7 @@ def send_save_history(
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
 
-# 
+# 回答履歴一覧取得
 @app.get("/histories", response_model=List[GetHistoryListResponse])
 def get_histories(
     user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
