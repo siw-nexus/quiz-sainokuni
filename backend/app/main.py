@@ -86,7 +86,7 @@ def create_interests(
 
 
 # 問題を保存する
-@app.post("/save_questions", response_model=SendSaveQuestionResponse, status_code=201)
+@app.post("/questions", response_model=SendSaveQuestionResponse, status_code=201)
 def send_save_question(
     quiz_result_data: SendSaveQuestion,
     db: Session = Depends(db_connect)
@@ -120,7 +120,7 @@ def get_interest(
     
 
 # 回答の履歴を保存する
-@app.post("/save_histories", response_model=SendSaveHistoryResponse, status_code=201)
+@app.post("/histories", response_model=SendSaveHistoryResponse, status_code=201)
 def send_save_history(
     history_data: SendSaveHistory,
     db: Session = Depends(db_connect)
