@@ -44,7 +44,7 @@ export default async function SpotDetail({ searchParams }: Props) {
   return (
     <main>
       <Detail proSpotDetail={spotDetail}/>
-      <DetailFooterBtn />
+      <DetailFooterBtn lat={spotDetail.lat} lon={spotDetail.lon} address={spotDetail.address}/>
     </main>
   );
 }
