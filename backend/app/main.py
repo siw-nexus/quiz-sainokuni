@@ -14,7 +14,7 @@ from app.crud.spot import get_spot
 
 # レスポンスモデルをインポート
 from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse, SendSaveHistory, SendSaveHistoryResponse, GetHistoryListResponse
-from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse, DeleteInterests
+from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
 from app.schemas.spot import GetSpotResponce
 
 
