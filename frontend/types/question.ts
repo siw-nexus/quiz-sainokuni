@@ -13,3 +13,10 @@ type Question = {
   question_text: string;
   options: Option[];
 }
+
+// 選択肢だけを受け取る型の定義
+type OptionOnly = {
+  id: number;
+  option_text: string;
+  is_correct: boolean;
+}
