@@ -12,7 +12,7 @@ import { Question } from "@types/question";
 
 // Propsの定義
 type Props = {
-  spot_type: string;
+  spot_type: 'tourist' | 'gourmet';
   limit: number;
   questions: Question[];
 }
