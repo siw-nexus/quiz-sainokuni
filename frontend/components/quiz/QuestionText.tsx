@@ -1,12 +1,8 @@
 'use client'
 
-// questionsの型を定義
-type Question = {
-  id: number;
-  spot_type: 'tourist' | 'gourmet';
-  spot_id: number;
-  question_text: string;
-}
+// 型の定義をインポート
+import { Question } from '@types/question';
+
 
 type Props = {
   questions: Question[];
