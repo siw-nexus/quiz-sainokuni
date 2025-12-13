@@ -1,7 +1,7 @@
 'use client'
 
 // 型の定義をインポート
-import { Question } from '@types/question';
+import { Question } from '@/types/question';
 
 
 type Props = {

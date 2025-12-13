@@ -2,7 +2,7 @@
 import QuizScreen from "@/components/quiz/QuizScreen";
 
 // 型の定義をインポート
-import { Question } from "@types/question";
+import { Question } from "@/types/question";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
