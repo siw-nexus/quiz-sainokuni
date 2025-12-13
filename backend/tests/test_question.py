@@ -157,7 +157,7 @@ def test_save_question_success(spot_type, score, total):
         "total_questions": total
     }
     
-    response = client.post("/save_questions", json=payload)
+    response = client.post("/questions", json=payload)
     
     # ステータスコードの確認
     assert response.status_code == 201
@@ -184,7 +184,7 @@ def test_save_question_logic_error(score, total):
         "total_questions": total
     }
     
-    response = client.post("/save_questions", json=payload)
+    response = client.post("/questions", json=payload)
     
     # ステータスコードの確認
     assert response.status_code == 400
@@ -196,19 +196,19 @@ def test_save_question_logic_error(score, total):
 # テストケース：回答結果保存でschemasの制限に引っかかる値を送信して422が返ってくるか
 def test_save_question_validation_error():
     # 存在しないspot_type
-    res1 = client.post("/save_questions", json={"user_id": 1, "spot_type": "unknown", "score": 3, "total_questions": 5})
+    res1 = client.post("/questions", json={"user_id": 1, "spot_type": "unknown", "score": 3, "total_questions": 5})
     
     # ステータスコードの確認
     assert res1.status_code == 422
 
     # マイナスのスコア
-    res2 = client.post("/save_questions", json={"user_id": 1, "spot_type": "tourist", "score": -1, "total_questions": 5})
+    res2 = client.post("/questions", json={"user_id": 1, "spot_type": "tourist", "score": -1, "total_questions": 5})
     
     # ステータスコードの確認
     assert res2.status_code == 422
 
     # 許可されていない問題数
-    res3 = client.post("/save_questions", json={"user_id": 1, "spot_type": "tourist", "score": 3, "total_questions": 7})
+    res3 = client.post("/questions", json={"user_id": 1, "spot_type": "tourist", "score": 3, "total_questions": 7})
     
     # ステータスコードの確認
     assert res3.status_code == 422
@@ -224,7 +224,7 @@ def test_save_question_unknown_user():
     }
     
     # リクエスト送信
-    response = client.post("/save_questions", json=payload)
+    response = client.post("/questions", json=payload)
     
     # ステータスコードの確認
     assert response.status_code == 404
@@ -244,7 +244,7 @@ def test_save_history_success():
         "is_correct": True
     }
     
-    response = client.post("/save_histories", json=payload)
+    response = client.post("/histories", json=payload)
     
     # ステータスコードが 201 (Created) であること
     assert response.status_code == 201
@@ -276,7 +276,7 @@ def test_save_history_validation_error(field, invalid_value):
     # 不正な値に書き換える
     payload[field] = invalid_value
     
-    response = client.post("/save_histories", json=payload)
+    response = client.post("/histories", json=payload)
     
     # バリデーションエラーなので 422 が返るはず
     assert response.status_code == 422
@@ -303,7 +303,7 @@ def test_save_history_missing_field(missing_field):
     # フィールドを削除する
     del payload[missing_field]
     
-    response = client.post("/save_histories", json=payload)
+    response = client.post("/histories", json=payload)
     
     assert response.status_code == 422
 
@@ -330,11 +330,17 @@ def test_get_histories_success():
     
     # 最初のデータの構造チェック（値の完全一致ではなく、キーの存在や型をチェック推奨）
     item = data[0]
+    assert "id" in item
     assert "quiz_result_id" in item
-    assert "question_text" in item
-    assert "score" in item
+    assert "question_num" in item
+    assert "question_id" in item
+    assert "choice_id" in item
     assert "is_correct" in item
+    assert "spot_type" in item
+    assert "score" in item
+    assert "total_questions" in item
     assert "play_at" in item
+    assert "question_text" in item
 
 def test_get_histories_not_found():
     """
