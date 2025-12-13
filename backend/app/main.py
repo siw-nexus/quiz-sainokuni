@@ -9,12 +9,12 @@ from app.database import db_connect
 
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, get_options, save_question, save_quiz_histories, get_question_histories
-from app.crud.interest import add_interests, get_interests
+from app.crud.interest import add_interests, get_interests, delete_interest
 from app.crud.spot import get_spot
 
 # レスポンスモデルをインポート
 from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse, SendSaveHistory, SendSaveHistoryResponse, GetHistoryListResponse
-from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
+from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse, DeleteInterests
 from app.schemas.spot import GetSpotResponce
 
 
@@ -159,6 +159,24 @@ def g_spot(
 ):
     result = get_spot(db, spot_type, spot_id)
     
+    # データがからなら404エラーを返す
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
+
+
+# 興味があるを削除するAPI
+@app.delete("/interests")
+def del_interest(
+    user_id: int,
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
+    spot_id: int = Query(..., ge = 1, description = 'スポットのID（1以上の数値）'),
+    db: Session = Depends(db_connect)
+):
+    
+    result = delete_interest(user_id, spot_type, spot_id)
+
     # データがからなら404エラーを返す
     if not result:
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
