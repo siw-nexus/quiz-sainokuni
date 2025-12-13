@@ -1,10 +1,10 @@
 'use client';
 
-// 選択肢の型を定義
-import { OptionOnly } from '@types/question'
+// 型を定義をインポート
+import { Option } from '@types/question'
 
 type Props = {
-  options: OptionOnly[];
+  options: Option[];
   onResult: (isCorrect: boolean) => void;
 }
 
