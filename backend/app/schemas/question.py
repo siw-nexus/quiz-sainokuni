@@ -1,38 +1,23 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Literal
+from typing import List, Literal
 from datetime import datetime
-
-# 問題文のレスポンスの型の定義
-class QestionResponse(BaseModel):
-    id: int
-    spot_type: str
-    spot_id: int
-    question_text: str
-
-    model_config = ConfigDict(from_attributes = True)
-
 
 # 選択肢のレスポンスの型の定義
 class OptionResponse(BaseModel):
     id: int
     option_text: str
-    is_correct: int
-    detail: str | None = None
-    address: str | None = None
-    lat: str | None = None
-    lon: str | None = None
-    available_time: str | None = None
-    closure_info: str | None = None
-    category: str  | None = None
-    tokusanhin: str | None = None
-    start_time: str | None = None
-    finish_time: str | None = None
-    notes: str | None = None
-    tel: str | None = None
-    hp_url: str | None = None
-    img: str | None = None
+    is_correct: bool
+    
+# 問題文のレスポンスの型の定義（選択肢も入ってる）
+class QestionResponse(BaseModel):
+    id: int
+    spot_type: str
+    spot_id: int
+    question_text: str
+    options: List[OptionResponse]
 
     model_config = ConfigDict(from_attributes = True)
+
 
 # 保存したデータのレスポンスの型を定義
 class SendSaveQuestionResponse(BaseModel):
