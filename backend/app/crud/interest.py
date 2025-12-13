@@ -1,4 +1,5 @@
-from sqlalchemy import select, join
+from fastapi import HTTPException
+from sqlalchemy import select, join, delete
 
 # モデルをインポート
 from app.models import Interests, Tourist_spots, Gourmet_spots
@@ -89,3 +90,12 @@ def add_interests(db, user_id: int, spot_type: str, spot_id: int):
     db.refresh(new_interests)
     
     return new_interests
+
+
+# 興味がある削除関数
+def delete_interest(db, user_id: int, spot_type: str, spot_id: int):
+    stmt = delete(Interests).where(Interests.user_id == user_id, Interests.spot_type == spot_type, Interests.spot_id == spot_id)
+    result = db.execute(stmt)
+    db.commit()
+
+    return result
