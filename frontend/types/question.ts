@@ -1,3 +1,11 @@
+// 問題の型を定義
+type Question = {
+  id: number;
+  spot_type: 'tourist' | 'gourmet';
+  spot_id: number;
+  question_text: string;
+}
+
 // 選択肢の型を定義
 type Option = {
   id: number;
