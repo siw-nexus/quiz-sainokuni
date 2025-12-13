@@ -8,7 +8,8 @@ import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
 
 // 型の定義をインポート
-import { Question } from "@types/question";
+import { Question } from "@/types/question";
+import { QuizHistory } from '@/types/history';
 
 // Propsの定義
 type Props = {
@@ -22,11 +23,12 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
   const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
   const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
+  const [history, setHistory] = useState<QuizHistory[]>([]);  // 回答履歴を保存する配列
   const router = useRouter();
 
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
-  const handleAnswerResult = (result: boolean) => {
+  const handleAnswerResult = (result: boolean, selectedText: string) => {
     // 回答中のフラグをfalseにする
     setIsResponding(false);
     if (result) {
@@ -40,9 +42,21 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
 
     // 現在の問題の選択肢の中から、正解フラグがtrueのものを探す
     const correctOption = currentQuestion.options.find(opt => opt.is_correct === true);
+    const correctText = correctOption?.option_text;
 
     // 正解を取得
-    isAnswer(correctOption?.option_text || '');
+    isAnswer(correctText || '');
+
+    // 回答履歴の配列に結果を追加
+    const newHistoryItem: QuizHistory = {
+      questionText: currentQuestion.question_text,
+      userAnswer: selectedText,
+      correctAnswer: correctText,
+      isCorrect: result
+    };
+
+    // 前回の結果 + 今回の結果
+    setHistory((prev) => [...prev, newHistoryItem]);
   };
 
   // 次の問題へ行く関数
@@ -56,7 +70,7 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
     // 出題数が取得した問題数を超えたらfinish画面に移動
     if (questions.length < nextCount) {
       // クイズ終了時に、今回の問題データをブラウザに保存する
-      sessionStorage.setItem('quiz_history', JSON.stringify(questions));
+      sessionStorage.setItem('quiz_history', JSON.stringify(history));
 
       router.push('/finish');
     } else {
