@@ -56,22 +56,6 @@ def get_questions(
     return result
 
 
-# 選択肢取得
-@app.get("/option", response_model = List[OptionResponse])
-def get_option(
-    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
-    spot_id: int = Query(..., ge = 1, description = '問題のID'),
-    db: Session = Depends(db_connect)
-):
-    result = get_options(db, spot_type, spot_id)
-    
-    # データがからなら404エラーを返す
-    if not result:
-        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
-    
-    return result
-
-
 # 興味がある保存
 @app.post('/interests', response_model = AddInterestResponse, status_code=status.HTTP_201_CREATED)
 def create_interests(

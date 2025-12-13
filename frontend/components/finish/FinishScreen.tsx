@@ -1,22 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function FinishScreen() {
-  const router = useRouter();
-
-  const handleHomeBtn = () => {
-    router.push('/');
-  };
-
-  // ▼▼▼ ここを書き換えました ▼▼▼
-  // 「出題した問題を表示」ボタンを押したときの処理
-  const handleShowQuestions = () => {
-    // ログ出力ではなく、実際にページ移動するように変更
-    router.push('/history');
-  };
-  // ▲▲▲ 書き換え終わり ▲▲▲
-
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
       
@@ -59,25 +45,25 @@ export default function FinishScreen() {
           </div>
 
           <div className="w-full max-w-xs space-y-4">
-            <button
-              onClick={handleHomeBtn}
+            <Link
+              href={'/'}
               className="w-full bg-[#333333] hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
               </svg>
               ホームへ戻る
-            </button>
+            </Link>
             
-            <button 
-              onClick={handleShowQuestions}
+            <Link 
+              href={'/history'}
               className="w-full bg-white border-2 border-gray-200 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
               出題した問題を表示
-            </button>
+            </Link>
           </div>
 
         </div>

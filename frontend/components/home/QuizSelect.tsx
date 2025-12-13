@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const DESCRIPTION_CONTENT = (
   <div className="text-sm leading-relaxed text-gray-200 space-y-2">
@@ -27,11 +27,7 @@ const QUESTION_TYPES = [
 export default function QuizSelect() {
   const [showDescription, setShowDescription] = useState(false);
   const [count, setCount] = useState(5);
-  const router = useRouter();
 
-  const handleClick = (key: string) => {
-    router.push(`/quiz?spot_type=${key}&limit=${count}`);
-  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
@@ -130,9 +126,9 @@ export default function QuizSelect() {
             <div className="space-y-4">
               <p className="text-gray-500 text-sm font-bold pl-1 mb-2">ジャンルを選択</p>
               {QUESTION_TYPES.map((type) => (
-                <button
+                <Link
+                  href={`/quiz?spot_type=${type.key}&limit=${count}`}
                   key={type.key}
-                  onClick={() => handleClick(type.key)}
                   className="w-full bg-[#333333] hover:bg-black text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex justify-between items-center group"
                 >
                   <span>{type.label}</span>
@@ -142,7 +138,7 @@ export default function QuizSelect() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
 

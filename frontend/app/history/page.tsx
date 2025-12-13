@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type Question = {
   id: number;
@@ -11,7 +11,6 @@ type Question = {
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<Question[]>([]);
-  const router = useRouter();
 
   // 画面が表示されたらセッションストレージから回答履歴を取得
   useEffect(() => {
@@ -37,15 +36,15 @@ export default function HistoryPage() {
             </p>
           </div>
 
-          <button 
-            onClick={() => router.push('/')}
+          <Link 
+            href={'/'}
             className="mt-auto flex items-center gap-2 text-gray-300 hover:text-white transition"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
             TOPへ戻る
-          </button>
+          </Link>
 
           {/* 背景装飾 */}
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -57,9 +56,9 @@ export default function HistoryPage() {
           {/* スマホ用ヘッダー */}
           <div className="md:hidden h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-white sticky top-0 z-10">
             <h1 className="font-bold text-gray-800">出題履歴</h1>
-            <button onClick={() => router.push('/finish')} className="text-sm text-gray-500">
+            <Link href={'/finish'} className="text-sm text-gray-500">
               閉じる
-            </button>
+            </Link>
           </div>
 
           {/* リスト部分 (スクロール可能に) */}
@@ -84,12 +83,12 @@ export default function HistoryPage() {
 
           {/* スマホ用下部ボタンエリア */}
           <div className="md:hidden p-4 border-t border-gray-100 bg-white">
-            <button 
-              onClick={() => router.push('/')}
+            <Link 
+              href={'/'}
               className="w-full bg-[#333333] text-white font-bold py-3 rounded-xl shadow-lg"
             >
               TOPへ戻る
-            </button>
+            </Link>
           </div>
 
         </div>
