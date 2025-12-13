@@ -41,10 +41,3 @@ class GetInterestResponse(BaseModel):
     img: str | None = None
     
     model_config = ConfigDict(from_attributes = True)
-
-
-# 興味がある削除をする型の定義
-class DeleteInterests(BaseModel):
-    user_id: int
-    spot_type: Literal['tourist', 'gourmet']
-    spot_id: int = Field(..., ge = 1)
