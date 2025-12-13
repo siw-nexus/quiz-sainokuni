@@ -64,6 +64,49 @@ def get_question_text(db, spot_type: str, limit: int):
             # 結果リストに追加
             final_results.append(question)
     
+    # グルメの選択肢を取得
+    if spot_type == 'gourmet':
+        for question in questions:
+            # 正解の選択肢を1件取得する
+            option_correct = (
+                select(
+                    Gourmet_spots.id,
+                    Gourmet_spots.name.label('option_text'),
+                    literal(True).label('is_correct')
+                )
+                .where(Gourmet_spots.id == question['spot_id'])
+            )
+            
+            # 不正解の選択肢を3件取得する
+            option_incorrect = (
+                select(
+                    Gourmet_spots.id,
+                    Gourmet_spots.name.label('option_text'),
+                    literal(False).label('is_correct')
+                )
+                .where(Gourmet_spots.id != question['spot_id'])
+                .order_by(func.random())
+                .limit(3)
+            )
+            
+            # 正解と不正解のsqlをunion_allで繋げる
+            option_union = union_all(option_correct, option_incorrect)
+            
+            # 結果を取得
+            result = db.execute(option_union).mappings().all()
+            
+            # 結果を辞書型に変換する
+            options_list = [dict(row) for row in result]
+            
+            # 選択肢をシャッフルする
+            random.shuffle(options_list)
+            
+            # 質問辞書に選択肢リストを追加
+            question['options'] = options_list
+            
+            # 結果リストに追加
+            final_results.append(question)
+    
     return final_results
     
     
