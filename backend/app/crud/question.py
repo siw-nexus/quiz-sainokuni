@@ -1,4 +1,6 @@
+from ssl import Options
 from sqlalchemy import func, literal, union_all, select
+import random
 
 # モデルをインポート
 from app.models import Questions, Tourist_spots, Gourmet_spots, QuizResults, QuizAnswers 
@@ -13,9 +15,64 @@ def get_question_text(db, spot_type: str, limit: int):
         .order_by(func.random())
         .limit(limit)
     )
+    
+    # 問題を辞書型に変換する
+    questions = [dict(row) for row in db.execute(question_texts).mappings().all()]
+    
+    final_results = [] # 結果を格納するリスト
+    
+    # 観光地の選択肢を取得
+    if spot_type == 'tourist':
+        for question in questions:
+            # 正解の選択肢を1件取得する
+            option_correct = (
+                select(
+                    Tourist_spots.id,
+                    Tourist_spots.name.label('option_text'),
+                    literal(True).label('is_correct')
+                )
+                .where(Tourist_spots.id == question['spot_id'])
+            )
+            
+            # 不正解の選択肢を3件取得する
+            option_incorrect = (
+                select(
+                    Tourist_spots.id,
+                    Tourist_spots.name.label('option_text'),
+                    literal(False).label('is_correct')
+                )
+                .where(Tourist_spots.id != question['spot_id'])
+                .order_by(func.random())
+                .limit(3)
+            )
+            
+            # 正解と不正解のsqlをunion_allで繋げる
+            option_union = union_all(option_correct, option_incorrect)
+            
+            # 結果を取得
+            result = db.execute(option_union).mappings().all()
+            
+            # 結果を辞書型に変換する
+            options_list = [dict(row) for row in result]
+            
+            # 選択肢をシャッフルする
+            random.shuffle(options_list)
+            
+            # 質問辞書に選択肢リストを追加
+            question['options'] = options_list
+            
+            # 結果リストに追加
+            final_results.append(question)
+    
+    return final_results
+    
+    
 
     # 結果を返す
-    return db.execute(question_texts).all()
+    # return db.execute(question_texts).all()
+
+from app.database import SessionLocal
+print(get_question_text(SessionLocal(), 'tourist', 5))
 
 
 # 選択肢を取得する関数
