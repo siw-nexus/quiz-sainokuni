@@ -108,14 +108,6 @@ def get_question_text(db, spot_type: str, limit: int):
             final_results.append(question)
     
     return final_results
-    
-    
-
-    # 結果を返す
-    # return db.execute(question_texts).all()
-
-from app.database import SessionLocal
-print(get_question_text(SessionLocal(), 'tourist', 5))
 
 
 # 選択肢を取得する関数
