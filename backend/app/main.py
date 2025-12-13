@@ -175,10 +175,10 @@ def del_interest(
     db: Session = Depends(db_connect)
 ):
     
-    result = delete_interest(user_id, spot_type, spot_id)
+    result = delete_interest(db, user_id, spot_type, spot_id)
 
     # データがからなら404エラーを返す
-    if not result:
+    if result.rowcount == 0:
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
     
-    return result
+    return {"message": "削除が完了しました"}
