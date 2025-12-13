@@ -88,7 +88,7 @@ def create_interests(
 
 
 # 問題を保存する
-@app.post("/save_questions", response_model=SendSaveQuestionResponse, status_code=201)
+@app.post("/questions", response_model=SendSaveQuestionResponse, status_code=201)
 def send_save_question(
     quiz_result_data: SendSaveQuestion,
     db: Session = Depends(db_connect)
@@ -122,7 +122,7 @@ def get_interest(
     
 
 # 回答の履歴を保存する
-@app.post("/save_histories", response_model=SendSaveHistoryResponse, status_code=201)
+@app.post("/histories", response_model=SendSaveHistoryResponse, status_code=201)
 def send_save_history(
     history_data: SendSaveHistory,
     db: Session = Depends(db_connect)
@@ -135,7 +135,7 @@ def send_save_history(
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
 
-# 回答履歴取得
+# 回答履歴一覧取得
 @app.get("/histories", response_model=List[GetHistoryListResponse])
 def get_histories(
     user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
