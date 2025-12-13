@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 import pytest
-
+from unittest.mock import MagicMock, patch
 client = TestClient(app)
 
 
@@ -170,3 +170,115 @@ def test_get_interest_422(user_id):
     
     # ステータスコードの確認
     assert response.status_code == 422
+
+
+
+# 興味がある削除テストコード
+
+# ---------------------------------------------------------
+# テストデータの準備
+# ---------------------------------------------------------
+# モック用のResultオブジェクトを作成するヘルパー
+def mock_db_result(rowcount):
+    mock_result = MagicMock()
+    mock_result.rowcount = rowcount
+    return mock_result
+
+class TestDeleteInterest:
+
+    # 1. 正常系: 正しいデータで削除が成功する場合 (200 OK)
+    @patch("app.main.delete_interest") # delete_interest関数をモック化
+    def test_delete_interest_success(self, mock_delete):
+        # 準備: 削除成功（1件削除）をシミュレート
+        mock_delete.return_value = mock_db_result(rowcount=1)
+
+        # 実行
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 1, "spot_type": "tourist", "spot_id": 100}
+        )
+
+        # 検証
+        assert response.status_code == 200
+        assert response.json() == {"message": "削除が完了しました"}
+
+    # 2. 正常系: グルメ (gourmet) 指定でも成功するか
+    @patch("app.main.delete_interest")
+    def test_delete_interest_gourmet_success(self, mock_delete):
+        mock_delete.return_value = mock_db_result(rowcount=1)
+        
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 1, "spot_type": "gourmet", "spot_id": 100}
+        )
+        assert response.status_code == 200
+
+    # 3. 異常系 (404): 存在しないuser_id, spot_id等を指定した場合
+    @patch("app.main.delete_interest")
+    def test_delete_interest_not_found(self, mock_delete):
+        # 準備: 該当データなし（0件削除）をシミュレート
+        mock_delete.return_value = mock_db_result(rowcount=0)
+
+        # 実行: 存在しないID (例: 9999) を送信
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 9999, "spot_type": "tourist", "spot_id": 9999}
+        )
+
+        # 検証: 404エラーが返ること
+        assert response.status_code == 404
+        assert response.json()["detail"] == "データが見つかりませんでした"
+
+    # 4. バリデーション (境界値): spot_id = 1 (最小許容値) -> OK
+    @patch("app.main.delete_interest")
+    def test_validation_boundary_min_valid(self, mock_delete):
+        mock_delete.return_value = mock_db_result(rowcount=1)
+        
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 1, "spot_type": "tourist", "spot_id": 1}
+        )
+        assert response.status_code == 200
+
+    # 5. バリデーション (境界値エラー): spot_id = 0 (1未満) -> 422
+    def test_validation_boundary_min_invalid(self):
+        # モック不要（FastAPIが先にエラーを返すため）
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 1, "spot_type": "tourist", "spot_id": 0}
+        )
+        assert response.status_code == 422
+        # エラー詳細に 'greater than or equal to 1' が含まれるか確認
+        assert "Input should be greater than or equal to 1" in str(response.json())
+
+    # 6. バリデーション (型エラー): spot_type が不正な文字列 -> 422
+    def test_validation_invalid_literal(self):
+        response = client.delete(
+            "/interests", 
+            params={"user_id": 1, "spot_type": "hotel", "spot_id": 10} # hotelは許可されていない
+        )
+        assert response.status_code == 422
+        assert "Input should be 'tourist' or 'gourmet'" in str(response.json())
+
+    # 7. バリデーション (型エラー): user_id に文字列を入力 -> 422
+    def test_validation_type_error(self):
+        response = client.delete(
+            "/interests", 
+            params={"user_id": "abc", "spot_type": "tourist", "spot_id": 10}
+        )
+        assert response.status_code == 422
+
+    # 8. 極端な値: 非常に大きな数値 (Python/FastAPIは処理できるがDB結果次第)
+    # ここではDBにないものとして404になることを確認
+    @patch("app.main.delete_interest")
+    def test_extreme_values(self, mock_delete):
+        mock_delete.return_value = mock_db_result(rowcount=0)
+        
+        huge_id = 999999999999999
+        response = client.delete(
+            "/interests", 
+            params={"user_id": huge_id, "spot_type": "tourist", "spot_id": huge_id}
+        )
+        
+        # FastAPIとしてはバリデーション通過するが、DBにはないので404
+        assert response.status_code == 404
