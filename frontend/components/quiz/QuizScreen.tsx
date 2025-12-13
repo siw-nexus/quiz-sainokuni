@@ -7,34 +7,6 @@ import { useRouter } from 'next/navigation'
 import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
 
-// questionsの型を定義
-type Question = {
-  id: number;
-  spot_type: 'tourist' | 'gourmet';
-  spot_id: number;
-  question_text: string;
-}
-
-// optionsの型を定義
-type Option = {
-  id: number;
-  option_text: string;
-  is_correct: number;
-  detail: string | null;
-  address: string | null;
-  lat: string | null;
-  lon: string | null;
-  availavle_time: string | null;
-  closure_info: string | null;
-  category: string | null;
-  tokusanhin: string | null;
-  start_time: string | null;
-  finish_time: string | null;
-  notes: string | null;
-  tel: string | null;
-  hp_url: string | null;
-  img: string | null;
-}
 
 // Propsの定義
 type Props = {
@@ -50,30 +22,6 @@ export default function QuizScreen({ spot_type, limit }: Props) {
   const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
   const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
   const router = useRouter();
-
-  // APIのエンドポイント
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-  // 問題文を取得
-  useEffect(() => {
-    if (!spot_type || !limit) return;
-    const fetchQuestions = async (apiUrl: string, spot_type: string, limit: number) => {
-      try {
-        const res = await fetch(
-          `${apiUrl}/question?spot_type=${spot_type}&limit=${limit}`,
-          { cache: "no-cache"} // キャッシュを無効化
-        );
-        // レスポンスの確認
-        if (!res.ok) throw new Error("問題の取得に失敗しました");
-        // レスポンスの中身を取得
-        const data = await res.json();
-        setQuestions(data);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchQuestions(apiUrl, spot_type, limit);
-  }, [apiUrl, spot_type, limit]);
 
 
   // 選択肢を取得
@@ -99,7 +47,7 @@ export default function QuizScreen({ spot_type, limit }: Props) {
     if (questions.length > 0 && questions.length >= questionCount){
       fetchOptions();
     }
-  }, [questions, questionCount, apiUrl, spot_type]);
+  }, [questions, questionCount, spot_type]);
 
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
