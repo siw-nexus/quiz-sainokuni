@@ -1,11 +1,11 @@
 'use client';
 
 // 型を定義をインポート
-import { Option } from '@types/question'
+import { Option } from '@/types/question';
 
 type Props = {
   options: Option[];
-  onResult: (isCorrect: boolean) => void;
+  onResult: (isCorrect: boolean, selectedText: string) => void;
 }
 
 export default function OptionBtn({ options, onResult }: Props) {
@@ -15,7 +15,7 @@ export default function OptionBtn({ options, onResult }: Props) {
       {options.map((option) => (
         <button
           key={option.id}
-          onClick={() => onResult(option.is_correct === 1)} // 正誤判定をする関数を呼び出し
+          onClick={() => onResult(option.is_correct, option.option_text)} // 正誤判定をする関数を呼び出し
           className="
             bg-[#333333] 
             hover:bg-black 
