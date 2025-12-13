@@ -1,53 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 // コンポーネントのインポート
 import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
 
+// 型の定義をインポート
+import { Question } from "@types/question";
 
 // Propsの定義
 type Props = {
-  spot_type: 'tourist' | 'gourmet';
+  spot_type: string;
   limit: number;
+  questions: Question[];
 }
 
-export default function QuizScreen({ spot_type, limit }: Props) {
-  const [questions, setQuestions] = useState<Question[]>([]); // 問題文を格納
-  const [options, setOptions] = useState<Option[]>([]);       // 選択肢を格納
+export default function QuizScreen({ spot_type, limit, questions }: Props) {
   const [questionCount, setQuestionCount] = useState(1);      // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
   const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
   const router = useRouter();
-
-
-  // 選択肢を取得
-  useEffect(() => {
-    const fetchOptions = async () => {
-      if (!questions[questionCount - 1]) return;
-      try {
-        const res = await fetch(
-          `${apiUrl}/option?spot_type=${spot_type}&spot_id=${questions[questionCount - 1].spot_id}`,
-          { cache: "no-cache"} // キャッシュを無効化
-        );
-        // レスポンスの確認
-        if (!res.ok) throw new Error("選択肢の取得に失敗しました");
-        // レスポンスの中身を取得
-        const data = await res.json();
-        setOptions(data);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    // questions配列に値が入っていて、かつquestionCountがquestions配列の長さ以下の場合にfetchOptions()を呼び出す
-    if (questions.length > 0 && questions.length >= questionCount){
-      fetchOptions();
-    }
-  }, [questions, questionCount, spot_type]);
 
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
@@ -59,8 +34,14 @@ export default function QuizScreen({ spot_type, limit }: Props) {
     } else {
       setIsCorrectText("不正解...");
     }
-    // 正解の選択肢を取得
-    const correctOption = options.find(item => item.is_correct === 1);
+
+    // 現在の問題を取得
+    const currentQuestion = questions[questionCount - 1];
+
+    // 現在の問題の選択肢の中から、正解フラグがtrueのものを探す
+    const correctOption = currentQuestion.options.find(opt => opt.is_correct === true);
+
+    // 正解を取得
     isAnswer(correctOption?.option_text || '');
   };
 
@@ -95,7 +76,7 @@ export default function QuizScreen({ spot_type, limit }: Props) {
         <div className="hidden md:flex md:w-1/3 bg-[#333333] text-white p-10 flex-col justify-between relative">
           <div>
             <p className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-2">CATEGORY</p>
-            <h1 className="text-3xl font-bold mb-8 capitalize">{spot_type === 'tourist' ? '観光地' : spot_type === 'gourmet' ? 'グルメ' : 'イベント'}</h1>
+            <h1 className="text-3xl font-bold mb-8 capitalize">{spot_type === 'tourist' ? '観光地' : 'グルメ'}</h1>
           </div>
           
           <div className="relative z-10">
@@ -130,7 +111,7 @@ export default function QuizScreen({ spot_type, limit }: Props) {
                   </div>
                 </div>
                 <div className="w-full max-w-2xl mx-auto">
-                   <OptionBtn options={options} onResult={handleAnswerResult}/>
+                  <OptionBtn options={questions[questionCount - 1].options} onResult={handleAnswerResult}/>
                 </div>
               </>
             ) : (
