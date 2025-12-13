@@ -98,7 +98,4 @@ def delete_interest(db, user_id: int, spot_type: str, spot_id: int):
     result = db.execute(stmt)
     db.commit()
 
-    # 削除された行数が 0 なら、データが存在しなかったということ
-    if result.rowcount == 0:
-        raise HTTPException(status_code=404, detail="データが存在しません")
-    return {"message": "削除完了"}
+    return result
