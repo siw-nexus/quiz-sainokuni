@@ -24,39 +24,40 @@ def test_get_questions(test_spot_type, test_limit):
     assert len(data) == test_limit    # 問題数が取得した問題数と一致しているか
     
     if len(data) > 0:
+        for question in data:
         # 必要なキーが含まれているかチェック
-        assert "id" in data[0]
-        assert "spot_type" in data[0]
-        assert "spot_id" in data[0]
-        assert "question_text" in data[0]
-        assert "options" in data[0]
+            assert "id" in question
+            assert "spot_type" in question
+            assert "spot_id" in question
+            assert "question_text" in question
+            assert "options" in question
         
-    # 選択肢の確認
-    if 'options' in data[0]:
-        question = data[0]
+            # リクエストしたspot_typeとレスポンスのspot_typeが一致しているか
+            assert question['spot_type'] == test_spot_type
         
-        # 選択肢が4つあるか確認
-        assert len(question['options']) == 4
+            # 選択肢が4つあるか確認
+            assert len(question['options']) == 4
         
-        # 必要なキーが含まれているかチェック
-        assert 'id' in question['options'][0]
-        assert 'option_text' in question['options'][0]
-        assert 'is_correct' in question['options'][0]
+            # 選択肢に必要なキーが含まれているかチェック
+            for option in question['options']:
+                assert 'id' in option
+                assert 'option_text' in option
+                assert 'is_correct' in option
         
-        # 正解と不正解をリストに分ける
-        correct_option = [i for i in question['options'] if i['is_correct']]
-        incorrect_option = [i for i in question['options'] if not i['is_correct']]
-        
-        # 正解が1つで不正解が3つか確認
-        assert len(correct_option) == 1
-        assert len(incorrect_option) == 3
-        
-        # 正解の選択肢が正しいか確認
-        assert correct_option[0]['id'] == data[0]['spot_id']
-        
-        # 選択肢に重複がないか確認
-        all_id = [i['id'] for i in data[0]['options']]
-        assert len(set(all_id)) == 4
+            # 正解と不正解をリストに分ける
+            correct_option = [i for i in question['options'] if i['is_correct']]
+            incorrect_option = [i for i in question['options'] if not i['is_correct']]
+            
+            # 正解が1つで不正解が3つか確認
+            assert len(correct_option) == 1
+            assert len(incorrect_option) == 3
+            
+            # 正解の選択肢が正しいか確認
+            assert correct_option[0]['id'] == question['spot_id']
+            
+            # 選択肢に重複がないか確認
+            all_id = [i['id'] for i in question['options']]
+            assert len(set(all_id)) == 4
 
 
 # テストケース：問題取得で存在しないタイプを指定したら422が返るか----------------------------------
