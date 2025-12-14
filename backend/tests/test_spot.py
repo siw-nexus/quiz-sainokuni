@@ -43,7 +43,7 @@ def test_get_spot(test_spot_type, test_spot_id):
 # テストケース：スポット取得で存在しないタイプを指定したら422が返るか-----------------------------------------
 def test_get_spot_unknown_type():
     # リクエストを送る
-    response = client.get("/option", params={"spot_type": "unknown", "spot_id": 1})
+    response = client.get("/spot", params={"spot_type": "unknown", "spot_id": 1})
     
     # ステータスコードの確認
     assert response.status_code == 422 
