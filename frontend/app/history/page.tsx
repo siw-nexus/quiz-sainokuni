@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Question = {
   id: number;
@@ -11,10 +11,11 @@ type Question = {
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<Question[]>([]);
+  const router = useRouter();
 
-  // 画面が表示されたらセッションストレージから回答履歴を取得
+  // 画面が表示されたらローカルストレージからデータを取得
   useEffect(() => {
-    const savedData = sessionStorage.getItem('quiz_history');
+    const savedData = localStorage.getItem('quiz_history');
     if (savedData) {
       setHistory(JSON.parse(savedData));
     }
@@ -29,36 +30,48 @@ export default function HistoryPage() {
         {/* --- [PC用] 左サイドパネル --- */}
         <div className="hidden md:flex md:w-1/3 bg-[#333333] text-white p-10 flex-col justify-between relative">
           <div>
-            <h1 className="text-3xl font-bold tracking-widest mb-4">HISTORY</h1>
-            <p className="text-gray-400 text-sm">
-              出題された問題の一覧です。<br/>
-              復習に役立てましょう。
-            </p>
+             <h1 className="text-3xl font-bold tracking-widest mb-4">HISTORY</h1>
+             <p className="text-gray-400 text-sm">
+               出題された問題の一覧です。<br/>
+               復習に役立てましょう。
+             </p>
           </div>
-
-          <Link 
-            href={'/'}
-            className="mt-auto flex items-center gap-2 text-gray-300 hover:text-white transition"
+          
+          <button 
+            onClick={() => router.push('/')}
+            className="mt-auto flex items-center gap-2 text-gray-300 hover:text-white transition group"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
             TOPへ戻る
-          </Link>
+          </button>
 
           {/* 背景装飾 */}
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
         </div>
 
         {/* --- [共通] 右サイドパネル (リスト表示エリア) --- */}
-        <div className="flex-1 flex flex-col h-[600px] md:h-auto">
+        <div className="flex-1 flex flex-col h-[600px] md:h-auto relative">
           
+          {/* ▼▼▼ 追加: PC用の閉じるボタン (右上に配置) ▼▼▼ */}
+          <button 
+            onClick={() => router.push('/')}
+            className="hidden md:flex absolute top-6 right-8 text-gray-400 hover:text-gray-600 transition items-center gap-1 z-10"
+          >
+            <span className="text-sm font-bold">閉じる</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          {/* ▲▲▲ 追加終わり ▲▲▲ */}
+
           {/* スマホ用ヘッダー */}
           <div className="md:hidden h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-white sticky top-0 z-10">
             <h1 className="font-bold text-gray-800">出題履歴</h1>
-            <Link href={'/finish'} className="text-sm text-gray-500">
+            <button onClick={() => router.push('/')} className="text-sm text-gray-500">
               閉じる
-            </Link>
+            </button>
           </div>
 
           {/* リスト部分 (スクロール可能に) */}
@@ -83,12 +96,12 @@ export default function HistoryPage() {
 
           {/* スマホ用下部ボタンエリア */}
           <div className="md:hidden p-4 border-t border-gray-100 bg-white">
-            <Link 
-              href={'/'}
+            <button 
+              onClick={() => router.push('/')}
               className="w-full bg-[#333333] text-white font-bold py-3 rounded-xl shadow-lg"
             >
               TOPへ戻る
-            </Link>
+            </button>
           </div>
 
         </div>
