@@ -56,7 +56,7 @@ export default function HistoryPage() {
           
           {/* ▼▼▼ 追加: PC用の閉じるボタン (右上に配置) ▼▼▼ */}
           <button 
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/finish')}
             className="hidden md:flex absolute top-6 right-8 text-gray-400 hover:text-gray-600 transition items-center gap-1 z-10"
           >
             <span className="text-sm font-bold">閉じる</span>
@@ -69,7 +69,7 @@ export default function HistoryPage() {
           {/* スマホ用ヘッダー */}
           <div className="md:hidden h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-white sticky top-0 z-10">
             <h1 className="font-bold text-gray-800">出題履歴</h1>
-            <button onClick={() => router.push('/')} className="text-sm text-gray-500">
+            <button onClick={() => router.push('/finish')} className="text-sm text-gray-500">
               閉じる
             </button>
           </div>
