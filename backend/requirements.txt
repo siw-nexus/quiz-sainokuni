@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+cryptography
+alembic
+greenlet
+requests
+pytest
+httpx
+passlib[bcrypt]
+bcrypt==3.2.2
