@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+// コンポーネントのインポート
 import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
 
+// 型の定義をインポート
 import { Question } from "@/types/question";
 // QuizHistoryの型定義を変更する必要があるため、ここで拡張しておきます
 import { QuizHistory } from '@/types/history';
@@ -23,16 +25,17 @@ type Props = {
 }
 
 export default function QuizScreen({ spot_type, limit, questions }: Props) {
-  const [questionCount, setQuestionCount] = useState(1);
-  const [isResponding, setIsResponding] = useState(true);
-  const [isCorrectText, setIsCorrectText] = useState('');
-  const [answer, isAnswer] = useState('');
-  // 型を拡張したものに変更
-  const [history, setHistory] = useState<ExtendedQuizHistory[]>([]);
+  const [questionCount, setQuestionCount] = useState(1);             // 現在何問目かをカウントする変数
+  const [isResponding, setIsResponding] = useState(true);            // 回答中かどうかのフラグ
+  const [isCorrectText, setIsCorrectText] = useState('');            // 「正解」か「不正解」の文字列を格納
+  const [answer, isAnswer] = useState('');                           // 正解の選択肢を格納
+  const [history, setHistory] = useState<ExtendedQuizHistory[]>([]); // 回答履歴を保存する配列
 
   const currentQuestion = questions[questionCount - 1];
 
+  // OptionBtnコンポーネントから正誤判定の結果を受け取る
   const handleAnswerResult = (result: boolean, selectedText: string) => {
+    // 回答中のフラグをfalseにする
     setIsResponding(false);
     if (result) {
       setIsCorrectText("正解！");
@@ -43,9 +46,10 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
     const correctOption = currentQuestion.options.find(opt => opt.is_correct === true);
     const correctText = correctOption?.option_text;
 
+    // 正解を取得
     isAnswer(correctText || '');
 
-    // ▼▼▼ 修正: ここで spot_id と spot_type も保存する ▼▼▼
+    // 回答履歴の配列に結果を追加
     const newHistoryItem: ExtendedQuizHistory = {
       questionText: currentQuestion.question_text,
       userAnswer: selectedText,
@@ -55,9 +59,11 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
       spot_type: spot_type              // 追加
     };
 
+    // 前回の結果 + 今回の結果
     setHistory((prev) => [...prev, newHistoryItem]);
   };
 
+  // 次の問題へ行く関数
   const handleNextQuiz = () => {
     setQuestionCount((prev) => prev + 1);
     setIsResponding(true);

@@ -17,6 +17,7 @@ type HistoryItem = {
 export default function QuizHistory() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
+  // 画面が表示されたらセッションストレージから回答履歴を取得
   useEffect(() => {
     const savedData = sessionStorage.getItem('quiz_history');
     if (savedData) {
