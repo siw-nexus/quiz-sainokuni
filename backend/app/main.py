@@ -1,3 +1,4 @@
+from operator import gt
 from typing import List, Literal
 from fastapi import FastAPI, HTTPException, Query, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,12 +11,12 @@ from app.database import db_connect
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, get_options, save_question, save_quiz_histories, get_question_histories
 from app.crud.interest import add_interests, get_interests, delete_interest
-from app.crud.spot import get_spot
+from app.crud.spot import get_spot, get_nearby_spots
 
 # レスポンスモデルをインポート
 from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuestion, SendSaveQuestionResponse, SendSaveHistory, SendSaveHistoryResponse, GetHistoryListResponse
 from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
-from app.schemas.spot import GetSpotResponce
+from app.schemas.spot import GetSpotResponce, GetNearbySpotsResponse
 
 
 app = FastAPI()
@@ -166,3 +167,19 @@ def del_interest(
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
     
     return {"message": "削除が完了しました"}
+
+
+# 周辺のスポット取得API
+@app.get('/spot/nearby')
+def get_nearby_spot(
+    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
+    lat: float = Query(..., ge = -90, le = 90, description = '緯度（-90～90）'),
+    lon: float = Query(..., ge = -180, le = 180, description = '経度（-180～180）'),
+    db: Session = Depends(db_connect)
+):
+    result = get_nearby_spots(db, spot_type, lat, lon)
+    
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
