@@ -11,7 +11,7 @@ import OptionBtn from "./OptionBtn";
 import { Question } from "@/types/question";
 import { HistoryItem } from '@/types/history';
 
-
+// Propsの定義
 type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
