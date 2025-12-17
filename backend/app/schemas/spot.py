@@ -21,3 +21,11 @@ class GetSpotResponce(BaseModel):
     img: str | None = None
 
     model_config = ConfigDict(from_attributes = True)
+
+
+# 周辺のスポット取得のレスポンスの型の定義
+class GetNearbySpotsResponse(BaseModel):
+    id: int
+    spot_type: str
+    name: str
+    distance: float
