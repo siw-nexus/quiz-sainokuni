@@ -66,7 +66,7 @@ def get_nearby_spots(db, spot_type: str, current_lat: float, current_lon: float)
         )
         
         # 観光地の周辺のスポットを取得して返す
-        return db.execute(tourist_near_spots).all()
+        return db.execute(tourist_near_spots).mappings().all()
     
     # グルメの周辺のスポットを取得
     if spot_type == 'gourmet':
@@ -98,4 +98,4 @@ def get_nearby_spots(db, spot_type: str, current_lat: float, current_lon: float)
         )
         
         # グルメの周辺のスポットを取得して返す
-        return db.execute(gourmet_near_spots).all()
+        return db.execute(gourmet_near_spots).mappings().all()
