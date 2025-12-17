@@ -9,14 +9,8 @@ import OptionBtn from "./OptionBtn";
 
 // 型の定義をインポート
 import { Question } from "@/types/question";
-// QuizHistoryの型定義を変更する必要があるため、ここで拡張しておきます
-import { QuizHistory } from '@/types/history';
+import { HistoryItem } from '@/types/history';
 
-// 履歴データの型を拡張（spot_idなどを追加）
-type ExtendedQuizHistory = QuizHistory & {
-  spot_id: number;
-  spot_type: string;
-};
 
 type Props = {
   spot_type: 'tourist' | 'gourmet';
@@ -25,11 +19,11 @@ type Props = {
 }
 
 export default function QuizScreen({ spot_type, limit, questions }: Props) {
-  const [questionCount, setQuestionCount] = useState(1);             // 現在何問目かをカウントする変数
-  const [isResponding, setIsResponding] = useState(true);            // 回答中かどうかのフラグ
-  const [isCorrectText, setIsCorrectText] = useState('');            // 「正解」か「不正解」の文字列を格納
-  const [answer, isAnswer] = useState('');                           // 正解の選択肢を格納
-  const [history, setHistory] = useState<ExtendedQuizHistory[]>([]); // 回答履歴を保存する配列
+  const [questionCount, setQuestionCount] = useState(1);     // 現在何問目かをカウントする変数
+  const [isResponding, setIsResponding] = useState(true);    // 回答中かどうかのフラグ
+  const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
+  const [answer, isAnswer] = useState('');                   // 正解の選択肢を格納
+  const [history, setHistory] = useState<HistoryItem[]>([]); // 回答履歴を保存する配列
 
   const currentQuestion = questions[questionCount - 1];
 
@@ -50,7 +44,7 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
     isAnswer(correctText || '');
 
     // 回答履歴の配列に結果を追加
-    const newHistoryItem: ExtendedQuizHistory = {
+    const newHistoryItem: HistoryItem = {
       questionText: currentQuestion.question_text,
       userAnswer: selectedText,
       correctAnswer: correctText,

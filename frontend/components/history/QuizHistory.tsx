@@ -3,16 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// 型定義（保存データに合わせて拡張）
-type HistoryItem = {
-  questionText: string;
-  userAnswer?: string;
-  isCorrect?: boolean;
-  correctAnswer?: string;
-  // 追加したID情報
-  spot_id?: number;
-  spot_type?: string;
-};
+// 型の定義をインポート
+import { HistoryItem } from '@/types/history';
 
 export default function QuizHistory() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
