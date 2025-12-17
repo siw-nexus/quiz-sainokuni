@@ -1,9 +1,9 @@
 // ユーザーが答えた結果を保存する型を定義
-export type QuizHistory = {
-  spot_type: string;
-  spot_id: number;
+export type HistoryItem = {
   questionText: string;
-  userAnswer: string;
-  correctAnswer: string;
-  isCorrect: boolean;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  correctAnswer?: string;
+  spot_id?: number;
+  spot_type?: string;
 };
