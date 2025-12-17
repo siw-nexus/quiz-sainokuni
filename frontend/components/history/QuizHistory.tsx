@@ -122,7 +122,7 @@ export default function QuizHistory() {
 
                   // リンクがあれば Link でラップ、なければそのまま表示
                   return linkHref ? (
-                    <Link key={index} href={linkHref} target="_blank" rel="noopener noreferrer">
+                    <Link key={index} href={linkHref} rel="noopener noreferrer">
                       {Content}
                     </Link>
                   ) : (

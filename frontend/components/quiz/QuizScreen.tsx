@@ -125,7 +125,6 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
                 <div className="w-full space-y-4">
                   <Link 
                     href={`/spot_detail?spot_type=${spot_type}&spot_id=${currentQuestion.spot_id}`}
-                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-full block text-center bg-white border-2 border-[#333333] text-[#333333] font-bold py-4 rounded-xl hover:bg-gray-50 transition"
                   >
