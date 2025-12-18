@@ -13,7 +13,7 @@ client = TestClient(app)
 ])
 def test_get_spot(test_spot_type, test_spot_id):
     # リクエストを送る
-    response = client.get("/spot", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
+    response = client.get("/spot/detail", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
     
     # ステータスコードの確認
     assert response.status_code == 200
@@ -43,7 +43,7 @@ def test_get_spot(test_spot_type, test_spot_id):
 # テストケース：スポット取得で存在しないタイプを指定したら422が返るか-----------------------------------------
 def test_get_spot_unknown_type():
     # リクエストを送る
-    response = client.get("/spot", params={"spot_type": "unknown", "spot_id": 1})
+    response = client.get("/spot/detail", params={"spot_type": "unknown", "spot_id": 1})
     
     # ステータスコードの確認
     assert response.status_code == 422 
@@ -58,7 +58,7 @@ def test_get_spot_unknown_type():
 ])
 def test_get_spot_unknown_id(test_spot_type, test_spot_id):
     # リクエストを送る
-    response = client.get("/spot", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
+    response = client.get("/spot/detail", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
     
     # responseのステータスコードの確認
     assert response.status_code == 404 
@@ -73,7 +73,7 @@ def test_get_spot_unknown_id(test_spot_type, test_spot_id):
 @pytest.mark.parametrize("test_spot_id", [-999, -1, 0])
 def test_get_spot_id_422(test_spot_type, test_spot_id):
     # リクエストを送る
-    response = client.get("/spot", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
+    response = client.get("/spot/detail", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
     
     # responseのステータスコードの確認
     assert response.status_code == 422

@@ -136,7 +136,7 @@ def get_histories(
 
 
 # 観光地・グルメを一件取得
-@app.get('/spot', response_model = GetSpotResponce)
+@app.get('/spot/detail', response_model = GetSpotResponce)
 def g_spot(
     spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
     spot_id: int = Query(..., ge = 1, description = 'スポットのID（1以上の数値）'),
