@@ -7,8 +7,8 @@ class GetSpotResponce(BaseModel):
     name: str
     detail: str | None = None
     address: str | None = None
-    lat: str | None = None
-    lon: str | None = None
+    lat: float | None = None
+    lon: float | None = None
     available_time: str | None = None
     closure_info: str | None = None
     category: str  | None = None
@@ -21,3 +21,11 @@ class GetSpotResponce(BaseModel):
     img: str | None = None
 
     model_config = ConfigDict(from_attributes = True)
+
+
+# 周辺のスポット取得のレスポンスの型の定義
+class GetNearbySpotsResponse(BaseModel):
+    id: int
+    spot_type: str
+    name: str
+    distance: float

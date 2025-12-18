@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DATETIME, UniqueConstraint, func, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, DATETIME, UniqueConstraint, func, ForeignKey, Boolean, DECIMAL
 from sqlalchemy.orm import declarative_base, relationship
 
 
@@ -14,8 +14,8 @@ class Tourist_spots(Base):
     name = Column(String(100), nullable = False, comment = '観光地名')
     detail = Column(Text, nullable = False, comment = '概要')
     address = Column(String(255), nullable = False, comment = '住所')
-    lat = Column(String(100), comment = '緯度')
-    lon = Column(String(100), comment = '経度')
+    lat = Column(DECIMAL(9, 6), comment = '緯度')
+    lon = Column(DECIMAL(9, 6), comment = '経度')
     available_time = Column(String(100), comment = '利用可能時間')
     closure_info = Column(Text, comment = '休業情報')
     start_time = Column(String(100), comment = '開始時間')
@@ -36,8 +36,8 @@ class Gourmet_spots(Base):
     name = Column(String(100), nullable = False, comment = '店舗名')
     detail = Column(Text, nullable = False, comment = '概要')
     address = Column(String(255), nullable = False, comment = '住所')
-    lat = Column(String(100), comment = '緯度')
-    lon = Column(String(100), comment = '経度')
+    lat = Column(DECIMAL(9, 6), comment = '緯度')
+    lon = Column(DECIMAL(9, 6), comment = '経度')
     category = Column(String(100), comment = '区分')
     tokusanhin = Column(String(255), comment = '特産品')
     start_time = Column(String(100), comment = '開始時間')
