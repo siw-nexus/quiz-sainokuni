@@ -36,3 +36,7 @@ def create_access_token(data: dict):
     
     # JWTを返す
     return encode_jwt
+
+# パスワードをハッシュ化する関数
+def password_hash(password: str):
+    return pwd_context.hash(password)
