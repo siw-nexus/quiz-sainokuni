@@ -170,14 +170,13 @@ def del_interest(
 
 
 # 周辺のスポット取得API
-@app.get('/spot/nearby')
+@app.get('/spot/nearby', response_model = List[GetNearbySpotsResponse])
 def get_nearby_spot(
-    spot_type: Literal['tourist', 'gourmet'] = Query(..., description = '観光地(tourist)かグルメ(gourmet)か'),
     lat: float = Query(..., ge = -90, le = 90, description = '緯度（-90～90）'),
     lon: float = Query(..., ge = -180, le = 180, description = '経度（-180～180）'),
     db: Session = Depends(db_connect)
 ):
-    result = get_nearby_spots(db, spot_type, lat, lon)
+    result = get_nearby_spots(db, lat, lon)
     
     if not result:
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
