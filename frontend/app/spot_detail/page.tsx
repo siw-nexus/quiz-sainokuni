@@ -4,7 +4,7 @@ import NearbySpotsList from "@/components/Spot_detail/NearbySpotsList";
 import DetailFooterBtn from "@/components/Spot_detail/DetailFooterBtn";
 
 // 型の定義をインポート
-import { Spot } from "@/types/spot";
+import { Spot, NearbySpot } from "@/types/spot";
 
 // Propsを定義
 type Props = {
@@ -33,6 +33,25 @@ const getSpot = async (spotType: string, spotId: number): Promise<Spot> => {
   }
 };
 
+// 周辺のスポットを取得する関数
+const getNearbySpot = async (lat: number, lon: number): Promise<NearbySpot[]> => {
+  try {
+    const res = await fetch(`${apiUrl}/spot/nearby?lat=${lat}&lon=${lon}`,
+      { cache: "no-store" } // キャッシュの無効化
+    );
+
+    // レスポンスの確認
+    if (!res.ok) throw new Error("スポットの取得に失敗しました");
+
+    // レスポンスの中身を取得
+    const data: NearbySpot[] = await res.json();
+
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 export default async function SpotDetail({ searchParams }: Props) {
   // URLのパラメーターを取得
   const params = await searchParams;
@@ -42,10 +61,13 @@ export default async function SpotDetail({ searchParams }: Props) {
   // スポットの詳細を取得する関数を呼び出す
   const spotDetail = await getSpot(spotType, spotId);
 
+  // 周辺のスポットを取得する関数を呼び出す
+  const nearbySpots = await getNearbySpot(spotDetail.lat, spotDetail.lon);
+
   return (
     <main>
       <Detail proSpotDetail={spotDetail}/>
-      <NearbySpotsList />
+      <NearbySpotsList nearbySpots={nearbySpots}/>
       {/* <DetailFooterBtn lat={spotDetail.lat} lon={spotDetail.lon} address={spotDetail.address}/> */}
     </main>
   );
