@@ -1,5 +1,6 @@
 // コンポーネントをインポート
 import Detail from "@/components/Spot_detail/Detail";
+import NearbySpotsList from "@/components/Spot_detail/NearbySpotsList";
 import DetailFooterBtn from "@/components/Spot_detail/DetailFooterBtn";
 
 // 型の定義をインポート
@@ -44,7 +45,8 @@ export default async function SpotDetail({ searchParams }: Props) {
   return (
     <main>
       <Detail proSpotDetail={spotDetail}/>
-      <DetailFooterBtn lat={spotDetail.lat} lon={spotDetail.lon} address={spotDetail.address}/>
+      <NearbySpotsList />
+      {/* <DetailFooterBtn lat={spotDetail.lat} lon={spotDetail.lon} address={spotDetail.address}/> */}
     </main>
   );
 }
