@@ -125,3 +125,12 @@ def test_get_nearby_spots_404(test_spot_type, test_spot_lat, test_spot_lon):
     # responseのレスポンスの中身の確認
     data = response.json()
     assert data["detail"] == "データが見つかりませんでした"
+
+
+# テストケース：周辺のスポットを取得で許容されてないspot_typeを指定したときに422が返ってくるか
+def test_get_nearby_spots_type_422():
+    # リクエストを送信
+    response = client.get('/spot/nearby', params = {'spot_type': 'unknown', 'lat': 35.924287, 'lon': 139.488561})
+    
+    # ステータスコードの確認
+    assert response.status_code == 422
