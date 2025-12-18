@@ -101,13 +101,9 @@ def test_get_nearby_spots():
         assert 'distance' in item
 
 # テストケース：周辺のスポットを取得できなかった時に404が返ってくるか
-@pytest.mark.parametrize('test_spot_type, test_spot_lat, test_spot_lon', [
-    ('tourist', 40.000000, 180.000000),
-    ('gourmet', 40.000000, 180.000000),
-])
-def test_get_nearby_spots_404(test_spot_type, test_spot_lat, test_spot_lon):
+def test_get_nearby_spots_404():
     # リクエストを送信
-    response = client.get('/spot/nearby', params = {'spot_type': test_spot_type, 'lat': test_spot_lat, 'lon': test_spot_lon})
+    response = client.get('/spot/nearby', params = {'lat': 40.000000, 'lon': 180.000000})
     
     # ステータスコードの確認
     assert response.status_code == 404
@@ -117,27 +113,18 @@ def test_get_nearby_spots_404(test_spot_type, test_spot_lat, test_spot_lon):
     assert data["detail"] == "データが見つかりませんでした"
 
 
-# テストケース：周辺のスポットを取得で許容されてないspot_typeを指定したときに422が返ってくるか
-def test_get_nearby_spots_type_422():
-    # リクエストを送信
-    response = client.get('/spot/nearby', params = {'spot_type': 'unknown', 'lat': 35.924287, 'lon': 139.488561})
-    
-    # ステータスコードの確認
-    assert response.status_code == 422
-
-
 # テストケース：周辺のスポットを取得で許容されていない緯度経度を指定したときに422が返ってくるか
-@pytest.mark.parametrize('test_spot_type, test_spot_lat, test_spot_lon', [
+@pytest.mark.parametrize('test_spot_lat, test_spot_lon', [
     # 緯度のバリデーションチェック
-    ('tourist', -90.000001, 139.000000),  # 緯度が下限より低い境界値
-    ('tourist', 90.000001, 139.000000),   # 緯度が上限より高い境界値
+    (-90.000001, 139.000000),  # 緯度が下限より低い境界値
+    (90.000001, 139.000000),   # 緯度が上限より高い境界値
     # 経度のバリデーションチェック
-    ('tourist', 35.000000, -180.000001),  # 経度が下限より低い境界値
-    ('tourist', 35.000000, 180.000001),   # 経度が上限より高い境界値
+    (35.000000, -180.000001),  # 経度が下限より低い境界値
+    (35.000000, 180.000001),   # 経度が上限より高い境界値
 ])
-def test_get_nearby_spots_lat_lon_422(test_spot_type, test_spot_lat, test_spot_lon):
+def test_get_nearby_spots_lat_lon_422(test_spot_lat, test_spot_lon):
     # リクエストを送信
-    response = client.get('/spot/nearby', params = {'spot_type': test_spot_type, 'lat': test_spot_lat, 'lon': test_spot_lon})
+    response = client.get('/spot/nearby', params = {'lat': test_spot_lat, 'lon': test_spot_lon})
     
     # ステータスコードの確認
     assert response.status_code == 422
