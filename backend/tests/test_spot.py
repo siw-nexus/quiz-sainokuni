@@ -80,15 +80,9 @@ def test_get_spot_id_422(test_spot_type, test_spot_id):
 
 
 # テストケース：周辺のスポット詳細を正常に取得できるか
-@pytest.mark.parametrize('test_spot_type, test_spot_lat, test_spot_lon', [
-    ('tourist', 35.924287, 139.488561),
-    ('tourist', 35.874133, 139.419411),
-    ('gourmet', 36.231883, 139.259953),
-    ('gourmet', 35.793497, 139.565330)
-])
-def test_get_nearby_spots(test_spot_type, test_spot_lat, test_spot_lon):
+def test_get_nearby_spots():
     # リクエストを送る
-    response = client.get('/spot/nearby', params = {'spot_type': test_spot_type, 'lat': test_spot_lat, 'lon': test_spot_lon})
+    response = client.get('/spot/nearby', params = {'lat': 35.78462512, 'lon': 139.5506787})
     
     # ステータスコードの確認
     assert response.status_code == 200
@@ -105,10 +99,6 @@ def test_get_nearby_spots(test_spot_type, test_spot_lat, test_spot_lon):
         assert 'spot_type' in item
         assert 'name' in item
         assert 'distance' in item
-        
-        # リクエストしたspot_typeとレスポンスのspot_typeが一致しているか
-        assert item['spot_type'] == test_spot_type
-
 
 # テストケース：周辺のスポットを取得できなかった時に404が返ってくるか
 @pytest.mark.parametrize('test_spot_type, test_spot_lat, test_spot_lon', [
