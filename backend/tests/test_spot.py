@@ -134,3 +134,20 @@ def test_get_nearby_spots_type_422():
     
     # ステータスコードの確認
     assert response.status_code == 422
+
+
+# テストケース：周辺のスポットを取得で許容されていない緯度経度を指定したときに422が返ってくるか
+@pytest.mark.parametrize('test_spot_type, test_spot_lat, test_spot_lon', [
+    # 緯度のバリデーションチェック
+    ('tourist', -90.000001, 139.000000),  # 緯度が下限より低い境界値
+    ('tourist', 90.000001, 139.000000),   # 緯度が上限より高い境界値
+    # 経度のバリデーションチェック
+    ('tourist', 35.000000, -180.000001),  # 経度が下限より低い境界値
+    ('tourist', 35.000000, 180.000001),   # 経度が上限より高い境界値
+])
+def test_get_nearby_spots_lat_lon_422(test_spot_type, test_spot_lat, test_spot_lon):
+    # リクエストを送信
+    response = client.get('/spot/nearby', params = {'spot_type': test_spot_type, 'lat': test_spot_lat, 'lon': test_spot_lon})
+    
+    # ステータスコードの確認
+    assert response.status_code == 422
