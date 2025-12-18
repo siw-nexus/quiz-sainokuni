@@ -65,7 +65,7 @@ export default function QuizSelect() {
 
           <div className="mt-8 md:mt-0">
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              観光地クイズ
+              クイズ彩の国
             </h1>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed">
               あなたの知識を試してみよう。<br className="hidden md:block"/>
