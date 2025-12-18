@@ -34,7 +34,10 @@ def test_dummy_user(db = SessionLocal()):
     db.refresh(user)
     
     # テスト用に生のメールアドレスとパスワードを返す
-    return {'email': email, 'password': raw_password}
+    yield {'email': email, 'password': raw_password}
+    
+    db.delete(user)
+    db.commit()
 
 
 # テストケース：正常にログインできてアクセストークンを取得できるか
