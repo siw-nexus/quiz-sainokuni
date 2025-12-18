@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+///import Link from 'next/link';
 import { Spot } from "@/types/spot";
 
 type Props = {
@@ -12,6 +12,16 @@ export default function Detail({ proSpotDetail }: Props) {
   const router = useRouter();
 
   const imageSrc = proSpotDetail.image || 'https://placehold.jp/800x400.png?text=No+Image';
+  // Google Maps APIキー
+  const GOOGLE_MAPS_API_KEY = 'AIzaSyCesg9RU9tbJTg9YPDi9ubcEC_jAelKdC4';
+
+  // 1. 埋め込み地図用のURL (Google Maps Embed API)
+  // keyとq(緯度経度)を指定して地図を表示します
+  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${proSpotDetail.lat},${proSpotDetail.lon}`;
+
+  // 2. 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
+  // query(緯度経度)を指定して検索結果を開きます
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${proSpotDetail.lat},${proSpotDetail.lon}`;
   const mapUrl = `https://maps.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}&output=embed&t=m&z=15`;
 
   return (
@@ -82,13 +92,13 @@ export default function Detail({ proSpotDetail }: Props) {
             
             {/* 地図 (残りのスペースを埋める) */}
             <div className="flex-1 w-full bg-gray-200 relative">
-              <iframe
+                <iframe
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 loading="lazy"
                 allowFullScreen
-                src={mapUrl}
+                src={mapEmbedUrl}
                 title="Google Map"
                 className="absolute inset-0 w-full h-full grayscale-[20%] hover:grayscale-0 transition duration-500"
               ></iframe>
@@ -96,17 +106,19 @@ export default function Detail({ proSpotDetail }: Props) {
 
             {/* ボタンエリア (PC:下部に固定される / Mobile:地図の下) */}
             <div className="p-4 lg:p-6 bg-white border-t border-gray-100 z-10 shrink-0">
-              <Link 
-                href={`/map?lat=${proSpotDetail.lat}&lon=${proSpotDetail.lon}&address=${proSpotDetail.address}`}
+              <a 
+                href={googleMapsLink}
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="block w-full bg-[#333] hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95 group text-center"
               >
                 <span className="flex items-center justify-center gap-2">
-                  ここに行く
+                  Googleマップで開く
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                   </svg>
                 </span>
-              </Link>
+              </a>
             </div>
 
           </div>
