@@ -17,7 +17,7 @@ const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
 // スポットの詳細を取得する関数
 const getSpot = async (spotType: string, spotId: number): Promise<Spot> => {
   try {
-    const res = await fetch(`${apiUrl}/spot?spot_type=${spotType}&spot_id=${spotId}`,
+    const res = await fetch(`${apiUrl}/spot/detail?spot_type=${spotType}&spot_id=${spotId}`,
       { cache: "no-store" } // キャッシュの無効化
     );
 
