@@ -1,0 +1,78 @@
+from fastapi.testclient import TestClient
+from app.main import app
+import pytest
+
+# パスワードをハッシュ化する関数をインポート
+from app.core.security import password_hash
+
+# モデルをインポート
+from app.models import Users
+
+# データベースの接続設定をインポート
+from app.database import SessionLocal
+
+
+# テスト用のクライアントを作成
+client = TestClient(app)
+
+# テスト用のダミーユーザーを作る
+@pytest.fixture
+def test_dummy_user(db = SessionLocal()):
+    # テスト用ダミーユーザーのメールアドレスとパスワードを定義
+    email = 'auth_test@example.com'
+    raw_password = 'testpassword123'
+    
+    # パスワードをハッシュ化して保存
+    user = Users(
+        email = email,
+        password = password_hash(raw_password),
+        name = 'Auth Test User'
+    )
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    # テスト用に生のメールアドレスとパスワードを返す
+    yield {'email': email, 'password': raw_password}
+    
+    db.delete(user)
+    db.commit()
+
+
+# テストケース：正常にログインできてアクセストークンを取得できるか
+def test_login(test_dummy_user):
+    # リクエスト送信
+    response = client.post(
+        '/token',
+        data = {
+            'username': test_dummy_user['email'],
+            'password': test_dummy_user['password']
+        }
+    )
+    
+    # ステータスコードの確認
+    assert response.status_code == 200
+    
+    # レスポンスの中身を確認
+    data = response.json()
+    assert 'access_token' in data
+    assert data['token_type'] == 'bearer'
+
+
+# テストケース：メールアドレスとパスワードを間違えたときに401が返ってくるか
+@pytest.mark.parametrize("email_input, password_input", [
+    ("auth_test@example.com", "wrong_password"), # パスワード違い
+    ("wrong@example.com", "testpassword123"),    # メアドが存在しない
+])
+def test_login_failure(test_dummy_user, email_input, password_input):
+    response = client.post(
+        "/token",
+        data={
+            "username": email_input,
+            "password": password_input
+        }
+    )
+    
+    assert response.status_code == 401
+    assert response.json()["detail"] == "メールアドレスまたはパスワードが正しくありません"

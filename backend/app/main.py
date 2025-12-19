@@ -18,6 +18,9 @@ from app.schemas.question import QestionResponse, OptionResponse, SendSaveQuesti
 from app.schemas.interest import AddInterestResponse, InterestsCreate, GetInterestResponse
 from app.schemas.spot import GetSpotResponce, GetNearbySpotsResponse
 
+# 認証関係をインポート
+from app.routers import auth
+
 
 app = FastAPI()
 
@@ -182,3 +185,7 @@ def get_nearby_spot(
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
     
     return result
+
+
+# ログインAPI
+app.include_router(auth.router)
