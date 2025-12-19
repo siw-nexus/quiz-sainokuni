@@ -1,28 +1,29 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 ///import Link from 'next/link';
+
 import { Spot } from "@/types/spot";
 
 type Props = {
   proSpotDetail: Spot
 }
 
+// SSRを無効化してMapコンポーネントをインポート
+const Map = dynamic(() => import('@/components/Spot_detail/Map'), { 
+  ssr: false,
+  loading: () => <p>地図を読み込み中...</p> 
+});
+
 export default function Detail({ proSpotDetail }: Props) {
   const router = useRouter();
 
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
-  // Google Maps APIキー
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyCesg9RU9tbJTg9YPDi9ubcEC_jAelKdC4';
 
-  // 1. 埋め込み地図用のURL (Google Maps Embed API)
-  // keyとq(緯度経度)を指定して地図を表示します
-  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${proSpotDetail.lat},${proSpotDetail.lon}`;
 
-  // 2. 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
-  // query(緯度経度)を指定して検索結果を開きます
+  // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${proSpotDetail.lat},${proSpotDetail.lon}`;
-  const mapUrl = `https://maps.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}&output=embed&t=m&z=15`;
 
   return (
     // 外枠：PCでは画面中央に配置し、高さを制限しない（中のカードで制限する）
@@ -92,16 +93,7 @@ export default function Detail({ proSpotDetail }: Props) {
             
             {/* 地図 (残りのスペースを埋める) */}
             <div className="flex-1 w-full bg-gray-200 relative">
-                <iframe
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-                src={mapEmbedUrl}
-                title="Google Map"
-                className="absolute inset-0 w-full h-full grayscale-[20%] hover:grayscale-0 transition duration-500"
-              ></iframe>
+                <Map lat={proSpotDetail.lat} lon={proSpotDetail.lon} zoom={20} spot_name={proSpotDetail.name}/>
             </div>
 
             {/* ボタンエリア (PC:下部に固定される / Mobile:地図の下) */}
