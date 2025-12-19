@@ -29,3 +29,18 @@ def g_spot(
         raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
     
     return result
+
+
+# 周辺のスポット取得
+@router.get('/spot/nearby', response_model = List[GetNearbySpotsResponse])
+def get_nearby_spot(
+    lat: float = Query(..., ge = -90, le = 90, description = '緯度（-90～90）'),
+    lon: float = Query(..., ge = -180, le = 180, description = '経度（-180～180）'),
+    db: Session = Depends(db_connect)
+):
+    result = get_nearby_spots(db, lat, lon)
+    
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
