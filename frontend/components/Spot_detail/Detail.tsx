@@ -3,8 +3,10 @@
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
+// 型の定義をインポート
 import { Spot } from "@/types/spot";
 
+// Propsの定義
 type Props = {
   proSpotDetail: Spot
 }

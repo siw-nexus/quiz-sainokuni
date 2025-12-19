@@ -1,24 +1,27 @@
+// コンポーネントをインポート
 import Detail from "@/components/Spot_detail/Detail";
-// ▼ DetailFooterBtn は不要になったので削除
-// import DetailFooterBtn from "@/components/Spot_detail/DetailFooterBtn";
 
+// 型の定義をインポート
 import { Spot } from "@/types/spot";
 
+// Propsを定義
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+// APIのエンドポイント
 const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
 
-// 戻り値を Spot | null に変更して安全性を向上
+// スポットの詳細を取得する関数
 const getSpot = async (spotType: string, spotId: number): Promise<Spot | null> => {
   try {
     if (!spotId) return null;
 
     const res = await fetch(`${apiUrl}/spot?spot_type=${spotType}&spot_id=${spotId}`,
-      { cache: "no-store" }
+      { cache: "no-store" } // キャッシュの無効化
     );
 
+    // レスポンスの確認
     if (!res.ok) {
       console.error(`API Error: ${res.status}`);
       return null;
@@ -33,10 +36,12 @@ const getSpot = async (spotType: string, spotId: number): Promise<Spot | null> =
 };
 
 export default async function SpotDetail({ searchParams }: Props) {
+  // URLのパラメーターを取得
   const params = await searchParams;
   const spotType = params.spot_type as string; 
   const spotId = Number(params.spot_id);
 
+  // スポットの詳細を取得する関数を呼び出す
   const spotDetail = await getSpot(spotType, spotId);
 
   // データが取れなかった場合の表示（クラッシュ防止）
@@ -51,7 +56,6 @@ export default async function SpotDetail({ searchParams }: Props) {
   return (
     <main>
       <Detail proSpotDetail={spotDetail}/>
-      {/* ▼ DetailFooterBtn は削除 */}
     </main>
   );
 }
