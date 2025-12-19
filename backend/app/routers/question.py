@@ -65,7 +65,7 @@ def send_save_history(
         return result
     
     except IntegrityError:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定された回答結果は存在しません')
 
 
 # 回答履歴一覧取得
