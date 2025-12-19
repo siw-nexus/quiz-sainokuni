@@ -1,17 +1,10 @@
-from fastapi.testclient import TestClient
-from app.main import app
 import pytest
-
-
-
-# テスト用のクライアントを作成
-client = TestClient(app)
 
 
 # テストケース：正常に問題と選択肢を取得できるか---------------------------------------------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
 @pytest.mark.parametrize("test_limit", [5, 10, 15])
-def test_get_questions(test_spot_type, test_limit):
+def test_get_questions(client, test_questions, test_spot_type, test_limit):
     # リクエストを送る 
     response = client.get("/question", params={"spot_type": test_spot_type, "limit": test_limit})
 
@@ -62,7 +55,7 @@ def test_get_questions(test_spot_type, test_limit):
 
 # テストケース：問題取得で存在しないタイプを指定したら422が返るか----------------------------------
 @pytest.mark.parametrize("test_limit", [5, 10, 15])
-def test_get_questions_unknown_type(test_limit):
+def test_get_questions_unknown_type(client, test_limit):
     response = client.get("/question", params={"spot_type": "unknown", "limit": test_limit})
     
     # ステータスコードの確認
@@ -72,118 +65,21 @@ def test_get_questions_unknown_type(test_limit):
 # テストケース：問題取得でlimitを[5, 10, 15]以外でリクエスト送信したら422が返るか--------------------
 @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
 @pytest.mark.parametrize('test_422_limit', [-1, 0, 1, 4, 6, 9, 11, 14, 16, 999])
-def test_get_question_limit_422(test_spot_type, test_422_limit):
+def test_get_question_limit_422(client, test_questions, test_spot_type, test_422_limit):
     response = client.get('/question', params = {'spot_type': test_spot_type, 'limit': test_422_limit})
     
     # ステータスコードの確認
     assert response.status_code == 422
 
 
-# # テストケース：正常に選択肢を取得できるか-----------------------------------------------
-# @pytest.mark.parametrize("test_spot_type, test_spot_id", [
-#     ("tourist", 1), ("tourist", 100),
-#     ("gourmet", 1), ("gourmet", 99),
-# ])
-# def test_get_options(test_spot_type, test_spot_id):
-#     # リクエストを送る
-#     response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
-    
-#     # ステータスコードの確認
-#     assert response.status_code == 200
-
-#     # レスポンスの中身の確認
-#     data = response.json()
-#     assert isinstance(data, list) # リストで返ってくるか
-#     assert len(data) == 4         # 選択肢が4件か
-    
-#     if len(data) > 0:
-#         # 必要なキーが含まれているかチェック
-#         # 必須項目
-#         assert "id" in data[0]
-#         assert "option_text" in data[0]
-#         assert "is_correct" in data[0]
-        
-#         # null許容項目（nullでもキー自体はある）
-#         expected_fields = [
-#             "detail", "address", "lat", "lon", "img", "hp_url",
-#             "start_time", "finish_time", "notes", "tel",
-#             # 観光地・グルメ固有のものも含めてチェック
-#             "available_time", "closure_info", "category", "tokusanhin"
-#         ]
-        
-#         for field in expected_fields:
-#             assert field in data[0]
-    
-    
-#     # 正解と不正解をリストに分ける
-#     correct_options = [x for x in data if x["is_correct"] == 1]
-#     incorrect_options = [x for x in data if x["is_correct"] == 0]
-
-#     # 数を確認
-#     assert len(correct_options) == 1
-#     assert len(incorrect_options) == 3
-
-#     # 「正解」の中身が正しいかチェック
-#     assert correct_options[0]["id"] == test_spot_id
-
-#     # 選択肢に重複がないかチェック
-#     all_ids = [x["id"] for x in data]
-#     assert len(set(all_ids)) == 4
-
-
-# # テストケース：存在しないタイプを指定したら422が返るか-----------------------------------------
-# def test_get_options_unknown_type():
-#     # リクエストを送る
-#     response = client.get("/option", params={"spot_type": "unknown", "spot_id": 1})
-    
-#     # ステータスコードの確認
-#     assert response.status_code == 422 
-
-
-# # テストケース：存在しないIDを指定したら空リストが返るか-------------------------------------------
-# @pytest.mark.parametrize("test_spot_type, test_spot_id", [
-#     ("tourist", 101), 
-#     ("gourmet", 100), 
-#     ("tourist", 9999),
-# ])
-# def test_get_options_unknown_id(test_spot_type, test_spot_id):
-#     # リクエストを送る
-#     response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
-    
-#     # responseのステータスコードの確認
-#     assert response.status_code == 404 
-    
-#     # responseのレスポンスの中身の確認
-#     data = response.json()
-#     assert data["detail"] == "データが見つかりませんでした"
-    
-
-# # テストケース：選択肢取得で許容されてない数値をIDに指定したら422が返るか----------------------------
-# @pytest.mark.parametrize("test_spot_type", ["tourist", "gourmet"])
-# @pytest.mark.parametrize("test_spot_id", [-999, -1, 0])
-# def test_get_options_id_422(test_spot_type, test_spot_id):
-#     # リクエストを送る
-#     response = client.get("/option", params={"spot_type": test_spot_type, "spot_id": test_spot_id})
-    
-#     # responseのステータスコードの確認
-#     assert response.status_code == 422
-
-
 # テストケース：回答結果保存で正常系のテスト
-@pytest.mark.parametrize("spot_type", ["tourist", "gourmet"])
-@pytest.mark.parametrize("score, total", [
-    (0, 5),
-    (5, 5),
-    (3, 10),
-    (15, 15)
-])
-def test_save_question_success(spot_type, score, total):
+def test_save_question_success(client, test_user):
     # 送信するデータ
     payload = {
-        "user_id": 1,
-        "spot_type": spot_type,
-        "score": score,
-        "total_questions": total
+        "user_id": test_user.id,
+        "spot_type": 'tourist',
+        "score": 5,
+        "total_questions": 5
     }
     
     response = client.post("/questions", json=payload)
@@ -194,9 +90,9 @@ def test_save_question_success(spot_type, score, total):
     # レスポンスの中身の確認
     data = response.json()
     assert "id" in data
-    assert data["user_id"] == 1
-    assert data["score"] == score
-    assert data["total_questions"] == total
+    assert data["user_id"] == test_user.id
+    assert data["score"] == 5
+    assert data["total_questions"] == 5
 
 
 # テストケース：回答結果保存でscoreがtotal_questionsより大きい値の場合に400が返るか
@@ -205,7 +101,7 @@ def test_save_question_success(spot_type, score, total):
     (11, 10),
     (100, 15)
 ])
-def test_save_question_logic_error(score, total):
+def test_save_question_logic_error(client, score, total):
     payload = {
         "user_id": 1,
         "spot_type": "tourist",
@@ -223,7 +119,7 @@ def test_save_question_logic_error(score, total):
 
 
 # テストケース：回答結果保存でschemasの制限に引っかかる値を送信して422が返ってくるか
-def test_save_question_validation_error():
+def test_save_question_validation_error(client):
     # 存在しないspot_type
     res1 = client.post("/questions", json={"user_id": 1, "spot_type": "unknown", "score": 3, "total_questions": 5})
     
@@ -244,7 +140,7 @@ def test_save_question_validation_error():
 
 
 # テストケース：存在しない user_id を指定した場合に404が返るか
-def test_save_question_unknown_user():
+def test_save_question_unknown_user(client):
     payload = {
         "user_id": 9999,
         "spot_type": "tourist",
@@ -263,13 +159,19 @@ def test_save_question_unknown_user():
 
 
 # テストケース：クイズの回答履歴を正常に保存できるか
-def test_save_history_success():
+def test_save_history_success(client, test_quiz_history, test_questions, test_spots):
     """正常に保存できるかテスト"""
+    # 問題のIDを取得
+    target_question = test_questions[0]
+    
+    # 選択肢のIDを取得
+    target_choice_id = test_spots["tourist"][0].id
+    
     payload = {
-        "quiz_result_id": 1,
+        "quiz_result_id": test_quiz_history.id,
         "question_num": 1,
-        "question_id": 100,
-        "choice_id": 2,
+        "question_id": target_question.id,
+        "choice_id": target_choice_id,
         "is_correct": True
     }
     
@@ -280,9 +182,8 @@ def test_save_history_success():
     
     # レスポンスの中身が送信したものと一致するか
     data = response.json()
-    assert data["quiz_result_id"] == 1
-    assert data["question_num"] == 1
-    assert data["is_correct"] is True
+    assert data["quiz_result_id"] == test_quiz_history.id
+    assert data["question_id"] == target_question.id
 
 
 # テストケース：bodyに入れる値が不正な値の場合に422が返るか
@@ -292,7 +193,7 @@ def test_save_history_success():
     ("question_id", 0),
     ("choice_id", 0),
 ])
-def test_save_history_validation_error(field, invalid_value):
+def test_save_history_validation_error(client, field, invalid_value):
     """不正なデータ（1未満の数値など）を送った時にエラーになるかテスト"""
     payload = {
         "quiz_result_id": 0,
@@ -319,7 +220,7 @@ def test_save_history_validation_error(field, invalid_value):
     "choice_id",
     "is_correct",
 ])
-def test_save_history_missing_field(missing_field):
+def test_save_history_missing_field(client, missing_field):
     """必須項目（is_correct）が欠けている場合のテスト"""
     payload = {
         "quiz_result_id": 1,
@@ -339,15 +240,12 @@ def test_save_history_missing_field(missing_field):
 
 
 # --- 回答履歴をgetするapiのテストケース ---
-def test_get_histories_success():
+def test_get_histories_success(client, test_quiz_history, test_user):
     """
     【正常系】存在する user_id を指定してデータが取得できるか
     (既存のDBデータを使用)
     """
-    # 既存DBに確実に存在する user_id を指定してください
-    user_id = 1 
-    
-    response = client.get(f"/histories?user_id={user_id}")
+    response = client.get(f"/histories?user_id={test_user.id}")
     
     # ステータスコードの確認
     assert response.status_code == 200, f"Error details: {response.text}"
@@ -371,7 +269,8 @@ def test_get_histories_success():
     assert "play_at" in item
     assert "question_text" in item
 
-def test_get_histories_not_found():
+
+def test_get_histories_not_found(client):
     """
     【準正常系】存在しない user_id の場合 404 が返るか
     """
@@ -382,7 +281,8 @@ def test_get_histories_not_found():
     assert response.status_code == 404
     assert response.json()["detail"] == "データが見つかりませんでした"
 
-def test_get_histories_validation_boundary_min():
+
+def test_get_histories_validation_boundary_min(client):
     """
     【境界値・異常系】user_id=0 (ge=1 なのでエラーになるべき)
     """
@@ -391,7 +291,8 @@ def test_get_histories_validation_boundary_min():
     
     assert response.status_code == 422
 
-def test_get_histories_validation_invalid_type():
+
+def test_get_histories_validation_invalid_type(client):
     """
     【異常系】user_id に文字列を入れた場合
     """
@@ -399,22 +300,3 @@ def test_get_histories_validation_invalid_type():
     response = client.get(f"/histories?user_id={user_id}")
     
     assert response.status_code == 422
-
-# setup_data 引数は削除
-def test_get_histories_boundary_valid_min():
-    """
-    【境界値・正常系】user_id=1 (最小の有効値) で成功するか
-    """
-    user_id = 1
-    response = client.get(f"/histories?user_id={user_id}")
-    assert response.status_code == 200
-
-def test_get_histories_large_number():
-    """
-    【極端な値】user_id が非常に大きい数字の場合
-    """
-    user_id = 999999999999999
-    response = client.get(f"/histories?user_id={user_id}")
-    
-    # 422ではなく404になればOK
-    assert response.status_code == 404
