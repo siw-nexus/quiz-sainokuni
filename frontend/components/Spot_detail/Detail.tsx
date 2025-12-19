@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-///import Link from 'next/link';
 
 import { Spot } from "@/types/spot";
 
@@ -23,7 +22,7 @@ export default function Detail({ proSpotDetail }: Props) {
 
 
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
-  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${proSpotDetail.lat},${proSpotDetail.lon}`;
+  const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
 
   return (
     // 外枠：PCでは画面中央に配置し、高さを制限しない（中のカードで制限する）
@@ -98,7 +97,7 @@ export default function Detail({ proSpotDetail }: Props) {
 
             {/* ボタンエリア (PC:下部に固定される / Mobile:地図の下) */}
             <div className="p-4 lg:p-6 bg-white border-t border-gray-100 z-10 shrink-0">
-              <a 
+              <a
                 href={googleMapsLink}
                 target="_blank" 
                 rel="noopener noreferrer"
