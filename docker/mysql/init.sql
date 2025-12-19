@@ -1,0 +1,7 @@
+-- テスト用DB
+CREATE DATABASE IF NOT EXISTS test_db;
+
+-- 権限付与
+GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';
+
+FLUSH PRIVILEGES;
