@@ -11,7 +11,7 @@ type Props = {
 export default function Detail({ proSpotDetail }: Props) {
   const router = useRouter();
 
-  const imageSrc = proSpotDetail.image || 'https://placehold.jp/800x400.png?text=No+Image';
+  const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
   // Google Maps APIキー
   const GOOGLE_MAPS_API_KEY = 'AIzaSyCesg9RU9tbJTg9YPDi9ubcEC_jAelKdC4';
 
