@@ -7,10 +7,10 @@ from sqlalchemy.exc import IntegrityError
 from app.database import db_connect
 
 # データベースを操作する関数をインポート
-from app.crud.question import get_question_text, save_question, save_quiz_histories
+from app.crud.question import get_question_text, save_question, save_quiz_histories, get_question_histories
 
 # レスポンスモデルとBodyの定義をインポート
-from app.schemas.question import QestionResponse, SendSaveQuestionResponse, SendSaveQuestion, SendSaveHistoryResponse, SendSaveHistory
+from app.schemas.question import QestionResponse, SendSaveQuestionResponse, SendSaveQuestion, SendSaveHistoryResponse, SendSaveHistory, GetHistoryListResponse
 
 
 router = APIRouter()
@@ -66,3 +66,18 @@ def send_save_history(
     
     except IntegrityError:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = '指定されたユーザーは存在しません')
+
+
+# 回答履歴一覧取得
+@router.get("/histories", response_model=List[GetHistoryListResponse])
+def get_histories(
+    user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
+    db: Session = Depends(db_connect)
+):
+    result = get_question_histories(db, user_id)
+    
+    # データがからなら404エラーを返す
+    if not result:
+        raise HTTPException(status_code = 404, detail = "データが見つかりませんでした")
+    
+    return result
