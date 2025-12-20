@@ -6,6 +6,9 @@ import dynamic from 'next/dynamic';
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
 
+// コンポーネントをインポート
+import InterestBtn from '@/components/ui/InterestBtn';
+
 // Propsの定義
 type Props = {
   proSpotDetail: Spot
@@ -82,6 +85,10 @@ export default function Detail({ proSpotDetail }: Props) {
               <p className="text-gray-800 font-medium text-sm lg:text-lg">
                 {proSpotDetail.address || "住所情報なし"}
               </p>
+            </section>
+
+            <section>
+              <InterestBtn />
             </section>
 
             {/* スマホの時はここに余白を入れる */}
