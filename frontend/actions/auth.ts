@@ -29,12 +29,15 @@ export async function login(prevState: any, formData: FormData) {
     // レスポンスの中身を取得
     const data = await res.json();
 
+    const cookiesStore = await cookies();
     // 受け取ったトークンをクッキーに保存
-    cookies().set('access_token', data.access_token, {
+    cookiesStore.set('access_token', data.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // secure: process.env.NODE_ENV === 'production',
+      secure: false,
       maxAge: 60 * 60 * 24, // 1日
       path: '/',
+      sameSite: 'lax',
     })
   } catch (e) {
     console.error(e);
