@@ -5,7 +5,6 @@ from typing import Literal
 
 # 興味があるの保存のbodyの型の定義
 class InterestsCreate(BaseModel):
-    user_id: int
     spot_type: Literal['tourist', 'gourmet']
     spot_id: int = Field(..., ge = 1)
 

@@ -2,12 +2,23 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
-from app.main import app
-from app.database import db_connect
-from app.models import Base, Users, Tourist_spots, Gourmet_spots, Questions, QuizResults, QuizAnswers, Interests
-from app.core.security import password_hash
 import os
 from dotenv import load_dotenv
+
+# インスタンスをインポート
+from app.main import app
+
+# データベースの接続設定をインポート
+from app.database import db_connect
+
+# データベースのモデルをインポート
+from app.models import Base, Users, Tourist_spots, Gourmet_spots, Questions, QuizResults, QuizAnswers, Interests
+
+# パスワードをハッシュ化する関数をインポート
+from app.core.security import password_hash
+
+# JWT認証する関数をインポート
+from app.dependencies import get_current_user
 
 load_dotenv()
 
@@ -59,16 +70,18 @@ def test_user(db):
         name="Auth Test User"
     )
     
-    # ダミーユーザーを追加
-    db.add(user)
+    db.add(user)     # ダミーユーザーを追加
+    db.commit()      # トランザクションを確定
+    db.refresh(user) # ダミーユーザーの情報を取得
     
-    # トランザクションを確定
-    db.commit()
+    # ダミーの認証
+    app.dependency_overrides[get_current_user] = lambda: user
     
-    # ダミーユーザーの情報を取得
-    db.refresh(user)
+    # ユーザー情報を返す
+    yield user
     
-    return user
+    # ダミー認証をクリア
+    app.dependency_overrides = {}
 
 # ダミーの観光地とグルメを追加するフィクスチャ
 @pytest.fixture(scope="function")

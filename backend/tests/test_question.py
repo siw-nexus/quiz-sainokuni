@@ -1,4 +1,9 @@
 import pytest
+from app.dependencies import get_current_user
+from app.main import app
+
+# モデルをインポート
+from app.models import Users
 
 
 # テストケース：正常に問題と選択肢を取得できるか---------------------------------------------------------
@@ -76,7 +81,6 @@ def test_get_question_limit_422(client, test_questions, test_spot_type, test_422
 def test_save_question_success(client, test_user):
     # 送信するデータ
     payload = {
-        "user_id": test_user.id,
         "spot_type": 'tourist',
         "score": 5,
         "total_questions": 5
@@ -101,9 +105,8 @@ def test_save_question_success(client, test_user):
     (11, 10),
     (100, 15)
 ])
-def test_save_question_logic_error(client, score, total):
+def test_save_question_logic_error(client, score, total, test_user):
     payload = {
-        "user_id": 1,
         "spot_type": "tourist",
         "score": score,
         "total_questions": total
@@ -119,21 +122,21 @@ def test_save_question_logic_error(client, score, total):
 
 
 # テストケース：回答結果保存でschemasの制限に引っかかる値を送信して422が返ってくるか
-def test_save_question_validation_error(client):
+def test_save_question_validation_error(client, test_user):
     # 存在しないspot_type
-    res1 = client.post("/questions", json={"user_id": 1, "spot_type": "unknown", "score": 3, "total_questions": 5})
+    res1 = client.post("/questions", json={"spot_type": "unknown", "score": 3, "total_questions": 5})
     
     # ステータスコードの確認
     assert res1.status_code == 422
 
     # マイナスのスコア
-    res2 = client.post("/questions", json={"user_id": 1, "spot_type": "tourist", "score": -1, "total_questions": 5})
+    res2 = client.post("/questions", json={"spot_type": "tourist", "score": -1, "total_questions": 5})
     
     # ステータスコードの確認
     assert res2.status_code == 422
 
     # 許可されていない問題数
-    res3 = client.post("/questions", json={"user_id": 1, "spot_type": "tourist", "score": 3, "total_questions": 7})
+    res3 = client.post("/questions", json={"spot_type": "tourist", "score": 3, "total_questions": 7})
     
     # ステータスコードの確認
     assert res3.status_code == 422
@@ -141,21 +144,30 @@ def test_save_question_validation_error(client):
 
 # テストケース：存在しない user_id を指定した場合に404が返るか
 def test_save_question_unknown_user(client):
+    # DBに存在しないユーザーオブジェクトを作成
+    fake_user = Users(id = 9999, email = 'ghost@example.com')
+    
+    # DBに存在しないユーザーのダミーの認証を設定
+    app.dependency_overrides[get_current_user] = lambda: fake_user
+    
     payload = {
-        "user_id": 9999,
         "spot_type": "tourist",
         "score": 3,
         "total_questions": 5
     }
     
-    # リクエスト送信
-    response = client.post("/questions", json=payload)
-    
-    # ステータスコードの確認
-    assert response.status_code == 404
-    
-    # レスポンスの中身の確認
-    assert response.json()['detail'] == '指定されたユーザーは存在しません'
+    try:
+        # リクエスト送信
+        response = client.post("/questions", json=payload)
+        
+        # ステータスコードの確認
+        assert response.status_code == 404
+        
+        # レスポンスの中身の確認
+        assert response.json()['detail'] == '指定されたユーザーは存在しません'
+        
+    finally:
+        app.dependency_overrides = {}
 
 
 # テストケース：クイズの回答履歴を正常に保存できるか
@@ -245,7 +257,7 @@ def test_get_histories_success(client, test_quiz_history, test_user):
     【正常系】存在する user_id を指定してデータが取得できるか
     (既存のDBデータを使用)
     """
-    response = client.get(f"/histories?user_id={test_user.id}")
+    response = client.get(f"/histories")
     
     # ステータスコードの確認
     assert response.status_code == 200, f"Error details: {response.text}"
@@ -274,29 +286,17 @@ def test_get_histories_not_found(client):
     """
     【準正常系】存在しない user_id の場合 404 が返るか
     """
-    # 既存DBに「絶対に存在しない」IDを指定してください
-    user_id = 999999
-    response = client.get(f"/histories?user_id={user_id}")
+    # DBに存在しないユーザーオブジェクトを作成
+    fake_user = Users(id = 9999, email = 'ghost@example.com')
     
-    assert response.status_code == 404
-    assert response.json()["detail"] == "データが見つかりませんでした"
-
-
-def test_get_histories_validation_boundary_min(client):
-    """
-    【境界値・異常系】user_id=0 (ge=1 なのでエラーになるべき)
-    """
-    user_id = 0
-    response = client.get(f"/histories?user_id={user_id}")
+    # DBに存在しないユーザーのダミーの認証を設定
+    app.dependency_overrides[get_current_user] = lambda: fake_user
     
-    assert response.status_code == 422
-
-
-def test_get_histories_validation_invalid_type(client):
-    """
-    【異常系】user_id に文字列を入れた場合
-    """
-    user_id = "abc"
-    response = client.get(f"/histories?user_id={user_id}")
-    
-    assert response.status_code == 422
+    try:
+        response = client.get(f"/histories")
+        
+        assert response.status_code == 404
+        assert response.json()["detail"] == "データが見つかりませんでした"
+        
+    finally:
+        app.dependency_overrides = {}

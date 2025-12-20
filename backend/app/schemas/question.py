@@ -31,7 +31,6 @@ class SendSaveQuestionResponse(BaseModel):
 
 # リザルトを保存するときのbodyの型の定義(簡単に言うとmain.pyのseve_qustionの型の設定をここでしている)
 class SendSaveQuestion(BaseModel):
-    user_id: int
     spot_type: Literal['tourist', 'gourmet']
     score: int = Field(ge = 0)
     total_questions: Literal[5, 10, 15]
