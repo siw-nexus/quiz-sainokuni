@@ -9,9 +9,14 @@ from app.database import db_connect
 # データベースを操作する関数をインポート
 from app.crud.question import get_question_text, save_question, save_quiz_histories, get_question_histories
 
+# データベースのモデルをインポート
+from app.models import Users
+
 # レスポンスモデルとBodyの定義をインポート
 from app.schemas.question import QestionResponse, SendSaveQuestionResponse, SendSaveQuestion, SendSaveHistoryResponse, SendSaveHistory, GetHistoryListResponse
 
+# JWT認証をする関数をインポート
+from app.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -38,6 +43,7 @@ def get_questions(
 @router.post("/questions", response_model=SendSaveQuestionResponse, status_code=201)
 def send_save_question(
     quiz_result_data: SendSaveQuestion,
+    current_user: Users = Depends(get_current_user),
     db: Session = Depends(db_connect)
 ):
     # スコアと問題数に不正な値が入っていた場合エラーを返す
@@ -45,7 +51,7 @@ def send_save_question(
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "スコアが問題数より大きい数値ではいけません")
     
     try:
-        result = save_question(db, quiz_result_data.user_id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
+        result = save_question(db, current_user.id, quiz_result_data.spot_type, quiz_result_data.score, quiz_result_data.total_questions)
         
         return result
     
@@ -71,10 +77,10 @@ def send_save_history(
 # 回答履歴一覧取得
 @router.get("/histories", response_model=List[GetHistoryListResponse])
 def get_histories(
-    user_id: int = Query(..., ge = 1, description = 'ユーザーID'),
+    current_user: Users = Depends(get_current_user),
     db: Session = Depends(db_connect)
 ):
-    result = get_question_histories(db, user_id)
+    result = get_question_histories(db, current_user.id)
     
     # データがからなら404エラーを返す
     if not result:
