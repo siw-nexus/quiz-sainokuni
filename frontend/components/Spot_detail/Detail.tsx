@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
+import { interest } from "@/types/interest";
 
 // コンポーネントをインポート
 import InterestBtn from '@/components/ui/InterestBtn';
@@ -12,6 +13,9 @@ import InterestBtn from '@/components/ui/InterestBtn';
 // Propsの定義
 type Props = {
   proSpotDetail: Spot
+  interests: interest[]
+  spotType: string
+  spotId: number
 }
 
 // SSRを無効化してMapコンポーネントをインポート
@@ -20,7 +24,7 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-export default function Detail({ proSpotDetail }: Props) {
+export default function Detail({ proSpotDetail, interests, spotType, spotId }: Props) {
   const router = useRouter();
 
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
@@ -88,7 +92,7 @@ export default function Detail({ proSpotDetail }: Props) {
             </section>
 
             <section>
-              <InterestBtn />
+              <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>
             </section>
 
             {/* スマホの時はここに余白を入れる */}
