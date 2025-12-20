@@ -1,18 +1,46 @@
 "use client";
 
-import { useState } from "react";
-import { Bookmark } from "lucide-react"; // アイコンをインポート
+import { useState, useEffect } from "react";
+import { Bookmark } from "lucide-react";
 
-export default function InterestButton() {
-  const [isInterested, setIsInterested] = useState(false);
+// 型の定義をインポート
+import { interest } from "@/types/interest";
+
+// Propsの定義
+type Props = {
+  interests: interest[]
+  spotType: string
+  spotId: number
+}
+
+export default function InterestButton({ interests, spotType, spotId }: Props) {
+  // 興味がある一覧にスポットが含まれているかチェック
+  const isAlreadyInterested = interests.some(
+    (item) => item.spot_type === spotType && String(item.spot_id) === String(spotId)
+  );
+
+  const [isInterested, setIsInterested] = useState(isAlreadyInterested);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const toggleInterest = () => {
-    setIsInterested(!isInterested);
-    
-    // アニメーション用のフラグをONにして、少し経ったらOFFにする
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 300);
+  // 再取得されたらボタンを同期
+  useEffect(() => {
+    setIsInterested(isAlreadyInterested);
+  }, [isAlreadyInterested]);
+
+  const toggleInterest = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 次の状態（反転）
+    const nextState = !isInterested;
+    setIsInterested(nextState);
+
+    // 興味ありになるときだけアニメーションさせる
+    if (nextState) {
+      // アニメーション用のフラグをONにして、少し経ったらOFFにする
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 300);
+    }
   };
 
   return (
