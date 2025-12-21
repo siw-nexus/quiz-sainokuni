@@ -5,8 +5,17 @@ import Link from 'next/link';
 
 // 型の定義をインポート
 import { HistoryItem } from '@/types/history';
+import { interest } from '@/types/interest';
 
-export default function QuizHistory() {
+// コンポーネントをインポート
+import InterestButton from '../ui/InterestBtn';
+
+// Propsを定義
+type Props = {
+  interests: interest
+}
+
+export default function QuizHistory({ interests }: Props) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   // 画面が表示されたらセッションストレージから回答履歴を取得
@@ -108,6 +117,7 @@ export default function QuizHistory() {
                                       正解は...{q.correctAnswer}
                                   </p>
                               )}
+                              <InterestButton interests={interests} spotType={q.spot_type} spotId={q.spot_id}/>
                           </div>
                       )}
                     </div>
