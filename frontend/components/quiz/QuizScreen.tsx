@@ -11,19 +11,22 @@ import { useRouter } from 'next/navigation';
 // コンポーネントのインポート
 import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
+import InterestButton from '../ui/InterestBtn';
 
 // 型の定義をインポート
 import { Question } from "@/types/question";
 import { HistoryItem } from '@/types/history';
+import { interest } from '@/types/interest';
 
 // Propsの定義
 type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
   questions: Question[];
+  interests: interest[]
 }
 
-export default function QuizScreen({ spot_type, limit, questions }: Props) {
+export default function QuizScreen({ spot_type, limit, questions, interests }: Props) {
   const [questionCount, setQuestionCount] = useState(1);     // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);    // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
@@ -197,6 +200,7 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
                     </button>
                   )}
 
+                  <InterestButton interests={interests} spotType={spot_type} spotId={currentQuestion.spot_id}/>
                 </div>
               </div>
             )}

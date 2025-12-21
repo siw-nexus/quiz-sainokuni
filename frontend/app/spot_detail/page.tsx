@@ -4,6 +4,10 @@ import NearbySpotsList from "@/components/Spot_detail/NearbySpotsList";
 
 // 型の定義をインポート
 import { Spot, NearbySpot } from "@/types/spot";
+import { interest } from "@/types/interest";
+
+// APIリクエストの関数をインポート
+import { getInterest } from "@/lib/api/interest";
 
 // Propsを定義
 type Props = {
@@ -75,13 +79,14 @@ export default async function SpotDetail({ searchParams }: Props) {
   // 周辺のスポットを取得する関数を呼び出す
   const nearbySpots = await getNearbySpot(spotDetail.lat, spotDetail.lon);
 
+  // 興味がある一覧を取得する関数を呼び出し
+  const interests = await getInterest()
+
   return (
-    <main>
-      {/* ▼▼▼ 変更点: Detailの中にNearbySpotsListを入れて、左パネルに表示させる ▼▼▼ */}
-      <Detail proSpotDetail={spotDetail}>
+    <main>  
+      <Detail proSpotDetail={spotDetail} interests={interests} spotType={spotType} spotId={spotId}>
         <NearbySpotsList nearbySpots={nearbySpots}/>
       </Detail>
-      {/* ▲▲▲ 変更点終了 ▲▲▲ */}
     </main>
   );
 }

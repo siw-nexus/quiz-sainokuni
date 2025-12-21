@@ -8,13 +8,18 @@ import { ReactNode } from 'react';
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
+import { interest } from "@/types/interest";
+
+// コンポーネントをインポート
+import InterestBtn from '@/components/ui/InterestBtn';
 
 // Propsの定義
 type Props = {
-  proSpotDetail: Spot;
-  // ▼▼▼ 変更点: 周辺情報などの子要素を受け取れるようにする ▼▼▼
-  children?: ReactNode; 
-  // ▲▲▲ 変更点終了 ▲▲▲
+  proSpotDetail: Spot
+  interests: interest[]
+  spotType: string
+  spotId: number
+  children?: ReactNode;
 }
 
 // SSRを無効化してMapコンポーネントをインポート
@@ -23,9 +28,7 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-// ▼▼▼ 変更点: childrenを受け取る ▼▼▼
-export default function Detail({ proSpotDetail, children }: Props) {
-// ▲▲▲ 変更点終了 ▲▲▲
+export default function Detail({ proSpotDetail, interests, spotType, spotId, children }: Props) {
   const router = useRouter();
 
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
@@ -91,13 +94,14 @@ export default function Detail({ proSpotDetail, children }: Props) {
               </p>
             </section>
 
-            {/* ▼▼▼ 変更点: 受け取ったchildren（周辺情報リスト）をここに表示 ▼▼▼ */}
+            <section>
+              <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>
+            </section>
             {children && (
               <div className="mt-8 pt-6 border-t border-gray-100">
                  {children}
               </div>
             )}
-            {/* ▲▲▲ 変更点終了 ▲▲▲ */}
 
             {/* スマホの時はここに余白を入れる */}
             <div className="h-4 lg:hidden"></div>

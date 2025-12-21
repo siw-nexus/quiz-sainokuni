@@ -4,6 +4,9 @@ import QuizScreen from "@/components/quiz/QuizScreen";
 // 型の定義をインポート
 import { Question } from "@/types/question";
 
+// APIリクエストの関数をインポート
+import { getInterest } from "@/lib/api/interest";
+
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -40,10 +43,13 @@ export default async function Quiz({ searchParams }: Props) {
 
   // 問題文を取得する関数を呼び出す
   const questions = await getQuestion(spot_type, limit);
+
+  // 興味がある一覧を取得する関数を呼び出し
+  const interests = await getInterest();
   
   return (
     <main>
-      <QuizScreen spot_type={spot_type} limit={limit} questions={questions}/>
+      <QuizScreen spot_type={spot_type} limit={limit} questions={questions} interests={interests}/>
     </main>
   );
 }
