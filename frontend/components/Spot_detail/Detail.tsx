@@ -2,13 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+// ▼▼▼ 変更点: childrenの型定義のためにReactNodeをインポート ▼▼▼
+import { ReactNode } from 'react'; 
+// ▲▲▲ 変更点終了 ▲▲▲
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
 
 // Propsの定義
 type Props = {
-  proSpotDetail: Spot
+  proSpotDetail: Spot;
+  // ▼▼▼ 変更点: 周辺情報などの子要素を受け取れるようにする ▼▼▼
+  children?: ReactNode; 
+  // ▲▲▲ 変更点終了 ▲▲▲
 }
 
 // SSRを無効化してMapコンポーネントをインポート
@@ -17,11 +23,12 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-export default function Detail({ proSpotDetail }: Props) {
+// ▼▼▼ 変更点: childrenを受け取る ▼▼▼
+export default function Detail({ proSpotDetail, children }: Props) {
+// ▲▲▲ 変更点終了 ▲▲▲
   const router = useRouter();
 
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
-
 
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
@@ -83,6 +90,14 @@ export default function Detail({ proSpotDetail }: Props) {
                 {proSpotDetail.address || "住所情報なし"}
               </p>
             </section>
+
+            {/* ▼▼▼ 変更点: 受け取ったchildren（周辺情報リスト）をここに表示 ▼▼▼ */}
+            {children && (
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                 {children}
+              </div>
+            )}
+            {/* ▲▲▲ 変更点終了 ▲▲▲ */}
 
             {/* スマホの時はここに余白を入れる */}
             <div className="h-4 lg:hidden"></div>
