@@ -2,6 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+// ▼▼▼ 変更点: childrenの型定義のためにReactNodeをインポート ▼▼▼
+import { ReactNode } from 'react'; 
+// ▲▲▲ 変更点終了 ▲▲▲
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
@@ -16,6 +19,7 @@ type Props = {
   interests: interest[]
   spotType: string
   spotId: number
+  children?: ReactNode;
 }
 
 // SSRを無効化してMapコンポーネントをインポート
@@ -24,11 +28,10 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-export default function Detail({ proSpotDetail, interests, spotType, spotId }: Props) {
+export default function Detail({ proSpotDetail, interests, spotType, spotId, children }: Props) {
   const router = useRouter();
 
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
-
 
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
@@ -94,6 +97,11 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId }: P
             <section>
               <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>
             </section>
+            {children && (
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                 {children}
+              </div>
+            )}
 
             {/* スマホの時はここに余白を入れる */}
             <div className="h-4 lg:hidden"></div>

@@ -54,6 +54,7 @@ const getNearbySpot = async (lat: number, lon: number): Promise<NearbySpot[]> =>
     return data;
   } catch (e) {
     console.error(e);
+    return []; // エラー時は空配列を返す
   }
 };
 
@@ -82,9 +83,10 @@ export default async function SpotDetail({ searchParams }: Props) {
   const interests = await getInterest()
 
   return (
-    <main>
-      <Detail proSpotDetail={spotDetail} interests={interests} spotType={spotType} spotId={spotId}/>
-      <NearbySpotsList nearbySpots={nearbySpots}/>
+    <main>  
+      <Detail proSpotDetail={spotDetail} interests={interests} spotType={spotType} spotId={spotId}>
+        <NearbySpotsList nearbySpots={nearbySpots}/>
+      </Detail>
     </main>
   );
 }
