@@ -6,6 +6,9 @@ import { Bookmark } from "lucide-react";
 // 型の定義をインポート
 import { interest } from "@/types/interest";
 
+// APIリクエストの関数をインポート
+import { toggleInterest } from "@/actions/interest";
+
 // Propsの定義
 type Props = {
   interests: interest[]
@@ -27,7 +30,7 @@ export default function InterestButton({ interests, spotType, spotId }: Props) {
     setIsInterested(isAlreadyInterested);
   }, [isAlreadyInterested]);
 
-  const toggleInterest = async (e: React.MouseEvent) => {
+  const toggleInterestBtn = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -41,11 +44,19 @@ export default function InterestButton({ interests, spotType, spotId }: Props) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 300);
     }
+
+    // ボタンの切り替え処理の関数を呼び出す
+    const result = await toggleInterest(spotType, spotId, nextState);
+
+    if (!result?.success) {
+      // 登録・削除が失敗したら見た目を元に戻す
+      setIsInterested(!nextState);
+    }
   };
 
   return (
     <button
-      onClick={toggleInterest}
+      onClick={toggleInterestBtn}
       className={`
         flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300
         ${isInterested ? "bg-red-50 text-red-500" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}
