@@ -2,42 +2,40 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+// ▼▼▼ 変更点: childrenの型定義のためにReactNodeをインポート ▼▼▼
+import { ReactNode } from 'react'; 
+// ▲▲▲ 変更点終了 ▲▲▲
 
-// 型の定義をインポート
 import { Spot } from "@/types/spot";
 
-// Propsの定義
 type Props = {
-  proSpotDetail: Spot
+  proSpotDetail: Spot;
+  // ▼▼▼ 変更点: 周辺情報などの子要素を受け取れるようにする ▼▼▼
+  children?: ReactNode; 
+  // ▲▲▲ 変更点終了 ▲▲▲
 }
 
-// SSRを無効化してMapコンポーネントをインポート
 const Map = dynamic(() => import('@/components/Spot_detail/Map'), { 
   ssr: false,
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-export default function Detail({ proSpotDetail }: Props) {
+// ▼▼▼ 変更点: childrenを受け取る ▼▼▼
+export default function Detail({ proSpotDetail, children }: Props) {
+// ▲▲▲ 変更点終了 ▲▲▲
   const router = useRouter();
 
+  // 元のコードに合わせて .img を使用
   const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
 
-
-  // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
 
   return (
-    // 外枠：PCでは画面中央に配置し、高さを制限しない（中のカードで制限する）
     <div className="min-h-screen bg-[#F5F5F7] py-4 md:py-8 px-2 md:px-4 font-sans flex justify-center items-center">
       
-      {/* メインカード */}
-      {/* PC (lg): h-[85vh] で高さを画面の85%に固定し、flex-colで縦方向のレイアウト管理を行う 
-         Mobile: h-auto で中身に合わせて自動的に縦に伸びる
-      */}
       <div className="bg-white w-full max-w-6xl rounded-3xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 lg:h-[85vh] lg:flex lg:flex-col">
         
-        {/* --- 1. ヘッダー画像エリア (PC:高さ固定 / Mobile:高さ固定) --- */}
-        {/* shrink-0 はPCレイアウトで画像が潰れないようにするため */}
+        {/* ヘッダー画像エリア */}
         <div className="relative h-48 lg:h-64 w-full bg-gray-200 shrink-0">
           <button 
             onClick={() => router.back()}
@@ -61,12 +59,11 @@ export default function Detail({ proSpotDetail }: Props) {
           </div>
         </div>
 
-        {/* --- 2. コンテンツエリア (PC:残りの高さを埋める / Mobile:縦積み) --- */}
-        {/* lg:flex-1 lg:overflow-hidden : PCでは残りのスペースを使い、はみ出しを隠す（内部スクロールさせるため） */}
+        {/* コンテンツエリア */}
         <div className="lg:flex-1 lg:grid lg:grid-cols-2 lg:overflow-hidden">
           
-          {/* --- 【左側】お店の概要 (PC:スクロール可能エリア) --- */}
-          {/* lg:overflow-y-auto : PCのみ、文字が溢れたらここだけスクロールさせる */}
+          {/* --- 【左側】お店の概要 ＋ 周辺情報 (スクロール可能エリア) --- */}
+          {/* overflow-y-auto があるので、この中身が増えると自動的にスクロールバーが出ます */}
           <div className="p-6 lg:p-8 space-y-6 lg:overflow-y-auto custom-scrollbar">
             <section>
               <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2 border-gray-100">
@@ -84,20 +81,24 @@ export default function Detail({ proSpotDetail }: Props) {
               </p>
             </section>
 
-            {/* スマホの時はここに余白を入れる */}
+            {/* ▼▼▼ 変更点: 受け取ったchildren（周辺情報リスト）をここに表示 ▼▼▼ */}
+            {children && (
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                 {children}
+              </div>
+            )}
+            {/* ▲▲▲ 変更点終了 ▲▲▲ */}
+
             <div className="h-4 lg:hidden"></div>
           </div>
 
-          {/* --- 【右側】地図＆ボタン (PC:高さ100%固定 / Mobile:縦積み) --- */}
-          {/* lg:border-l : PCのみ左に境界線を入れる */}
+          {/* --- 【右側】地図＆ボタン --- */}
           <div className="bg-gray-50 lg:bg-white lg:border-l border-gray-100 flex flex-col h-[400px] lg:h-full">
             
-            {/* 地図 (残りのスペースを埋める) */}
             <div className="flex-1 w-full bg-gray-200 relative">
                 <Map lat={proSpotDetail.lat} lon={proSpotDetail.lon} zoom={20} spot_name={proSpotDetail.name}/>
             </div>
 
-            {/* ボタンエリア (PC:下部に固定される / Mobile:地図の下) */}
             <div className="p-4 lg:p-6 bg-white border-t border-gray-100 z-10 shrink-0">
               <a
                 href={googleMapsLink}

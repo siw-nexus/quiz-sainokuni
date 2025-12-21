@@ -1,7 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+// ▼▼▼ 変更点: useEffectを追加 ▼▼▼
+import { useState, useEffect } from 'react';
+// ▲▲▲ 変更点終了 ▲▲▲
 import Link from 'next/link';
+// ▼▼▼ 変更点: useRouterを使用 ▼▼▼
+import { useRouter } from 'next/navigation';
+// ▲▲▲ 変更点終了 ▲▲▲
 
 // コンポーネントのインポート
 import QuestionText from "./QuestionText";
@@ -24,6 +29,34 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
   const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
   const [answer, isAnswer] = useState('');                   // 正解の選択肢を格納
   const [history, setHistory] = useState<HistoryItem[]>([]); // 回答履歴を保存する配列
+  
+  // ▼▼▼ 変更点: routerインスタンスを作成 ▼▼▼
+  const router = useRouter(); 
+  // ▲▲▲ 変更点終了 ▲▲▲
+
+  // ▼▼▼ 変更点: 画面読み込み時に、一時保存された状態があれば復元する ▼▼▼
+  useEffect(() => {
+    // sessionStorageからデータを取得
+    const savedState = sessionStorage.getItem('quiz_state_backup');
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        
+        // 状態を復元する
+        setQuestionCount(parsed.questionCount);
+        setIsResponding(parsed.isResponding); // false (結果画面) になっているはず
+        setIsCorrectText(parsed.isCorrectText);
+        isAnswer(parsed.answer);
+        setHistory(parsed.history);
+
+        // 復元したら用済みなので削除する (リロード時などは最初からにするため)
+        sessionStorage.removeItem('quiz_state_backup');
+      } catch (e) {
+        console.error("Failed to restore quiz state", e);
+      }
+    }
+  }, []);
+  // ▲▲▲ 変更点終了 ▲▲▲
 
   const currentQuestion = questions[questionCount - 1];
 
@@ -123,13 +156,27 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
                 </div>
 
                 <div className="w-full space-y-4">
-                  <Link 
-                    href={`/spot_detail?spot_type=${spot_type}&spot_id=${currentQuestion.spot_id}`}
-                    rel="noopener noreferrer"
+                  {/* ▼▼▼ 変更点: Linkからbuttonに変更し、状態保存処理を追加 ▼▼▼ */}
+                  <button 
+                    onClick={() => {
+                      // 1. 現在の画面の状態をバックアップとして保存
+                      const stateToSave = {
+                        questionCount,
+                        isResponding, // ここでは false (結果画面)
+                        isCorrectText,
+                        answer,
+                        history
+                      };
+                      sessionStorage.setItem('quiz_state_backup', JSON.stringify(stateToSave));
+
+                      // 2. 詳細ページへ遷移
+                      router.push(`/spot_detail?spot_type=${spot_type}&spot_id=${currentQuestion.spot_id}`);
+                    }}
                     className="w-full block text-center bg-white border-2 border-[#333333] text-[#333333] font-bold py-4 rounded-xl hover:bg-gray-50 transition"
                   >
                     興味がある
-                  </Link>
+                  </button>
+                  {/* ▲▲▲ 変更点終了 ▲▲▲ */}
                   
                   {isLastQuestion ? (
                     <Link 
