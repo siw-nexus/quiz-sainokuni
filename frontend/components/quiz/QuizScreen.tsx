@@ -177,7 +177,7 @@ export default function QuizScreen({ spot_type, limit, questions, interests }: P
                     }}
                     className="w-full block text-center bg-white border-2 border-[#333333] text-[#333333] font-bold py-4 rounded-xl hover:bg-gray-50 transition"
                   >
-                    興味がある
+                    詳細を見る
                   </button>
                   {/* ▲▲▲ 変更点終了 ▲▲▲ */}
                   
