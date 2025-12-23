@@ -1,9 +1,8 @@
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 
-type JWTPayload = {
-  exp: number;
-};
+// 型の定義をインポート
+import { JWTPayload } from '@/types/auth'
 
 
 // クッキーからアクセストークンを取得する
