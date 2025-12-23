@@ -79,7 +79,7 @@ export default function QuizHistory({ interests }: Props) {
             {history.length === 0 ? (
               <p className="text-center text-gray-400 mt-10">履歴がありません</p>
             ) : (
-              <div className="space-y-4 pb-20 md:pb-0">
+              <div className="space-y-6 pb-20 md:pb-0">
                 {history.map((q, index) => {
                   // ▼▼▼ 修正: リンクを作成（IDがない場合はリンクなしのdivにする） ▼▼▼
                   const linkHref = q.spot_id && q.spot_type 
@@ -125,7 +125,7 @@ export default function QuizHistory({ interests }: Props) {
 
                   // リンクがあれば Link でラップ、なければそのまま表示
                   return linkHref ? (
-                    <Link key={index} href={linkHref} rel="noopener noreferrer">
+                    <Link key={index} href={linkHref} rel="noopener noreferrer" className="block">
                       {Content}
                     </Link>
                   ) : (
