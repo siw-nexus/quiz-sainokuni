@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-// ▼▼▼ 変更点: childrenの型定義のためにReactNodeをインポート ▼▼▼
+// childrenの型定義のためにReactNodeをインポート
 import { ReactNode } from 'react'; 
-// ▲▲▲ 変更点終了 ▲▲▲
+
 
 // 型の定義をインポート
 import { Spot } from "@/types/spot";
@@ -19,6 +19,7 @@ type Props = {
   interests: interest[]
   spotType: string
   spotId: number
+  // 周辺情報などの子要素を受け取れるようにする
   children?: ReactNode;
 }
 
@@ -31,7 +32,8 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
 export default function Detail({ proSpotDetail, interests, spotType, spotId, children }: Props) {
   const router = useRouter();
 
-  const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
+  // ヘッダー画像を削除するため、imageSrcは使用しなくなりますがコメントアウトして残します
+  // const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
 
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
@@ -46,30 +48,7 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
       */}
       <div className="bg-white w-full max-w-6xl rounded-3xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 lg:h-[85vh] lg:flex lg:flex-col">
         
-        {/* --- 1. ヘッダー画像エリア (PC:高さ固定 / Mobile:高さ固定) --- */}
-        {/* shrink-0 はPCレイアウトで画像が潰れないようにするため */}
-        <div className="relative h-48 lg:h-64 w-full bg-gray-200 shrink-0">
-          <button 
-            onClick={() => router.back()}
-            className="absolute top-4 left-4 z-10 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-          </button>
-
-          <img 
-            src={imageSrc} 
-            alt={proSpotDetail.name} 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-          <div className="absolute bottom-0 left-0 p-4 lg:p-8 text-white w-full">
-            <h1 className="text-2xl lg:text-4xl font-bold tracking-tight text-shadow-lg">
-              {proSpotDetail.name}
-            </h1>
-          </div>
-        </div>
+        {/* 1. ヘッダー画像エリア (削除済み) */}
 
         {/* --- 2. コンテンツエリア (PC:残りの高さを埋める / Mobile:縦積み) --- */}
         {/* lg:flex-1 lg:overflow-hidden : PCでは残りのスペースを使い、はみ出しを隠す（内部スクロールさせるため） */}
@@ -78,8 +57,25 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
           {/* --- 【左側】お店の概要 (PC:スクロール可能エリア) --- */}
           {/* lg:overflow-y-auto : PCのみ、文字が溢れたらここだけスクロールさせる */}
           <div className="p-6 lg:p-8 space-y-6 lg:overflow-y-auto custom-scrollbar">
+            
+            {/* 削除したヘッダーから「戻るボタン」と「タイトル」をここに移動 */}
+            <div className="flex items-start gap-4 mb-2">
+              <button 
+                onClick={() => router.back()}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-500 p-2 rounded-full transition shrink-0 mt-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+              <h1 className="text-xl lg:text-3xl font-bold tracking-tight text-gray-800 leading-tight">
+                {proSpotDetail.name}
+              </h1>
+            </div>
+
             <section>
-              <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 border-b pb-2 border-gray-100">
+              {/* 境界線(border-b)を削除 */}
+              <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
                 <span className="text-purple-600">●</span> スポット概要
               </h2>
               <p className="text-gray-600 leading-relaxed text-sm lg:text-base whitespace-pre-wrap">
@@ -97,8 +93,10 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
             <section>
               <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>
             </section>
+
+            {/* 周辺情報の境界線(border-t)を削除し、余白を調整 */}
             {children && (
-              <div className="mt-8 pt-6 border-t border-gray-100">
+              <div className="mt-6">
                  {children}
               </div>
             )}
