@@ -1,4 +1,5 @@
 import { jwtDecode } from "jwt-decode";
+import { cookies } from "next/headers";
 
 type JWTPayload = {
   exp: number;
@@ -6,7 +7,7 @@ type JWTPayload = {
 
 
 // クッキーからアクセストークンを取得する
-export asycn function getAccessToken() {
+export async function getAccessToken() {
   // クッキーからアクセストークンを取得
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
