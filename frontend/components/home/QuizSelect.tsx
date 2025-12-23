@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { LogIn } from 'lucide-react';
+
+// コンポーネントをインポート
+import AuthStatusBtn from '@/components/ui/AuthStatusBtn';
+
+// Propsを定義
+type Props = {
+  isLoggedIn: boolean;
+}
+
 
 const DESCRIPTION_CONTENT = (
   <div className="text-sm leading-relaxed text-gray-200 space-y-2">
@@ -25,7 +33,7 @@ const QUESTION_TYPES = [
   { key: 'tourist', label: '観光地' },
 ];
 
-export default function QuizSelect() {
+export default function QuizSelect({ isLoggedIn }: Props) {
   const [showDescription, setShowDescription] = useState(false);
   const [count, setCount] = useState(5);
 
@@ -81,18 +89,8 @@ export default function QuizSelect() {
         {/* --- 右側：操作エリア --- */}
         <div className="flex-1 bg-white p-8 md:p-12 flex flex-col relative">
           
-          {/* ログインボタン or ユーザーボタン (PCでは右上に配置) */}
-          <div className="flex justify-end mb-8 md:mb-12">
-            <div className="relative group">
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border border-purple-200 text-purple-600 hover:bg-purple-50 transition">
-                <LogIn />
-              </button>
-              {/* login吹き出し */}
-              <div className="absolute top-14 right-0 bg-purple-100 text-purple-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm animate-bounce whitespace-nowrap">
-                login
-              </div>
-            </div>
-          </div>
+          {/* ログインボタン(PCでは右上に配置) */}
+          <AuthStatusBtn isLoggedIn={isLoggedIn}/>
 
           <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
             
