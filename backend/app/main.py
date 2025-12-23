@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # ルーターをインポート
-from app.routers import auth, question, interest, spot
+from app.routers import auth, question, interest, spot, user
 
 
 app = FastAPI()
@@ -35,3 +35,6 @@ app.include_router(spot.router)
 
 # ログインAPI
 app.include_router(auth.router)
+
+# ユーザー情報取得
+app.include_router(user.router)
