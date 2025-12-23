@@ -89,7 +89,7 @@ export default function LoginForm() {
             className={`flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
               ${isPending 
                 ? 'bg-glay-400 cursor-not-allowed' // 送信中のスタイル（薄くする）
-                : 'bg-black hover:bg-gray-800'  // 通常時のスタイル
+                : 'bg-[#333333] hover:bg-black'  // 通常時のスタイル
               }`}
           >
             {/* ▼ 送信中かどうかで表示する文字を切り替え */}
