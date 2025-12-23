@@ -88,8 +88,8 @@ export default function LoginForm() {
             disabled={isPending} // ▼ 送信中はボタンを押せないように無効化
             className={`flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
               ${isPending 
-                ? 'bg-blue-400 cursor-not-allowed' // 送信中のスタイル（薄くする）
-                : 'bg-blue-600 hover:bg-blue-700'  // 通常時のスタイル
+                ? 'bg-glay-400 cursor-not-allowed' // 送信中のスタイル（薄くする）
+                : 'bg-black hover:bg-gray-800'  // 通常時のスタイル
               }`}
           >
             {/* ▼ 送信中かどうかで表示する文字を切り替え */}
