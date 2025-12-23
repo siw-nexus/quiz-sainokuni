@@ -5,6 +5,19 @@ type JWTPayload = {
 };
 
 
+// クッキーからアクセストークンを取得する
+export asycn function getAccessToken() {
+  // クッキーからアクセストークンを取得
+  const cookieStore = await cookies();
+  const token = cookieStore.get('access_token')?.value;
+
+  // アクセストークンが無かったら空配列を返す
+  if (!token) return [];
+
+  return token;
+}
+
+
 // JWTトークンが有効かどうかを判定する
 export function isTokenValid(token: string | undefined): boolean {
   // JWTトークンが無かったら終了
