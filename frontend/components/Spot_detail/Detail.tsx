@@ -32,9 +32,6 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
 export default function Detail({ proSpotDetail, interests, spotType, spotId, children }: Props) {
   const router = useRouter();
 
-  // ヘッダー画像を削除するため、imageSrcは使用しなくなりますがコメントアウトして残します
-  // const imageSrc = proSpotDetail.img || 'https://placehold.jp/800x400.png?text=No+Image';
-
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
 
