@@ -101,7 +101,7 @@ export default function LoginForm() {
             {/* 新規登録画面へのリンク */}
             <div>
               <span className="text-gray-600">アカウントをお持ちでない方は </span>
-              <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/signup" className="font-medium text-black hover:underline">
                 新規登録
               </Link>
             </div>
@@ -110,7 +110,7 @@ export default function LoginForm() {
             <div>
               <Link 
                 href="/password-reset" 
-                className="text-blue-600 hover:text-gray-700 hover:underline text-xs"
+                className="text-black hover:text-gray-700 hover:underline"
               >
                 パスワードをお忘れですか？
               </Link>
