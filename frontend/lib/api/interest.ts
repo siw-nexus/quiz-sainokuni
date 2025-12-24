@@ -1,17 +1,8 @@
-import { cookies } from 'next/headers';
-
 // APIのエンドポイント
 const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
 
 // 興味がある一覧を取得する関数
-export async function getInterest() {
-  // クッキーからアクセストークンを取得
-  const cookieStore = await cookies();
-  const token = cookieStore.get('access_token')?.value;
-
-  // トークンが無かったら空配列を返す
-  if (!token) return [];
-
+export async function getInterest(token: string) {
   // 興味がある一覧を取得
   try {
     const res = await fetch(`${apiUrl}/interests`, {
