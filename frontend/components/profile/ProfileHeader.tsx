@@ -10,7 +10,9 @@ type Props = {
 
 export default function ProfileHeader({ user }: Props) {
   return (
-    <p>{user.name}</p>
-    <p>{user.email}</p>
+    <div>
+      <p>{user.name}</p>
+      <p>{user.email}</p>
+    </div>
   );
 }
