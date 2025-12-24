@@ -219,8 +219,26 @@ def coordinates_data_insert(db):
         print(f'グルメの緯度経度のデータのinsert/check完了')
 
 
+# グルメの足りないdetailをINSERTする関数
+def gourmet_detail_insert(db):
+    # detail.jsonを読み込む
+    with open('app/seeds/new_plus.json', 'r') as f:
+        details_data = json.load(f)
+        
+        # # 足りないdetailをINSERT
+        for item in details_data['detail_add']:
+            detail = db.query(Gourmet_spots).filter(Gourmet_spots.id == item['spot_id']).first()
+            
+            detail.detail = item['detail']
+            db.commit()
+        print('グルメの足りないdetailのINSERT完了')
+
+
 # 問題文のデータをINSERTする関数
 def question_data_insert(db):
+    tourist = True
+    gourmet = True
+    
     # questions.jsonを読み込む
     with open('app/seeds/questions.json', 'r') as f:
         questions_data = json.load(f)
@@ -239,9 +257,8 @@ def question_data_insert(db):
                 
                 # トランザクションを確定
                 db.commit() 
-                
-                print('観光地の問題文のinsert/check完了')
             except Exception as e:
+                tourist = False
                 print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
                 db.rollback() # エラー時はロールバック
                 
@@ -260,11 +277,14 @@ def question_data_insert(db):
                 
                 # トランザクションを確定
                 db.commit() 
-                
-                print('グルメの問題文のinsert/check完了')
             except Exception as e:
+                gourmet = False
                 print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
                 db.rollback() # エラー時はロールバック
+    if tourist:
+        print('観光地の問題文のinsert/check完了')
+    if gourmet:
+        print('グルメの問題文のinsert/check完了')
 
 
 # ダミーユーザーをINSERTする関数
@@ -512,6 +532,9 @@ def seed_data():
     
     # 緯度経度のデータを入れる関数を呼び出す
     coordinates_data_insert(db)
+    
+    # グルメの足りないdetailをINSERTする関数
+    gourmet_detail_insert(db)
     
     # questionsテーブルにデータがあるかチェック
     if db.query(Questions).first():
