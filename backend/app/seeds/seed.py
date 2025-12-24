@@ -221,47 +221,50 @@ def coordinates_data_insert(db):
 
 # 問題文のデータをINSERTする関数
 def question_data_insert(db):
-    # 観光地の問題文のINSERT
-    try:
-        new_questions = [
-            Questions(
-                spot_type = 'tourist',
-                spot_id = i,
-                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
-            )
-            for i in range(1, 101)
-        ]
-        
-        db.add_all(new_questions)
-        
-        # トランザクションを確定
-        db.commit() 
-        
-        print('観光地の問題文のinsert/check完了')
-    except Exception as e:
-        print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
-        db.rollback() # エラー時はロールバック
-    
-    # グルメの問題文のINSERT
-    try:
-        new_questions = [
-            Questions(
-                spot_type = 'gourmet',
-                spot_id = i,
-                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
-            )
-            for i in range(1, 100)
-        ]
-        
-        db.add_all(new_questions)
-        
-        # トランザクションを確定
-        db.commit()
-        
-        print('グルメの問題文のinsert/check完了')
-    except Exception as e:
-        print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
-        db.rollback() # エラー時はロールバック
+    # questions.jsonを読み込む
+    with open('app/seeds/questions.json', 'r') as f:
+        questions_data = json.load(f)
+        # 観光地の問題文のINSERT
+        for item in questions_data['tourist']:
+            try:
+                new_questions = [
+                    Questions(
+                        spot_type = 'tourist',
+                        spot_id = item['spot_id'],
+                        question_text = item['question_text']
+                    )
+                ]
+                
+                db.add_all(new_questions)
+                
+                # トランザクションを確定
+                db.commit() 
+                
+                print('観光地の問題文のinsert/check完了')
+            except Exception as e:
+                print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
+                db.rollback() # エラー時はロールバック
+                
+        # グルメの問題文のINSERT
+        for item in questions_data['gourmet']:
+            try:
+                new_questions = [
+                    Questions(
+                        spot_type = 'gourmet',
+                        spot_id = item['spot_id'],
+                        question_text = item['question_text']
+                    )
+                ]
+                
+                db.add_all(new_questions)
+                
+                # トランザクションを確定
+                db.commit() 
+                
+                print('グルメの問題文のinsert/check完了')
+            except Exception as e:
+                print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
+                db.rollback() # エラー時はロールバック
 
 
 # ダミーユーザーをINSERTする関数
