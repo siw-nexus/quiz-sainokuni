@@ -1,5 +1,5 @@
 // 興味一覧の型の定義
-export type interest {
+export type interest = {
   id: number
   spot_type: string
   spot_id: number
