@@ -17,8 +17,8 @@ type Props = {
 }
 
 export default function ProfileScreen({ user, interests }: Props) {
-  const [isProfile, setIsProfile]: boolean = useState(false);
-  const [isInterest, setIsInterest]: boolean = useState(true);
+  const [isProfile, setIsProfile]: boolean = useState(true);
+  const [isInterest, setIsInterest]: boolean = useState(false);
 
   // プロフィールボタンを押したら実行する関数
   const handleProfile = () => {
