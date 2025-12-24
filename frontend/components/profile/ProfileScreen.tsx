@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react';
+
 // コンポーネントをインポート
 import ProfileHeader from "./ProfileHeader"
 
@@ -12,9 +14,14 @@ type Props = {
 }
 
 export default function ProfileScreen({ user }: Props) {
-  return(
-    <main>
-      <ProfileHeader user={user} />
-    </main>
-  );
+  const [isProfile, serIsProfile]: boolean = useState(true);
+
+  // isProfileがtrueならProfileHeaderを表示
+  if (isProfile) {
+    return(
+      <main>
+        <ProfileHeader user={user} />
+      </main>
+    );
+  }
 }
