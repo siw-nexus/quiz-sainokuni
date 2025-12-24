@@ -3,8 +3,10 @@ import QuizScreen from "@/components/quiz/QuizScreen";
 
 // 型の定義をインポート
 import { Question } from "@/types/question";
+import { interest } from "@/types/interest";
 
 // APIリクエストの関数をインポート
+import { getAccessToken, isTokenValid } from "@/lib/auth";
 import { getInterest } from "@/lib/api/interest";
 
 type Props = {
@@ -44,9 +46,21 @@ export default async function Quiz({ searchParams }: Props) {
   // 問題文を取得する関数を呼び出す
   const questions = await getQuestion(spot_type, limit);
 
-  // 興味がある一覧を取得する関数を呼び出し
-  const interests = await getInterest();
-  
+  // アクセストークンを取得する関数を呼び出す
+  const token: string = await getAccessToken();
+
+  // アクセストークンが有効かどうかを確認する関数を呼び出す
+  const isLoggedIn: boolean = await isTokenValid(token);
+
+  // 興味がある一覧を格納する配列を準備
+  let interests: interest[] = [];
+
+  // トークンが場合のみ興味がある一覧を取得
+  if (token && isLoggedIn) {
+    // 興味がある一覧を取得する関数を呼び出し
+    interests = await getInterest(token);
+  }
+
   return (
     <main>
       <QuizScreen spot_type={spot_type} limit={limit} questions={questions} interests={interests}/>
