@@ -63,7 +63,7 @@ export default async function Quiz({ searchParams }: Props) {
 
   return (
     <main>
-      <QuizScreen spot_type={spot_type} limit={limit} questions={questions} interests={interests}/>
+      <QuizScreen spot_type={spot_type} limit={limit} questions={questions} interests={interests} isLoggedIn={isLoggedIn}/>
     </main>
   );
 }
