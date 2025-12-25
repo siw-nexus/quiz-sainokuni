@@ -23,10 +23,11 @@ type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
   questions: Question[];
-  interests: interest[]
+  interests: interest[];
+  isLoggedIn: boolean;
 }
 
-export default function QuizScreen({ spot_type, limit, questions, interests }: Props) {
+export default function QuizScreen({ spot_type, limit, questions, interests, isLoggedIn }: Props) {
   const [questionCount, setQuestionCount] = useState(1);     // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);    // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
@@ -200,7 +201,8 @@ export default function QuizScreen({ spot_type, limit, questions, interests }: P
                     </button>
                   )}
 
-                  <InterestButton interests={interests} spotType={spot_type} spotId={currentQuestion.spot_id}/>
+                  {/* ログインしてる時だけ興味があるボタンを表示 */}
+                  {isLoggedIn && <InterestButton interests={interests} spotType={spot_type} spotId={currentQuestion.spot_id}/>}
                 </div>
               </div>
             )}

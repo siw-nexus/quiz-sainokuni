@@ -25,6 +25,6 @@ export default async function HistoryPage() {
   }
 
   return (
-    <QuizHistory interests={interests}/>
+    <QuizHistory interests={interests} isLoggedIn={isLoggedIn} />
   );
 }
