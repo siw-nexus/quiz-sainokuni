@@ -12,10 +12,11 @@ import InterestButton from '../ui/InterestBtn';
 
 // Propsを定義
 type Props = {
-  interests: interest
+  interests: interest;
+  isLoggedIn: boolean;
 }
 
-export default function QuizHistory({ interests }: Props) {
+export default function QuizHistory({ interests, isLoggedIn }: Props) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   // 画面が表示されたらセッションストレージから回答履歴を取得
@@ -117,7 +118,7 @@ export default function QuizHistory({ interests }: Props) {
                                       正解は...{q.correctAnswer}
                                   </p>
                               )}
-                              <InterestButton interests={interests} spotType={q.spot_type} spotId={q.spot_id}/>
+                              {isLoggedIn && <InterestButton interests={interests} spotType={q.spot_type} spotId={q.spot_id}/> }
                           </div>
                       )}
                     </div>
