@@ -98,7 +98,7 @@ export default async function SpotDetail({ searchParams }: Props) {
 
   return (
     <main>  
-      <Detail proSpotDetail={spotDetail} interests={interests} spotType={spotType} spotId={spotId}>
+      <Detail proSpotDetail={spotDetail} interests={interests} spotType={spotType} spotId={spotId} isLoggedIn={isLoggedIn} >
         <NearbySpotsList nearbySpots={nearbySpots}/>
       </Detail>
     </main>
