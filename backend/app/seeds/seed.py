@@ -222,7 +222,7 @@ def coordinates_data_insert(db):
 # グルメの足りないdetailをINSERTする関数
 def gourmet_detail_insert(db):
     # detail.jsonを読み込む
-    with open('app/seeds/new_plus.json', 'r') as f:
+    with open('app/seeds/detail.json', 'r') as f:
         details_data = json.load(f)
         
         # # 足りないdetailをINSERT
