@@ -21,6 +21,7 @@ type Props = {
   spotId: number
   // 周辺情報などの子要素を受け取れるようにする
   children?: ReactNode;
+  isLoggedIn: boolean;
 }
 
 // SSRを無効化してMapコンポーネントをインポート
@@ -29,8 +30,9 @@ const Map = dynamic(() => import('@/components/Spot_detail/Map'), {
   loading: () => <p>地図を読み込み中...</p> 
 });
 
-export default function Detail({ proSpotDetail, interests, spotType, spotId, children }: Props) {
+export default function Detail({ proSpotDetail, interests, spotType, spotId, children, isLoggedIn }: Props) {
   const router = useRouter();
+  console.log(isLoggedIn)
 
   // 「ここに行く」ボタン用のURL (Googleマップのサイトへ遷移)
   const googleMapsLink = `https://www.google.com/maps?q=${proSpotDetail.lat},${proSpotDetail.lon}`;
@@ -88,7 +90,7 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
             </section>
 
             <section>
-              <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>
+              {isLoggedIn && <InterestBtn interests={interests} spotId={spotId} spotType={spotType}/>}
             </section>
 
             {/* 周辺情報の境界線(border-t)を削除し、余白を調整 */}
