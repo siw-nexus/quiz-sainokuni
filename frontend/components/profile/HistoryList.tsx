@@ -46,10 +46,14 @@ export default function HistoryList({ histories }: Props) {
           </p>
 
           {/* 回答内容 */}
-          <div className="text-sm bg-gray-50 p-3 rounded-lg mb-2">
-            <p className="text-gray-600">
-              あなたの回答: <span className="font-bold">{item.user_answer}</span>
-            </p>
+          <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-2">
+            <div>
+              <span className="text-gray-500 text-xs block mb-1">あなたの回答 :</span>
+              <p className="font-medium text-gray-900 min-h-[1.25rem]">
+                {/* user_answer がなければ choice_id を表示してみる */}
+                {history.user_answer || `${history.choice_id}`} 
+              </p>
+            </div>
             {/* 不正解の時だけ正解を表示 */}
             {!item.is_correct && (
               <p className="text-red-600 text-xs mt-1">

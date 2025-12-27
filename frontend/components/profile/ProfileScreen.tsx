@@ -29,14 +29,8 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
   // 状態管理: 現在のタブモード
   const [activeTab, setActiveTab] = useState<TabType>('profile');
 
-  console.log("【デバッグ】APIから届いた生の履歴データ:", histories);
-
-  // ▼▼▼ 追加: 回答が空のデータを除外するフィルタリング処理 ▼▼▼
-  const filteredHistories = histories.filter(history => {
-    // ※注意: 'userAnswer' は実際の回答データが入っているプロパティ名に合わせてください
-    // 回答が存在し、かつ空文字でない場合のみ表示リストに残します
-    return history.user_answer && history.user_answer !== '';
-  });
+ // ▼▼▼ 修正後：フィルタリングせず、全てのデータをそのまま通す ▼▼▼
+  const filteredHistories = histories;
 
   return (
     // 全体の背景色と余白を設定
