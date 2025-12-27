@@ -26,20 +26,7 @@ export default function ProfileHeader({ user }: Props) {
         {user.email}
       </p>
 
-      {/* ▼ 詳細情報のエリア（装飾用） */}
-      <div className="mt-8 w-full border-t border-gray-100 pt-6">
-        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">アカウント詳細</h3>
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-left">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <dt className="text-xs text-gray-500 mb-1">会員ステータス</dt>
-            <dd className="text-sm font-medium text-green-600">有効</dd>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <dt className="text-xs text-gray-500 mb-1">登録日</dt>
-            <dd className="text-sm font-medium text-gray-900">2024/01/01</dd>
-          </div>
-        </dl>
-      </div>
+    
     </div>
   );
 }
