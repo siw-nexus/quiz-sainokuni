@@ -6,6 +6,9 @@ import Link from 'next/link';
 // 型の定義をインポート
 import { interest } from "@/types/interest"
 
+// コンポーネントをインポート
+import InterestButton from '../ui/InterestBtn';
+
 // Propsの定義
 type Props = {
   interests: interest[];
@@ -50,6 +53,11 @@ export default function InterestList({ interests }: Props) {
       >
         詳細を見る
       </Link>
+      
+      <div className='mt-4'>
+        {/* 興味があるボタン */}
+        <InterestButton interests={interests} spotType={item.spot_type} spotId={item.spot_id}/>
+      </div>
     </div>
   );
 
