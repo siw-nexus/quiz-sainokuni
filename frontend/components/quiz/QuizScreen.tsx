@@ -19,7 +19,7 @@ import { HistoryItem } from '@/types/history';
 import { interest } from '@/types/interest';
 
 // APIリクエストの関数をインポート
-import { saveQuestionResult } from '@/actions/question';
+import { saveQuestionResult, saveQuizHistory } from '@/actions/question';
 
 // Propsの定義
 type Props = {
@@ -69,7 +69,7 @@ export default function QuizScreen({ spot_type, limit, questions, interests, tok
   const currentQuestion = questions[questionCount - 1];
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
-  const handleAnswerResult = (result: boolean, selectedText: string) => {
+  const handleAnswerResult = (result: boolean, selectedText: string, selectedId: number) => {
     // 回答中のフラグをfalseにする
     setIsResponding(false);
     if (result) {
@@ -87,6 +87,7 @@ export default function QuizScreen({ spot_type, limit, questions, interests, tok
     // 回答履歴の配列に結果を追加
     const newHistoryItem: HistoryItem = {
       questionText: currentQuestion.question_text,
+      userAnswerId: selectedId,
       userAnswer: selectedText,
       correctAnswer: correctText,
       isCorrect: result,
@@ -116,6 +117,12 @@ export default function QuizScreen({ spot_type, limit, questions, interests, tok
     if (isLoggedIn) {
       // 回答結果を保存する関数を呼び出し
       const savedResult = await saveQuestionResult(token, spot_type, correctCount, limit);
+      
+      // 回答結果の保存に成功したら実行
+      if (savedResult.length != 0) {
+        // 回答履歴を保存する関数を呼び出し
+        await saveQuizHistory(token, savedResult.id, history);
+      }
     }
   };
 
