@@ -1,13 +1,17 @@
+export const dynamic = 'force-dynamic';
+
 import { redirect } from "next/navigation";
 
 // APIリクエストの関数をインポート
 import { getAccessToken, isTokenValid } from "@/lib/auth";
 import { getUser } from "@/lib/api/user";
 import { getInterest } from "@/lib/api/interest";
+import { getHistory } from "@/lib/api/question"; // ▼ 追加: 履歴取得API
 
 // 型の定義をインポート
 import { User } from "@/types/user";
 import { interest } from "@/types/interest";
+import { AnswerHistory } from "@/types/question"; // ▼ 追加
 
 // コンポーネントをインポート
 import ProfileScreen from "@/components/profile/ProfileScreen";
@@ -32,11 +36,17 @@ export default async function Profile() {
   const user: User = await getUser(token);
 
   // 興味がある一覧を取得する関数を呼び出す
-  // ▼ お気に入り登録した観光地やグルメのリストを取得
-  const interests: interest[] = await getInterest(token)
+  const interests: interest[] = await getInterest(token);
+
+  // ▼▼▼ 追加: 回答履歴を取得する関数を呼び出す ▼▼▼
+  const histories: AnswerHistory[] = await getHistory(token);
 
   return(
-    // ▼ 取得したデータをクライアントコンポーネントに渡して表示
-    <ProfileScreen user={user} interests={interests} />
+    // 取得した各データをコンポーネントに渡す
+    <ProfileScreen 
+      user={user} 
+      interests={interests} 
+      histories={histories} // ▼ 追加
+    />
   );
 }

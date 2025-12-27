@@ -13,3 +13,13 @@ export type Question = {
   question_text: string;
   options: Option[];
 }
+
+// 回答履歴の型を定義 
+export type AnswerHistory = {
+  question_text: string;       
+  user_answer: string;         
+  correct_answer: string;      
+  is_correct: boolean;         
+  spot_id: number;            
+  spot_type: 'tourist' | 'gourmet'; 
+}
