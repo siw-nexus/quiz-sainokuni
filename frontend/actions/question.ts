@@ -5,7 +5,6 @@ const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
 
 export async function saveQuestionResult(token: string, spotType: 'tourist' | 'gourmet', correctCount: number, limit: number) {
   // 回答結果を保存
-  console.log(`spot_type：${spotType}、score：${correctCount}、total_questions：${limit}`);
   try {
     const res = await fetch(`${apiUrl}/questions`, {
       method: 'POST',
@@ -16,7 +15,7 @@ export async function saveQuestionResult(token: string, spotType: 'tourist' | 'g
       body: JSON.stringify({'spot_type': spotType, 'score': Number(correctCount), 'total_questions': Number(limit)})
     });
     
-    // レスポンスの確認（エラーならfalseを返す）
+    // レスポンスの確認
     if (!res.ok) throw new Error("回答結果の保存に失敗しました");
 
     // 結果を返す
@@ -24,6 +23,6 @@ export async function saveQuestionResult(token: string, spotType: 'tourist' | 'g
 
   } catch (e) {
     console.error(e);
-    return { success: false }; // エラーならfalseを返す
+    return []; // エラーなら空配列を返す
   }
 }
