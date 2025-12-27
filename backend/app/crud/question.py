@@ -221,7 +221,7 @@ def save_quiz_histories(db, quiz_result_id: int, quiz_num: int, quiz_id: int, ch
 def get_question_histories(db, user_id: int):
     quiz_histories_data = (
         select(
-            QuizAnswers.id,
+            QuizAnswers.id.label("answer_id"),
             QuizAnswers.quiz_result_id,
             QuizAnswers.question_num,
             QuizAnswers.question_id,
@@ -236,7 +236,36 @@ def get_question_histories(db, user_id: int):
         .join(QuizResults, QuizResults.id == QuizAnswers.quiz_result_id)
         .join(Questions, Questions.id == QuizAnswers.question_id)
         .where(QuizResults.user_id == user_id)
+        .order_by(QuizResults.play_at.desc(), QuizAnswers.question_num.asc()) # 日時順・設問順に並べる
     )
-    quiz_histories_result = db.execute(quiz_histories_data).mappings().all() #mappings()は結果を辞書（キーと値のペア）のように扱える形式に変換する。.all()は全件取得をし辞書方を中に含んだリスト型で返してくれる。
+    
+    rows = db.execute(quiz_histories_data).mappings().all()
 
-    return quiz_histories_result
+    # データをグループ化する
+    grouped = {}
+    for row in rows:
+        result_id = row["quiz_result_id"]
+        
+        if result_id not in grouped:
+            grouped[result_id] = {
+                "id": result_id, # GetHistoryListResponseのid
+                "spot_type": row["spot_type"],
+                "score": row["score"],
+                "total_questions": row["total_questions"],
+                "play_at": row["play_at"],
+                # 親階層のquestion_textには、代表として最初の設問文を入れておきます
+                "question_text": row["question_text"], 
+                "answers": []
+            }
+        
+        # 子要素 (QuizHistory) の追加
+        grouped[result_id]["answers"].append({
+            "id": row["answer_id"],
+            "question_num": row["question_num"],
+            "question_id": row["question_id"],
+            "question_text": row["question_text"],
+            "choice_id": row["choice_id"],
+            "is_correct": row["is_correct"]
+        })
+
+    return list(grouped.values())
