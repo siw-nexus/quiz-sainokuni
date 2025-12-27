@@ -18,16 +18,20 @@ import { Question } from "@/types/question";
 import { HistoryItem } from '@/types/history';
 import { interest } from '@/types/interest';
 
+// APIリクエストの関数をインポート
+import { saveQuestionResult } from '@/actions/question';
+
 // Propsの定義
 type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
   questions: Question[];
   interests: interest[];
+  token: string;
   isLoggedIn: boolean;
 }
 
-export default function QuizScreen({ spot_type, limit, questions, interests, isLoggedIn }: Props) {
+export default function QuizScreen({ spot_type, limit, questions, interests, token, isLoggedIn }: Props) {
   const [questionCount, setQuestionCount] = useState(1);     // 現在何問目かをカウントする変数
   const [isResponding, setIsResponding] = useState(true);    // 回答中かどうかのフラグ
   const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
@@ -101,6 +105,19 @@ export default function QuizScreen({ spot_type, limit, questions, interests, isL
   };
 
   const isLastQuestion = questionCount === questions.length;
+
+  const handleQuizFinish = async () => {
+    // sessionStorageにクイズの結果を保存
+    sessionStorage.setItem('quiz_history', JSON.stringify(history));
+
+    // 正解数を取得
+    const correctCount: number = history.filter(item => item.isCorrect).length;
+
+    if (isLoggedIn) {
+      // 回答結果を保存する関数を呼び出し
+      const savedResult = await saveQuestionResult(token, spot_type, correctCount, limit);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
@@ -185,9 +202,7 @@ export default function QuizScreen({ spot_type, limit, questions, interests, isL
                   {isLastQuestion ? (
                     <Link 
                       href="/finish"
-                      onClick={() => {
-                         sessionStorage.setItem('quiz_history', JSON.stringify(history));
-                      }}
+                      onClick={handleQuizFinish}
                       className="w-full block text-center bg-[#333333] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition"
                     >
                       結果を見る
