@@ -11,7 +11,7 @@ import { getHistory } from "@/lib/api/question"; // ▼ 追加: 履歴取得API
 // 型の定義をインポート
 import { User } from "@/types/user";
 import { interest } from "@/types/interest";
-import { AnswerHistory } from "@/types/question"; // ▼ 追加
+import { QuizHistory } from "@/types/history";
 
 // コンポーネントをインポート
 import ProfileScreen from "@/components/profile/ProfileScreen";
@@ -39,7 +39,7 @@ export default async function Profile() {
   const interests: interest[] = await getInterest(token);
 
   // ▼▼▼ 追加: 回答履歴を取得する関数を呼び出す ▼▼▼
-  const histories: AnswerHistory[] = await getHistory(token);
+  const histories: QuizHistory[] = await getHistory(token);
 
   return(
     // 取得した各データをコンポーネントに渡す
