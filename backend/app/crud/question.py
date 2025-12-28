@@ -240,31 +240,77 @@ def get_question_histories(db, user_id: int):
     )
     
     rows = db.execute(quiz_histories_data).mappings().all()
+    
+    # 選んだ選択肢のテキストを取得
+    tourist_choice_ids = {r["choice_id"] for r in rows if r["spot_type"] == "tourist"}
+    gourmet_choice_ids = {r["choice_id"] for r in rows if r["spot_type"] == "gourmet"}
+    
+    choice_map = {}
+    
+    # 観光地の選択肢を取得
+    if tourist_choice_ids:
+        t_choices = db.execute(select(Tourist_spots.id, Tourist_spots.name).where(Tourist_spots.id.in_(tourist_choice_ids))).all()
+        for c_id, text in t_choices:
+            choice_map[("tourist", c_id)] = text
+    
+    # グルメの選択肢を取得
+    if gourmet_choice_ids:
+        g_choices = db.execute(select(Gourmet_spots.id, Gourmet_spots.name).where(Gourmet_spots.id.in_(gourmet_choice_ids))).all()
+        for c_id, text in g_choices:
+            choice_map[("gourmet", c_id)] = text
+    
+    
+    # 正解の選択肢のテキストを取得
+    tourist_correct_ids = {r['question_id'] for r in rows if r['spot_type'] == 'tourist'}
+    gourmet_correct_ids = {r['question_id'] for r in rows if r['spot_type'] == 'gourmet'}
+    
+    correct_map = {}
+    
+    # 観光地の正解の選択肢を取得
+    if tourist_correct_ids:
+        t_corrects = db.execute(select(Tourist_spots.id, Tourist_spots.name).where(Tourist_spots.id.in_(tourist_correct_ids))).all()
+        for c_id, text in t_corrects:
+            correct_map[("tourist", c_id)] = text
+    
+    # グルメの正解の選択肢を取得
+    if gourmet_correct_ids:
+        t_corrects = db.execute(select(Gourmet_spots.id, Gourmet_spots.name).where(Gourmet_spots.id.in_(gourmet_correct_ids))).all()
+        for c_id, text in t_corrects:
+            correct_map[("gourmet", c_id)] = text
 
     # データをグループ化する
     grouped = {}
     for row in rows:
         result_id = row["quiz_result_id"]
+        spot_type = row["spot_type"]
+        choice_id = row["choice_id"]
         
         if result_id not in grouped:
             grouped[result_id] = {
-                "id": result_id, # GetHistoryListResponseのid
+                "id": result_id,
                 "spot_type": row["spot_type"],
                 "score": row["score"],
                 "total_questions": row["total_questions"],
                 "play_at": row["play_at"],
-                # 親階層のquestion_textには、代表として最初の設問文を入れておきます
                 "question_text": row["question_text"], 
                 "answers": []
             }
         
-        # 子要素 (QuizHistory) の追加
+        # マップから選択肢のテキストを取得
+        user_answer_text = choice_map.get((spot_type, choice_id), "不明な選択肢")
+        
+        # マップから正解の選択肢を取得
+        correct_answer_text = correct_map.get((row['spot_type'], row['question_id']), '不明な答え')
+        
+        # 子要素の追加
         grouped[result_id]["answers"].append({
             "id": row["answer_id"],
             "question_num": row["question_num"],
             "question_id": row["question_id"],
             "question_text": row["question_text"],
+            "correct_answer_text": correct_answer_text,
             "choice_id": row["choice_id"],
+            "user_answer_text": user_answer_text,
             "is_correct": row["is_correct"]
         })
 
