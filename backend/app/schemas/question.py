@@ -51,17 +51,22 @@ class SendSaveHistory(BaseModel):
     choice_id: int = Field(ge = 1)
     is_correct: bool
 
-class GetHistoryListResponse(BaseModel):
+# 回答履歴の型の定義
+class QuizHistory(BaseModel):
     id: int
-    quiz_result_id: int
     question_num: int
     question_id: int
+    question_text: str
     choice_id: int
     is_correct: bool
+
+class GetHistoryListResponse(BaseModel):
+    id: int
     spot_type: str
     score: int
     total_questions: int
     play_at: datetime
     question_text: str
+    answers: List[QuizHistory]
 
-    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
+    model_config = ConfigDict(from_attributes=True)

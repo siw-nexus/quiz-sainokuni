@@ -62,12 +62,13 @@ def send_save_question(
 # 回答履歴保存
 @router.post("/histories", response_model=SendSaveHistoryResponse, status_code=201)
 def send_save_history(
-    history_data: SendSaveHistory,
+    history_data: List[SendSaveHistory],
     db: Session = Depends(db_connect)
 ):
 
     try:
-        result = save_quiz_histories(db, history_data.quiz_result_id, history_data.question_num, history_data.question_id, history_data.choice_id, history_data.is_correct)
+        for i in history_data:
+            result = save_quiz_histories(db, i.quiz_result_id, i.question_num, i.question_id, i.choice_id, i.is_correct)
         return result
     
     except IntegrityError:
