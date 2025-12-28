@@ -28,10 +28,7 @@ type TabType = 'profile' | 'interest' | 'history';
 export default function ProfileScreen({ user, interests, histories }: Props) {
   // 状態管理: 現在のタブモード
   const [activeTab, setActiveTab] = useState<TabType>('profile');
-
- // ▼▼▼ 修正後：フィルタリングせず、全てのデータをそのまま通す ▼▼▼
-  const filteredHistories = histories;
-
+  
   return (
     // 全体の背景色と余白を設定
     <main className="min-h-screen bg-gray-50 py-8 px-4">
@@ -112,7 +109,7 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
               {/* ▼ 高さを制限してスクロールさせるためのdivで囲む ▼ */}
               <div className="max-h-[60vh] overflow-y-auto pr-2">
                 {/* ▼ フィルタリング済みのデータを渡すように変更 ▼ */}
-                <HistoryList histories={filteredHistories}/>
+                <HistoryList histories={histories}/>
               </div>
             </div>
           )}
