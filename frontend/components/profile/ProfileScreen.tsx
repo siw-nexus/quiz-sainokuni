@@ -13,13 +13,13 @@ import HistoryList from './HistoryList';
 // 型の定義をインポート
 import { User } from "@/types/user";
 import { interest } from '@/types/interest';
-import { AnswerHistory } from "@/types/question"; // ▼ 追加
+import { QuizHistory } from '@/types/history';
 
 // Propsの定義
 type Props = {
   user: User;
   interests: interest[];
-  histories: AnswerHistory[]; // ▼ 追加: 履歴データを受け取る
+  histories: QuizHistory[]; // ▼ 追加: 履歴データを受け取る
 }
 
 // タブの種類を定義（'history'を追加）
@@ -28,7 +28,7 @@ type TabType = 'profile' | 'interest' | 'history';
 export default function ProfileScreen({ user, interests, histories }: Props) {
   // 状態管理: 現在のタブモード
   const [activeTab, setActiveTab] = useState<TabType>('profile');
-  
+
   return (
     // 全体の背景色と余白を設定
     <main className="min-h-screen bg-gray-50 py-8 px-4">
@@ -109,7 +109,7 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
               {/* ▼ 高さを制限してスクロールさせるためのdivで囲む ▼ */}
               <div className="max-h-[60vh] overflow-y-auto pr-2">
                 {/* ▼ フィルタリング済みのデータを渡すように変更 ▼ */}
-                <HistoryList histories={histories}/>
+                <HistoryList histories={histories} interests={interests}/>
               </div>
             </div>
           )}
