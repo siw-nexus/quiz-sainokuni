@@ -57,7 +57,9 @@ class QuizHistory(BaseModel):
     question_num: int
     question_id: int
     question_text: str
+    correct_answer_text: str
     choice_id: int
+    user_answer_text: str
     is_correct: bool
 
 class GetHistoryListResponse(BaseModel):
