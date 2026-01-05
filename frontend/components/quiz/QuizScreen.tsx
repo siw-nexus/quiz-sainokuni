@@ -1,34 +1,75 @@
 'use client';
 
+// ▼▼▼ 変更点: useEffectを追加 ▼▼▼
 import { useState, useEffect } from 'react';
+// ▲▲▲ 変更点終了 ▲▲▲
+import Link from 'next/link';
+// ▼▼▼ 変更点: useRouterを使用 ▼▼▼
 import { useRouter } from 'next/navigation';
+// ▲▲▲ 変更点終了 ▲▲▲
 
 // コンポーネントのインポート
 import QuestionText from "./QuestionText";
 import OptionBtn from "./OptionBtn";
+import InterestButton from '../ui/InterestBtn';
 
 // 型の定義をインポート
 import { Question } from "@/types/question";
-import { QuizHistory } from '@/types/history';
+import { HistoryItem } from '@/types/history';
+import { interest } from '@/types/interest';
+
+// APIリクエストの関数をインポート
+import { saveQuestionResult, saveQuizHistory } from '@/actions/question';
 
 // Propsの定義
 type Props = {
   spot_type: 'tourist' | 'gourmet';
   limit: number;
   questions: Question[];
+  interests: interest[];
+  token: string;
+  isLoggedIn: boolean;
 }
 
-export default function QuizScreen({ spot_type, limit, questions }: Props) {
-  const [questionCount, setQuestionCount] = useState(1);      // 現在何問目かをカウントする変数
-  const [isResponding, setIsResponding] = useState(true);     // 回答中かどうかのフラグ
-  const [isCorrectText, setIsCorrectText] = useState('');     // 「正解」か「不正解」の文字列を格納
-  const [answer, isAnswer] = useState('');                    // 正解の選択肢を格納
-  const [history, setHistory] = useState<QuizHistory[]>([]);  // 回答履歴を保存する配列
-  const router = useRouter();
+export default function QuizScreen({ spot_type, limit, questions, interests, token, isLoggedIn }: Props) {
+  const [questionCount, setQuestionCount] = useState(1);     // 現在何問目かをカウントする変数
+  const [isResponding, setIsResponding] = useState(true);    // 回答中かどうかのフラグ
+  const [isCorrectText, setIsCorrectText] = useState('');    // 「正解」か「不正解」の文字列を格納
+  const [answer, isAnswer] = useState('');                   // 正解の選択肢を格納
+  const [history, setHistory] = useState<HistoryItem[]>([]); // 回答履歴を保存する配列
+  
+  // ▼▼▼ 変更点: routerインスタンスを作成 ▼▼▼
+  const router = useRouter(); 
+  // ▲▲▲ 変更点終了 ▲▲▲
 
+  // ▼▼▼ 変更点: 画面読み込み時に、一時保存された状態があれば復元する ▼▼▼
+  useEffect(() => {
+    // sessionStorageからデータを取得
+    const savedState = sessionStorage.getItem('quiz_state_backup');
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        
+        // 状態を復元する
+        setQuestionCount(parsed.questionCount);
+        setIsResponding(parsed.isResponding); // false (結果画面) になっているはず
+        setIsCorrectText(parsed.isCorrectText);
+        isAnswer(parsed.answer);
+        setHistory(parsed.history);
+
+        // 復元したら用済みなので削除する (リロード時などは最初からにするため)
+        sessionStorage.removeItem('quiz_state_backup');
+      } catch (e) {
+        console.error("Failed to restore quiz state", e);
+      }
+    }
+  }, []);
+  // ▲▲▲ 変更点終了 ▲▲▲
+
+  const currentQuestion = questions[questionCount - 1];
 
   // OptionBtnコンポーネントから正誤判定の結果を受け取る
-  const handleAnswerResult = (result: boolean, selectedText: string) => {
+  const handleAnswerResult = (result: boolean, selectedText: string, selectedId: number) => {
     // 回答中のフラグをfalseにする
     setIsResponding(false);
     if (result) {
@@ -37,10 +78,6 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
       setIsCorrectText("不正解...");
     }
 
-    // 現在の問題を取得
-    const currentQuestion = questions[questionCount - 1];
-
-    // 現在の問題の選択肢の中から、正解フラグがtrueのものを探す
     const correctOption = currentQuestion.options.find(opt => opt.is_correct === true);
     const correctText = correctOption?.option_text;
 
@@ -48,11 +85,14 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
     isAnswer(correctText || '');
 
     // 回答履歴の配列に結果を追加
-    const newHistoryItem: QuizHistory = {
+    const newHistoryItem: HistoryItem = {
       questionText: currentQuestion.question_text,
+      userAnswerId: selectedId,
       userAnswer: selectedText,
       correctAnswer: correctText,
-      isCorrect: result
+      isCorrect: result,
+      spot_id: currentQuestion.spot_id, // 追加
+      spot_type: spot_type              // 追加
     };
 
     // 前回の結果 + 今回の結果
@@ -61,36 +101,43 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
 
   // 次の問題へ行く関数
   const handleNextQuiz = () => {
-    // 次か何問目か
-    const nextCount = questionCount + 1;
+    setQuestionCount((prev) => prev + 1);
+    setIsResponding(true);
+  };
 
-    // 次の問題へ
-    setQuestionCount(nextCount);
-    
-    // 出題数が取得した問題数を超えたらfinish画面に移動
-    if (questions.length < nextCount) {
-      // クイズ終了時に、今回の問題データをブラウザに保存する
-      sessionStorage.setItem('quiz_history', JSON.stringify(history));
+  const isLastQuestion = questionCount === questions.length;
 
-      router.push('/finish');
-    } else {
-      // 出題数が取得した問題数を超えていなかったら回答中のフラグをtrueにする
-      setIsResponding(true);
+  const handleQuizFinish = async () => {
+    // sessionStorageにクイズの結果を保存
+    sessionStorage.setItem('quiz_history', JSON.stringify(history));
+
+    // 正解数を取得
+    const correctCount: number = history.filter(item => item.isCorrect).length;
+
+    if (isLoggedIn) {
+      // 回答結果を保存する関数を呼び出し
+      const savedResult = await saveQuestionResult(token, spot_type, correctCount, limit);
+      
+      // 回答結果の保存に成功したら実行
+      if (savedResult.length != 0) {
+        // 回答履歴を保存する関数を呼び出し
+        await saveQuizHistory(token, savedResult.id, history);
+      }
     }
   };
 
-  // --- レンダリング ---
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4 font-sans">
       
-      {/* メインコンテナ */}
       <div className="w-full max-w-md md:max-w-6xl bg-white min-h-[600px] md:min-h-[700px] rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
-        {/* --- [PC用] 左サイドパネル --- */}
+        {/* 左サイドパネル */}
         <div className="hidden md:flex md:w-1/3 bg-[#333333] text-white p-10 flex-col justify-between relative">
           <div>
             <p className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-2">CATEGORY</p>
-            <h1 className="text-3xl font-bold mb-8 capitalize">{spot_type === 'tourist' ? '観光地' : 'グルメ'}</h1>
+            <h1 className="text-3xl font-bold mb-8 capitalize">
+              {spot_type === 'tourist' ? '観光地' : 'グルメ'}
+            </h1>
           </div>
           
           <div className="relative z-10">
@@ -104,20 +151,16 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
         </div>
 
-        {/* --- [共通] 右サイドパネル --- */}
+        {/* 右サイドパネル */}
         <div className="w-full md:w-2/3 flex flex-col relative">
           
-          {/* スマホ用ヘッダー */}
           <div className="md:hidden h-14 flex items-center justify-center font-bold text-gray-400 text-sm border-b border-gray-100">
             Q. {questionCount} / {limit}
           </div>
 
-          {/* コンテンツエリア */}
           <div className="flex-1 flex flex-col px-6 py-8 md:px-12 md:py-12 justify-center">
             
-            {/* 回答中フラグがtrueだったら問題と選択肢を表示 */}
             {isResponding ? (
-              /* --- 出題中 --- */
               <>
                 <div className="flex-1 flex items-center justify-center mb-10">
                   <div className="text-xl md:text-2xl font-bold text-center leading-relaxed text-gray-800">
@@ -125,11 +168,10 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
                   </div>
                 </div>
                 <div className="w-full max-w-2xl mx-auto">
-                  <OptionBtn options={questions[questionCount - 1].options} onResult={handleAnswerResult}/>
+                  <OptionBtn options={currentQuestion.options} onResult={handleAnswerResult}/>
                 </div>
               </>
             ) : (
-              /* 回答中フラグがfalseだったら結果を表示 */
               <div className="flex-1 flex flex-col items-center justify-center animate-pulse-once max-w-lg mx-auto w-full">
                 <div className="text-center mb-12">
                   <h2 className={`text-5xl md:text-6xl font-black mb-6 ${isCorrectText.includes("正解") ? "text-red-500" : "text-blue-600"}`}>
@@ -142,15 +184,47 @@ export default function QuizScreen({ spot_type, limit, questions }: Props) {
                 </div>
 
                 <div className="w-full space-y-4">
-                  <button className="w-full bg-white border-2 border-[#333333] text-[#333333] font-bold py-4 rounded-xl hover:bg-gray-50 transition">
-                    興味がある
-                  </button>
+                  {/* ▼▼▼ 変更点: Linkからbuttonに変更し、状態保存処理を追加 ▼▼▼ */}
                   <button 
-                    onClick={() => handleNextQuiz()}
-                    className="w-full bg-[#333333] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition"
+                    onClick={() => {
+                      // 1. 現在の画面の状態をバックアップとして保存
+                      const stateToSave = {
+                        questionCount,
+                        isResponding, // ここでは false (結果画面)
+                        isCorrectText,
+                        answer,
+                        history
+                      };
+                      sessionStorage.setItem('quiz_state_backup', JSON.stringify(stateToSave));
+
+                      // 2. 詳細ページへ遷移
+                      router.push(`/spot_detail?spot_type=${spot_type}&spot_id=${currentQuestion.spot_id}`);
+                    }}
+                    className="w-full block text-center bg-white border-2 border-[#333333] text-[#333333] font-bold py-4 rounded-xl hover:bg-gray-50 transition"
                   >
-                    次の問題へ
+                    詳細を見る
                   </button>
+                  {/* ▲▲▲ 変更点終了 ▲▲▲ */}
+                  
+                  {isLastQuestion ? (
+                    <Link 
+                      href="/finish"
+                      onClick={handleQuizFinish}
+                      className="w-full block text-center bg-[#333333] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition"
+                    >
+                      結果を見る
+                    </Link>
+                  ) : (
+                    <button 
+                      onClick={handleNextQuiz}
+                      className="w-full bg-[#333333] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition"
+                    >
+                      次の問題へ
+                    </button>
+                  )}
+
+                  {/* ログインしてる時だけ興味があるボタンを表示 */}
+                  {isLoggedIn && <InterestButton interests={interests} spotType={spot_type} spotId={currentQuestion.spot_id}/>}
                 </div>
               </div>
             )}

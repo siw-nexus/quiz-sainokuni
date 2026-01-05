@@ -17,3 +17,11 @@ export type Spot = {
   hp_url: string | null;
   img: string | null;
 }
+
+// 周辺のスポットの型の定義
+export type NearbySpot = {
+  id: number
+  spot_type: string
+  name: string
+  distance: number
+}

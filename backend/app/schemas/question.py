@@ -31,7 +31,6 @@ class SendSaveQuestionResponse(BaseModel):
 
 # リザルトを保存するときのbodyの型の定義(簡単に言うとmain.pyのseve_qustionの型の設定をここでしている)
 class SendSaveQuestion(BaseModel):
-    user_id: int
     spot_type: Literal['tourist', 'gourmet']
     score: int = Field(ge = 0)
     total_questions: Literal[5, 10, 15]
@@ -52,17 +51,24 @@ class SendSaveHistory(BaseModel):
     choice_id: int = Field(ge = 1)
     is_correct: bool
 
-class GetHistoryListResponse(BaseModel):
+# 回答履歴の型の定義
+class QuizHistory(BaseModel):
     id: int
-    quiz_result_id: int
     question_num: int
     question_id: int
+    question_text: str
+    correct_answer_text: str
     choice_id: int
+    user_answer_text: str
     is_correct: bool
+
+class GetHistoryListResponse(BaseModel):
+    id: int
     spot_type: str
     score: int
     total_questions: int
     play_at: datetime
     question_text: str
+    answers: List[QuizHistory]
 
-    model_config = ConfigDict(from_attributes=True) # 自動で上記で設定した通り型変換をしてくれる
+    model_config = ConfigDict(from_attributes=True)

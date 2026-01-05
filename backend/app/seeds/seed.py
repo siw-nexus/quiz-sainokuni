@@ -1,6 +1,7 @@
 import requests
 from passlib.context import CryptContext
 import json
+import re
 
 # データベース接続設定をインポート
 from app.database import SessionLocal
@@ -68,7 +69,6 @@ def tourist_data_insert(endpoint, db):
         "query": sparql_tourist,
         "format": "json"
     }
-    
     try:
         # 観光地データの取得
         print('観光地のオープンデータ取得中...')
@@ -79,12 +79,16 @@ def tourist_data_insert(endpoint, db):
         
         # 観光地データのINSERT
         for item in tourist_data:
+            # 緯度経度の形式が「度分秒」かを確認して「度分秒」なら10進数の小数にする
+            decimal_lat = parse_coordinate(item["kankochi_ido"]["value"])
+            decimal_lon = parse_coordinate(item["kankochi_keido"]["value"])
+            
             new_spot = Tourist_spots(
                 name = item["kankochi_meisho"]["value"],
                 detail = item["kankochi_shokaibun"]["value"],
                 address = item["kankochi_jusho"]["value"],
-                lat = item["kankochi_ido"]["value"],
-                lon = item["kankochi_keido"]["value"],
+                lat = decimal_lat,
+                lon = decimal_lon,
                 available_time = item["kankochi_riyokanojikanjoho"]["value"],
                 closure_info = item["kankochi_kyugyojoho"]["value"],
                 start_time = item["kaishijikan"]["value"],
@@ -161,12 +165,16 @@ def gourmet_data_insert(endpoint, db):
         
         for item in gourmet_data:
             if item['tempo_meisho']['value']:
+                # 緯度経度の形式が「度分秒」かを確認して「度分秒」なら10進数の小数にする
+                decimal_lat = parse_coordinate(item["tempo_ido"]["value"])
+                decimal_lon = parse_coordinate(item["tempo_keido"]["value"])
+                
                 new_gourmet = Gourmet_spots(
                     name = item["tempo_meisho"]["value"],
                     detail = item["gaiyo"]["value"],
                     address = item["tempo_jusho"]["value"],
-                    lat = item["tempo_ido"]["value"],
-                    lon = item["tempo_keido"]["value"],
+                    lat = decimal_lat,
+                    lon = decimal_lon,
                     category = item["kubun"]["value"],
                     tokusanhin = item["tokusanhin"]["value"],
                     start_time = item["kaishijikan"]["value"],
@@ -195,65 +203,88 @@ def coordinates_data_insert(db):
         # 観光地の緯度経度を入れる
         for item in coordinates_data['tourist']:
             spot = db.query(Tourist_spots).filter(Tourist_spots.id == item['id']).first()
-            if not spot.lat or not spot.lon:
-                spot.lat = item['lat']
-                spot.lon = item['lon']
-                db.commit()
+            
+            spot.lat = item['lat']
+            spot.lon = item['lon']
+            db.commit()
         print(f'観光地の緯度経度のデータのinsert/check完了')
         
         # グルメの緯度経度を入れる
         for item in coordinates_data['gourmet']:
             spot = db.query(Gourmet_spots).filter(Gourmet_spots.id == item['id']).first()
-            if not spot.lat or not spot.lon:
-                spot.lat = item['lat']
-                spot.lon = item['lon']
-                db.commit()
+            
+            spot.lat = item['lat']
+            spot.lon = item['lon']
+            db.commit()
         print(f'グルメの緯度経度のデータのinsert/check完了')
+
+
+# グルメの足りないdetailをINSERTする関数
+def gourmet_detail_insert(db):
+    # detail.jsonを読み込む
+    with open('app/seeds/detail.json', 'r') as f:
+        details_data = json.load(f)
+        
+        # # 足りないdetailをINSERT
+        for item in details_data['detail_add']:
+            detail = db.query(Gourmet_spots).filter(Gourmet_spots.id == item['spot_id']).first()
+            
+            detail.detail = item['detail']
+            db.commit()
+        print('グルメの足りないdetailのINSERT完了')
 
 
 # 問題文のデータをINSERTする関数
 def question_data_insert(db):
-    # 観光地の問題文のINSERT
-    try:
-        new_questions = [
-            Questions(
-                spot_type = 'tourist',
-                spot_id = i,
-                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
-            )
-            for i in range(1, 101)
-        ]
-        
-        db.add_all(new_questions)
-        
-        # トランザクションを確定
-        db.commit() 
-        
-        print('観光地の問題文のinsert/check完了')
-    except Exception as e:
-        print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
-        db.rollback() # エラー時はロールバック
+    tourist = True
+    gourmet = True
     
-    # グルメの問題文のINSERT
-    try:
-        new_questions = [
-            Questions(
-                spot_type = 'gourmet',
-                spot_id = i,
-                question_text = 'この問題文はダミー。この問題文はダミー。この問題文はダミー。'
-            )
-            for i in range(1, 100)
-        ]
-        
-        db.add_all(new_questions)
-        
-        # トランザクションを確定
-        db.commit()
-        
+    # questions.jsonを読み込む
+    with open('app/seeds/questions.json', 'r') as f:
+        questions_data = json.load(f)
+        # 観光地の問題文のINSERT
+        for item in questions_data['tourist']:
+            try:
+                new_questions = [
+                    Questions(
+                        spot_type = 'tourist',
+                        spot_id = item['spot_id'],
+                        question_text = item['question_text']
+                    )
+                ]
+                
+                db.add_all(new_questions)
+                
+                # トランザクションを確定
+                db.commit() 
+            except Exception as e:
+                tourist = False
+                print(f"観光地の問題文のデータをINSERT中にエラーが発生しました: {e}")
+                db.rollback() # エラー時はロールバック
+                
+        # グルメの問題文のINSERT
+        for item in questions_data['gourmet']:
+            try:
+                new_questions = [
+                    Questions(
+                        spot_type = 'gourmet',
+                        spot_id = item['spot_id'],
+                        question_text = item['question_text']
+                    )
+                ]
+                
+                db.add_all(new_questions)
+                
+                # トランザクションを確定
+                db.commit() 
+            except Exception as e:
+                gourmet = False
+                print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
+                db.rollback() # エラー時はロールバック
+    if tourist:
+        print('観光地の問題文のinsert/check完了')
+    if gourmet:
         print('グルメの問題文のinsert/check完了')
-    except Exception as e:
-        print(f"グルメの問題文のデータをINSERT中にエラーが発生しました: {e}")
-        db.rollback() # エラー時はロールバック
 
 
 # ダミーユーザーをINSERTする関数
@@ -451,6 +482,35 @@ def dummy_quiz_result_insert(db):
     db.commit()
 
 
+# 緯度経度が60進数だったら10進数に直す関数
+def parse_coordinate(coord):
+    # 数値かどうかチェック
+    if isinstance(coord, (float, int)):
+        # すでに数値ならそのまま返す
+        return float(coord)
+    
+    # 文字列の不要な空白を取り除く
+    coord_str = str(coord).strip()
+    
+    # すでに10進数の小数の文字列ならfloatにして返す ("35.123"など)
+    if re.match(r'^-?\d+(\.\d+)?$', coord_str):
+        return float(coord_str)
+
+    # 60進数 (度分秒) のパターンを探す
+    # 数字を全て抽出する (例: [35, 40, 30.5])
+    parts = re.findall(r"[\d\.]+", coord_str)
+    
+    # 60進数を10進数にする
+    if len(parts) >= 3:
+        d = float(parts[0])
+        m = float(parts[1])
+        s = float(parts[2])
+        return d + (m / 60) + (s / 3600)
+    
+    # パース失敗時はNoneまたは0を返すなどのエラーハンドリング
+    return 0.0
+
+
 def seed_data():
     db = SessionLocal()
     print('データベース接続成功')
@@ -472,6 +532,9 @@ def seed_data():
     
     # 緯度経度のデータを入れる関数を呼び出す
     coordinates_data_insert(db)
+    
+    # グルメの足りないdetailをINSERTする関数
+    gourmet_detail_insert(db)
     
     # questionsテーブルにデータがあるかチェック
     if db.query(Questions).first():
