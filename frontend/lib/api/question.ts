@@ -2,7 +2,7 @@
 import { AnswerHistory } from "@/types/question";
 
 // APIのエンドポイント
-const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
+const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // 回答履歴を取得する関数
 export async function getHistory(token: string): Promise<AnswerHistory[]> {

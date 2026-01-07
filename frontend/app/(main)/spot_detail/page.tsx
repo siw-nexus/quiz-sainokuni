@@ -16,7 +16,7 @@ type Props = {
 }
 
 // APIのエンドポイント
-const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
+const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // スポットの詳細を取得する関数
 const getSpot = async (spotType: string, spotId: number): Promise<Spot | null> => {
