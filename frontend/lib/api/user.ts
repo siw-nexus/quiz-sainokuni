@@ -2,7 +2,7 @@
 import { User } from "@/types/user";
 
 // APIのエンドポイント
-const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
+const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // ユーザー情報を取得する関数
 export async function getUser(token: string) {

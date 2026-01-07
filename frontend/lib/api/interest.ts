@@ -1,5 +1,5 @@
 // APIのエンドポイント
-const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
+const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // 興味がある一覧を取得する関数
 export async function getInterest(token: string) {

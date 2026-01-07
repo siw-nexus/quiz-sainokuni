@@ -14,7 +14,7 @@ type Props = {
 }
 
 // APIのエンドポイント
-const apiUrl = process.env.INTERNAL_API_URL || 'http://backend:8000';
+const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // 問題文を取得する関数
 const getQuestion = async (spot_type: string, limit: number ): Promise<Question[]> => {
