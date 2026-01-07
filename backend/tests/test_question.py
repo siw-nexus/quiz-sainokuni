@@ -179,13 +179,16 @@ def test_save_history_success(client, test_quiz_history, test_questions, test_sp
     # 選択肢のIDを取得
     target_choice_id = test_spots["tourist"][0].id
     
-    payload = {
+    history_data = {
         "quiz_result_id": test_quiz_history.id,
         "question_num": 1,
         "question_id": target_question.id,
         "choice_id": target_choice_id,
         "is_correct": True
     }
+    
+    # リスト形式に変換
+    payload = [history_data]
     
     response = client.post("/histories", json=payload)
     
