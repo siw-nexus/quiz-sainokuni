@@ -179,13 +179,16 @@ def test_save_history_success(client, test_quiz_history, test_questions, test_sp
     # 選択肢のIDを取得
     target_choice_id = test_spots["tourist"][0].id
     
-    payload = {
+    history_data = {
         "quiz_result_id": test_quiz_history.id,
         "question_num": 1,
         "question_id": target_question.id,
         "choice_id": target_choice_id,
         "is_correct": True
     }
+    
+    # リスト形式に変換
+    payload = [history_data]
     
     response = client.post("/histories", json=payload)
     
@@ -270,16 +273,21 @@ def test_get_histories_success(client, test_quiz_history, test_user):
     # 最初のデータの構造チェック（値の完全一致ではなく、キーの存在や型をチェック推奨）
     item = data[0]
     assert "id" in item
-    assert "quiz_result_id" in item
-    assert "question_num" in item
-    assert "question_id" in item
-    assert "choice_id" in item
-    assert "is_correct" in item
     assert "spot_type" in item
     assert "score" in item
     assert "total_questions" in item
     assert "play_at" in item
-    assert "question_text" in item
+    assert "answers" in item
+    
+    for answer in item["answers"]:
+        assert "id" in answer
+        assert "question_num" in answer
+        assert "question_id" in answer
+        assert "question_text" in answer
+        assert "correct_answer_text" in answer
+        assert "choice_id" in answer
+        assert "user_answer_text" in answer
+        assert "is_correct" in answer
 
 
 def test_get_histories_not_found(client):

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, question, interest, spot, user
 
 
-app = FastAPI()
+app = FastAPI(root_path='/api')
 
 # CORSの設定
 origins = [
