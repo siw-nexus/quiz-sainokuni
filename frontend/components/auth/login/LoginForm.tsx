@@ -98,23 +98,7 @@ export default function LoginForm() {
 
           <div className="space-y-3 text-center text-sm">
             
-            {/* 新規登録画面へのリンク */}
-            <div>
-              <span className="text-gray-600">アカウントをお持ちでない方は </span>
-              <Link href="/signup" className="font-medium text-black hover:underline">
-                新規登録
-              </Link>
-            </div>
-
-            {/* パスワードリセット画面へのリンク */}
-            <div>
-              <Link 
-                href="/password-reset" 
-                className="text-black hover:text-gray-700 hover:underline"
-              >
-                パスワードをお忘れですか？
-              </Link>
-            </div>
+            
 
           </div>
 
