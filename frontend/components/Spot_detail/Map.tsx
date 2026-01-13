@@ -1,63 +1,51 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect } from 'react';
 
-
-// Propsの型定義
-type MapProps = {
+// Propsの型定義（Detail.tsxから渡されるもの）
+type Props = {
   lat: number;
   lon: number;
-  zoom?: number;
-	spot_name: string;
-};
+  zoom: number;
+  spot_name: string;
+}
 
-// 緯度経度が変わったときに地図の中心を移動
-const MapUpdater = ({ lat, lon, zoom }: MapProps) => {
-  const map = useMap();
+export default function Map({ lat, lon, zoom, spot_name }: Props) {
+
+  // ▼ Leafletのデフォルトアイコンが表示されないバグへの対策 ▼
   useEffect(() => {
-    map.setView([lat, lon], zoom);
-  }, [lat, lon, zoom, map]);
-  return null;
-};
+    // 既存のアイコン設定を一度削除
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
 
-const Map = ({ lat, lon, zoom = 20, spot_name }: MapProps) => {
-	// アイコン設定
-	const customIcon = L.icon({
-		iconUrl: '/marker-icon.png',
-		iconRetinaUrl: '/marker-icon-2x.png',
-		shadowUrl: '/marker-shadow.png',
-		iconSize: [25, 41],
-		iconAnchor: [12, 41],
-		popupAnchor: [1, -34],
-		shadowSize: [41, 41],
-	});
+    // 正しいアイコン画像のパスを再設定
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    });
+  }, []);
 
   return (
-    <MapContainer
-      center={[lat, lon]}
-      zoom={zoom}
+    // MapContainerに key={lat + lon} を付けることで、座標が変わった時に
+    // 強制的に地図を作り直させ、「再利用エラー」を防ぎます。
+    <MapContainer 
+      key={`${lat}-${lon}`} 
+      center={[lat, lon]} 
+      zoom={zoom} 
       style={{ height: '100%', width: '100%' }}
     >
-      {/* 地理院地図（標準地図）のタイルレイヤー */}
       <TileLayer
-				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-				url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-			/>
-      
-      {/* 中心地にマーカーを表示 */}
-      <Marker position={[lat, lon]}  icon={customIcon}>
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={[lat, lon]}>
         <Popup>
-					{spot_name}
+          {spot_name}
         </Popup>
       </Marker>
-
-      {/* 動的に視点を移動させるためのコンポーネント */}
-      <MapUpdater lat={lat} lon={lon} zoom={zoom} />
     </MapContainer>
   );
-};
-
-export default Map;
+}

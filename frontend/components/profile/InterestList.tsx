@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react';
+// ▼▼▼ 変更: useStateの代わりにURL操作用のフックをインポート ▼▼▼
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 // 型の定義をインポート
@@ -18,20 +19,24 @@ type Props = {
 type FilterType = 'tourist' | 'gourmet';
 
 export default function InterestList({ interests }: Props) {
-  // ▼ 状態管理を修正: 文字列で管理することで「両方false」や「両方true」を防ぎます
-  const [filterType, setFilterType] = useState<FilterType>('tourist');
+  // ▼▼▼ 変更: URLから状態を管理するためのフック ▼▼▼
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // ▼▼▼ 変更: URLの 'type' パラメータを取得して現在のフィルターを決定 ▼▼▼
+  // URLに 'type=gourmet' があれば 'gourmet'、それ以外（または指定なし）は 'tourist'
+  const typeParam = searchParams.get('type');
+  const filterType: FilterType = (typeParam === 'gourmet') ? 'gourmet' : 'tourist';
   
   // データをフィルタリング（表示判定用）
-  // ▼ 選択されているフィルタータイプと一致するデータだけを抽出します
   const displayItems = interests.filter((s) => s.spot_type === filterType);
 
-  // サブコンポーネントを作成
-  // ▼ リストアイテム（カード）のデザインコンポーネント
+  // サブコンポーネント（変更なし）
   const SpotCard = ({ item }: { item: interest }) => (
     <div className="group bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow duration-200 flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-2">
-          {/* ▼ カテゴリラベル（色分け） */}
           <span className={`text-[10px] font-bold px-2 py-1 rounded text-white ${
             item.spot_type === 'tourist' ? 'bg-blue-400' : 'bg-orange-400'
           }`}>
@@ -46,7 +51,6 @@ export default function InterestList({ interests }: Props) {
         </p>
       </div>
       
-      {/* ▼ 詳細ページへのリンクボタン */}
       <Link
         href={`/spot_detail?spot_type=${item.spot_type}&spot_id=${item.spot_id}`}
         className="mt-auto block text-center w-full py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800 transition-colors"
@@ -55,22 +59,20 @@ export default function InterestList({ interests }: Props) {
       </Link>
       
       <div className='mt-4'>
-        {/* 興味があるボタン */}
         <InterestButton interests={interests} spotType={item.spot_type} spotId={item.spot_id}/>
       </div>
     </div>
   );
 
-  // 観光地ボタンを押したら実行する関数
-  // ▼ フィルターを 'tourist' にセット
-  const handleTourist = () => {
-    setFilterType('tourist');
-  }
-
-  // グルメボタンを押したら実行する関数
-  // ▼ フィルターを 'gourmet' にセット
-  const handleGourmet = () => {
-    setFilterType('gourmet');
+  // ▼▼▼ 変更: ボタンを押した時にURLを書き換える関数 ▼▼▼
+  const handleFilterChange = (type: FilterType) => {
+    // 現在のURLパラメータをコピー
+    const params = new URLSearchParams(searchParams.toString());
+    // typeパラメータを更新 (例: &type=gourmet)
+    params.set('type', type);
+    
+    // URLを更新 (ページトップへのスクロールを防ぐ)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   return (
@@ -83,7 +85,8 @@ export default function InterestList({ interests }: Props) {
               ? 'bg-black text-white shadow-md' // 選択中
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' // 未選択
           }`}
-          onClick={handleTourist}
+          // ▼▼▼ 変更: 新しい関数を使用 ▼▼▼
+          onClick={() => handleFilterChange('tourist')}
         >
           観光地
         </button>
@@ -93,20 +96,19 @@ export default function InterestList({ interests }: Props) {
               ? 'bg-black text-white shadow-md'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
           }`}
-          onClick={handleGourmet}
+          // ▼▼▼ 変更: 新しい関数を使用 ▼▼▼
+          onClick={() => handleFilterChange('gourmet')}
         >
           グルメ
         </button>
       </div>
 
-      {/* ▼ リスト表示エリア */}
+      {/* ▼ リスト表示エリア (変更なし) */}
       {displayItems.length > 0 ? (
-        // ▼ データがある場合はグリッド表示（map関数で繰り返し表示）
         <div className="grid gap-4 sm:grid-cols-2">
           {displayItems.map((spot) => <SpotCard key={spot.id} item={spot} />)}
         </div>
       ) : (
-        // ▼ データがない場合のメッセージ表示
         <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
           <p className="text-gray-400 text-sm">
             {filterType === 'tourist' ? '観光地' : 'グルメ'}のお気に入りは登録されていません
