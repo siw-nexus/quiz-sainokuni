@@ -72,6 +72,24 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
               </h1>
             </div>
 
+            {/* ▼▼▼ 変更点: 営業時間と電話番号を追加 (spot.tsの定義を使用) ▼▼▼ */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <section className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Open</h3>
+                <p className="text-gray-800 font-medium text-sm">
+                   {proSpotDetail.availavle_time || "営業時間情報なし"}
+                </p>
+              </section>
+
+              <section className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tel</h3>
+                <p className="text-gray-800 font-medium text-sm">
+                   {proSpotDetail.tel || "電話番号情報なし"}
+                </p>
+              </section>
+            </div>
+            {/* ▲▲▲ 変更点終了 ▲▲▲ */}
+
             <section>
               {/* 境界線(border-b)を削除 */}
               <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
