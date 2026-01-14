@@ -78,7 +78,7 @@ export default async function SpotDetail({ searchParams }: Props) {
   }
   
   // 周辺のスポットを取得する関数を呼び出す
-  const nearbySpots = await getNearbySpot(spotDetail.lat, spotDetail.lon);
+  const nearbySpots = await getNearbySpot(Number(spotDetail.lat), Number(spotDetail.lon));
 
 
   // アクセストークンを取得する関数を呼び出す
