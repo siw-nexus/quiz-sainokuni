@@ -169,7 +169,7 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
           {/* --- 【右側】地図＆アクション (固定表示) --- */}
           <div className="bg-gray-50 lg:border-l border-gray-100 flex flex-col h-[400px] lg:h-full">
             <div className="flex-1 w-full bg-gray-200 relative">
-                <Map lat={proSpotDetail.lat} lon={proSpotDetail.lon} zoom={16} spot_name={proSpotDetail.name}/>
+                <Map lat={Number(proSpotDetail.lat)} lon={Number(proSpotDetail.lon)} zoom={16} spot_name={proSpotDetail.name}/>
             </div>
             
             {/* Googleマップボタン */}
