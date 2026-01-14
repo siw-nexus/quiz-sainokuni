@@ -40,6 +40,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      target: development
       dockerfile: Dockerfile
     container_name: frontend
     expose:
