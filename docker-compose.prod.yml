@@ -45,7 +45,6 @@ services:
     container_name: frontend
     expose:
       - "3000"
-    volumes: []
     depends_on:
       - backend
     restart: unless-stopped
