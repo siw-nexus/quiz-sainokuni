@@ -1,11 +1,11 @@
 // 型定義をインポート（パスは実際の場所に合わせてください。例: @/types/question）
-import { AnswerHistory } from "@/types/question";
+import { QuizHistory } from "@/types/history";
 
 // APIのエンドポイント
 const apiUrl = process.env.INTERNAL_API_URL || 'http://nginx/api';
 
 // 回答履歴を取得する関数
-export async function getHistory(token: string): Promise<AnswerHistory[]> {
+export async function getHistory(token: string): Promise<QuizHistory[]> {
   try {
     // ▼ エンドポイントはバックエンドの仕様に合わせて変更してください (例: /histories)
     const res = await fetch(`${apiUrl}/histories`, {
@@ -26,7 +26,7 @@ export async function getHistory(token: string): Promise<AnswerHistory[]> {
     const data = await res.json();
     
     // 型アサーション（必要に応じて）
-    return data as AnswerHistory[];
+    return data as QuizHistory[];
 
   } catch (e) {
     console.error(e);
