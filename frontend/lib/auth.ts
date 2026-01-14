@@ -11,8 +11,8 @@ export async function getAccessToken() {
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
-  // アクセストークンが無かったら空配列を返す
-  if (!token) return [];
+  // アクセストークンが無かったら空文字を返す
+  if (!token) return '';
 
   return token;
 }
