@@ -4,7 +4,7 @@ import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 
 type Props = {
-	isLoggedIn: boolian;
+	isLoggedIn: boolean;
 }
 
 export default function AuthStatusBtn({ isLoggedIn }: Props) {

@@ -5,7 +5,7 @@ import { Option } from '@/types/question';
 
 type Props = {
   options: Option[];
-  onResult: (isCorrect: boolean, selectedText: string) => void;
+  onResult: (isCorrect: boolean, selectedText: string, selectedId: number) => void;
 }
 
 export default function OptionBtn({ options, onResult }: Props) {
