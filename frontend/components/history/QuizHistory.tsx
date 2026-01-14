@@ -12,7 +12,7 @@ import InterestButton from '../ui/InterestBtn';
 
 // Propsを定義
 type Props = {
-  interests: interest;
+  interests: interest[];
   isLoggedIn: boolean;
 }
 
