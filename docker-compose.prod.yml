@@ -1,0 +1,66 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: database
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      LANG: C.UTF-8
+      TZ: Asia/Tokyo 
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./mysql_conf:/etc/mysql/conf.d
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "${MYSQL_PORT_NUMBER}:3306"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - ./backend/.env
+    expose:
+      - "8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DB_HOST: db
+      DB_PORT: 3306
+      TZ: Asia/Tokyo
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: runner
+      dockerfile: Dockerfile
+    container_name: frontend
+    expose:
+      - "3000"
+    volumes: []
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db-data:
