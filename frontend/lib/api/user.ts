@@ -17,7 +17,7 @@ export async function getUser(token: string) {
     });
 
     // レスポンスの確認
-    if (!res.ok) return { message: 'ユーザー情報の取得に失敗しました' };
+    if (!res.ok) return null;
 
     // レスポンスの中身を取得して返す
     const data: User = await res.json();
@@ -25,6 +25,6 @@ export async function getUser(token: string) {
 
   } catch (e) {
     console.error(e);
-    return []; // エラーなら空配列を返す
+    return null; // エラーならnullを返す
   }
 }

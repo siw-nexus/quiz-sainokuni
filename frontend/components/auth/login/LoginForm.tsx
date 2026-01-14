@@ -21,7 +21,7 @@ export default function LoginForm() {
   // ▼ state（ログイン結果）が変わるたびに実行される処理
   useEffect(() => {
     // バックエンドから { success: true } が返ってきたらホームへ移動
-    if (state?.success) {
+    if (state && 'success' in state && state.success) {
       router.push('/home'); 
       router.refresh(); // 画面のデータを最新の状態に更新
     }

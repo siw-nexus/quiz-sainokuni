@@ -36,7 +36,7 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
   // 営業時間をいい感じに表示する関数
   // touristは available_time、gourmetは start_time/finish_time を持っている場合があるため両対応
   const displayBusinessHours = () => {
-    if (proSpotDetail.start_time == '-' || proSpotDetail.finish_time == '-') return '営業時間情報なし';
+    if (!proSpotDetail.start_time || !proSpotDetail.finish_time || proSpotDetail.start_time == '-' || proSpotDetail.finish_time == '-') return '営業時間情報なし';
     const formatTime = (time: string) => {
       const parts = time.split(':');
       return `${parts[0]}:${parts[1]}`;
@@ -169,7 +169,7 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
           {/* --- 【右側】地図＆アクション (固定表示) --- */}
           <div className="bg-gray-50 lg:border-l border-gray-100 flex flex-col h-[400px] lg:h-full">
             <div className="flex-1 w-full bg-gray-200 relative">
-                <Map lat={proSpotDetail.lat} lon={proSpotDetail.lon} zoom={16} spot_name={proSpotDetail.name}/>
+                <Map lat={Number(proSpotDetail.lat)} lon={Number(proSpotDetail.lon)} zoom={16} spot_name={proSpotDetail.name}/>
             </div>
             
             {/* Googleマップボタン */}

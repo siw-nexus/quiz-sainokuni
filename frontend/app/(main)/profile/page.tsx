@@ -33,7 +33,11 @@ export default async function Profile() {
 
   // ユーザー情報を取得する関数を呼び出す
   // ▼ 画面表示に必要なユーザー名やメアドを取得
-  const user: User = await getUser(token);
+  const userData = await getUser(token);
+
+  if (!userData) redirect('/login');
+
+  const user: User = userData;
 
   // 興味がある一覧を取得する関数を呼び出す
   const interests: interest[] = await getInterest(token);
