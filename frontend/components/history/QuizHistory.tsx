@@ -118,7 +118,7 @@ export default function QuizHistory({ interests, isLoggedIn }: Props) {
                                       正解は...{q.correctAnswer}
                                   </p>
                               )}
-                              {isLoggedIn && <InterestButton interests={interests} spotType={q.spot_type} spotId={q.spot_id}/> }
+                              {isLoggedIn && <InterestButton interests={interests} spotType={q.spot_type || ''} spotId={q.spot_id ?? 0}/> }
                           </div>
                       )}
                     </div>
