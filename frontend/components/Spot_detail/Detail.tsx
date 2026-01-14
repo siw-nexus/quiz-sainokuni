@@ -103,7 +103,13 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
 
               {/* 電話番号（もしカラムにあれば表示、なければ情報なし） */}
               <InfoCard title="Tel" icon={<PhoneIcon />}>
-                {proSpotDetail.tel || "電話番号情報なし"}
+                {proSpotDetail.tel ? (
+                  <a href={`tel:${proSpotDetail.tel}`} className="text-blue-600 hover:underline">
+                    {proSpotDetail.tel}
+                  </a>
+                ) : (
+                  "電話番号情報なし"
+                )}
               </InfoCard>
 
               {/* 特産品（グルメ用） - データがある時だけ表示 */}
