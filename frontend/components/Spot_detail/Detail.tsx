@@ -36,12 +36,12 @@ export default function Detail({ proSpotDetail, interests, spotType, spotId, chi
   // 営業時間をいい感じに表示する関数
   // touristは available_time、gourmetは start_time/finish_time を持っている場合があるため両対応
   const displayBusinessHours = () => {
-    if (proSpotDetail.available_time) return proSpotDetail.available_time;
-    if (proSpotDetail.start_time && proSpotDetail.finish_time) {
-      // 秒まではなくていい場合は .slice(0, 5) などで削れますが、一旦そのまま表示します
-      return `${proSpotDetail.start_time} ～ ${proSpotDetail.finish_time}`;
-    }
-    return "営業時間情報なし";
+    if (proSpotDetail.start_time == '-' || proSpotDetail.finish_time == '-') return '営業時間情報なし';
+    const formatTime = (time: string) => {
+      const parts = time.split(':');
+      return `${parts[0]}:${parts[1]}`;
+    };
+    return `${formatTime(proSpotDetail.start_time)} ～ ${formatTime(proSpotDetail.finish_time)}`;
   };
 
   return (
