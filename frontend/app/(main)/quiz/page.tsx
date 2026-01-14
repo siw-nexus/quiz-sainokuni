@@ -40,8 +40,8 @@ const getQuestion = async (spot_type: string, limit: number ): Promise<Question[
 export default async function Quiz({ searchParams }: Props) {
   // URLのパラメーターを取得
   const params = await searchParams;
-  const spot_type = params.spot_type; // spot_typeの値を取得
-  const limit = params.limit;         // limitの値を取得
+  const spot_type = params.spot_type?.toString() as 'tourist' | 'gourmet' || 'tourist'; // spot_typeの値を取得
+  const limit = Number(params.limit) || 5;         // limitの値を取得
 
   // 問題文を取得する関数を呼び出す
   const questions = await getQuestion(spot_type, limit);

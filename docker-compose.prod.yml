@@ -40,15 +40,11 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: development
+      target: runner
       dockerfile: Dockerfile
     container_name: frontend
     expose:
       - "3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
     depends_on:
       - backend
     restart: unless-stopped

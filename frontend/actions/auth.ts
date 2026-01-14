@@ -14,8 +14,8 @@ export async function login(prevState: any, formData: FormData) {
 
   try {
     const params = new URLSearchParams();
-    params.append('username', email);
-    params.append('password', password);
+    params.append('username', email?.toString() || '');
+    params.append('password', password?.toString() || '');
 
     // ログインAPI
     const res = await fetch(`${apiUrl}/token`, {

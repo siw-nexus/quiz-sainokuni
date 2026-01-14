@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react';
+// ▼▼▼ 変更: useStateではなくURL管理用のフックをインポートします ▼▼▼
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 // リンク作成用のコンポーネントをインポート
 import Link from 'next/link';
 
@@ -26,8 +27,22 @@ type Props = {
 type TabType = 'profile' | 'interest' | 'history';
 
 export default function ProfileScreen({ user, interests, histories }: Props) {
-  // 状態管理: 現在のタブモード
-  const [activeTab, setActiveTab] = useState<TabType>('profile');
+  // ▼▼▼ 変更: 状態管理をuseStateからURLクエリパラメータに変更 ▼▼▼
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // URLから現在のタブを取得 (パラメータがない、または不正なら 'profile' をデフォルトにする)
+  const tabParam = searchParams.get('tab');
+  const activeTab: TabType = (tabParam === 'interest' || tabParam === 'history') ? tabParam : 'profile';
+
+  // タブ切り替え時にURLを書き換える関数
+  const handleTabChange = (tab: TabType) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    // ページトップへのスクロールを防ぎつつURLを更新
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   return (
     // 全体の背景色と余白を設定
@@ -57,7 +72,8 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
                 ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' 
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
-            onClick={() => setActiveTab('profile')}
+            // ▼▼▼ 変更: クリック時の処理をhandleTabChangeに変更 ▼▼▼
+            onClick={() => handleTabChange('profile')}
           >
             プロフィール
           </button>
@@ -69,7 +85,8 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
                 ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' 
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
-            onClick={() => setActiveTab('interest')}
+            // ▼▼▼ 変更: クリック時の処理をhandleTabChangeに変更 ▼▼▼
+            onClick={() => handleTabChange('interest')}
           >
             興味一覧
           </button>
@@ -81,7 +98,8 @@ export default function ProfileScreen({ user, interests, histories }: Props) {
                 ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30' 
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
-            onClick={() => setActiveTab('history')}
+            // ▼▼▼ 変更: クリック時の処理をhandleTabChangeに変更 ▼▼▼
+            onClick={() => handleTabChange('history')}
           >
             回答履歴
           </button>
